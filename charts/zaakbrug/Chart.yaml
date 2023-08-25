@@ -1,0 +1,12 @@
+apiVersion: v2
+appVersion: "latest" # TODO: Set version
+description: A Helm chart for running ZaakBrug on Kubernetes
+name: zaakbrug
+icon: https://raw.githubusercontent.com/wearefrank/charts/master/zaakbrug/icon.svg
+type: application
+version: 0.1.0
+
+dependencies:
+  - name: ff-common
+    version: ~0.1.12
+    repository: file://../../ibissource/charts/ff-common

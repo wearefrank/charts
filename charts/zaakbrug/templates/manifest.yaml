@@ -1,0 +1,17 @@
+{{ template "ff-common.configmap.context.tpl" . }}
+---
+{{ template "ff-common.configmap.env.tpl" . }}
+---
+{{ template "ff-common.configmap.tomcat-users.tpl" . }}
+---
+{{ template "ff-common.configmap.ldap-role-mapping.tpl" . }}
+---
+{{ template "ff-common.deployment.tpl" . }}
+---
+{{ template "ff-common.hpa.tpl"}}
+---
+{{ template "ff-common.serviceAccount.tpl" . }}
+---
+{{ template "ff-common.service.tpl" . }}
+---
+{{ template "ff-common.ingress.tpl" . }}

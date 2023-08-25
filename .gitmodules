@@ -1,0 +1,3 @@
+[submodule "ibissource"]
+	path = ibissource
+	url = git@github.com:ibissource/charts.git
