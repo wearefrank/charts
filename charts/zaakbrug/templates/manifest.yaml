@@ -6,8 +6,6 @@
 ---
 {{ template "ff-common.configmap.ldap-role-mapping.tpl" . }}
 ---
-{{ template "ff-common.deployment.tpl" . }}
----
 {{ template "ff-common.hpa.tpl"}}
 ---
 {{ template "ff-common.serviceAccount.tpl" . }}

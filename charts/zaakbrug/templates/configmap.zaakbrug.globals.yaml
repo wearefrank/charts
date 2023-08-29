@@ -1,0 +1,11 @@
+{{- if .Values.zaakbrug.globals -}}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ template "ff-common.fullname" . }}-globals
+  labels:
+    {{- include "ff-common.labels" . | nindent 4 }}
+data:
+  Globals.json: |-
+    {{ .Values.zaakbrug.globals | toJson }}
+{{- end -}}

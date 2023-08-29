@@ -1,0 +1,34 @@
+{{/*
+Create a name for apiProxy
+We truncate at 57 chars in order to provide space for the "-apiProxy" suffix
+*/}}
+{{- define "zaakbrug.apiProxyName" -}}
+{{ include "ff-common.name" . | trunc 57 | trimSuffix "-" }}-apiProxy
+{{- end }}
+
+{{/*
+Create a default fully qualified name for apiProxy.
+We truncate at 57 chars in order to provide space for the "-apiProxy" suffix
+*/}}
+{{- define "zaakbrug.apiProxyFullname" -}}
+{{ include "ff-common.fullname" . | trunc 57 | trimSuffix "-" }}-apiProxy
+{{- end }}
+
+{{/*
+apiProxy labels
+*/}}
+{{- define "zaakbrug.apiProxyLabels" -}}
+helm.sh/chart: {{ include "ff-common.chart" . }}
+{{ include "zaakbrug.apiProxySelectorLabels" . }}
+{{- if .Chart.AppVersion }}
+app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
+{{- end }}
+app.kubernetes.io/managed-by: {{ .Release.Service }}
+{{- end }}
+
+{{/*
+apiProxy selector labels
+*/}}
+{{- define "zaakbrug.apiProxySelectorLabels" -}}
+app.kubernetes.io/name: {{ include "zaakbrug.apiProxyName" . }}
+{{- end }}

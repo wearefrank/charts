@@ -1,6 +1,6 @@
 {{- if .Values.staging.enabled -}}
 {{- if .Values.staging.apiProxy.ingress.enabled -}}
-{{- $fullName := include "zaakbrug.nginxFullname" . -}}
+{{- $fullName := include "zaakbrug.apiProxyFullname" . -}}
 {{- $svcPort := .Values.staging.apiProxy.service.port -}}
 {{- if and .Values.staging.apiProxy.ingress.className (not (semverCompare ">=1.18-0" .Capabilities.KubeVersion.GitVersion)) }}
   {{- if not (hasKey .Values.staging.apiProxy.ingress.annotations "kubernetes.io/ingress.class") }}
@@ -18,7 +18,7 @@ kind: Ingress
 metadata:
   name: {{ $fullName }}
   labels:
-    {{- include "zaakbrug.nginxLabels" . | nindent 4 }}
+    {{- include "zaakbrug.apiProxyLabels" . | nindent 4 }}
   {{- with .Values.staging.apiProxy.ingress.annotations }}
   annotations:
     {{- toYaml . | nindent 4 }}

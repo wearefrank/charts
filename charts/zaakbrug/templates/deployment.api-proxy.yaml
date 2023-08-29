@@ -2,39 +2,39 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "zaakbrug.nginxFullname" . }}
+  name: {{ include "zaakbrug.apiProxyFullname" . }}
   labels:
-    {{- include "zaakbrug.nginxLabels" . | nindent 4 }}
+    {{- include "zaakbrug.apiProxyLabels" . | nindent 4 }}
 spec:
   {{- if not .Values.staging.apiProxy.autoscaling.enabled }}
   replicas: {{ .Values.staging.apiProxy.replicaCount }}
   {{- end }}
   selector:
     matchLabels:
-      {{- include "zaakbrug.nginxSelectorLabels" . | nindent 6 }}
+      {{- include "zaakbrug.apiProxySelectorLabels" . | nindent 6 }}
   template:
     metadata:
       annotations:
-        checksum/configmap-nginx: {{ include (print $.Template.BasePath "/configmap-nginx.yaml") . | sha256sum }}
+        checksum/configmap-apiProxy: {{ include (print $.Template.BasePath "/configmap.api-proxy.yaml") . | sha256sum }}
         {{- with .Values.podAnnotations }}
-          {{- toYaml . | nindent 8 }}
+          {{- toYaml . | nindent 10 }}
         {{- end }}
       labels:
-        {{- include "zaakbrug.nginxSelectorLabels" . | nindent 8 }}
+        {{- include "zaakbrug.apiProxySelectorLabels" . | nindent 8 }}
         {{- with .Values.staging.apiProxy.podLabels }}
-            {{- toYaml . | nindent 8 }}
+            {{- toYaml . | nindent 12 }}
         {{- end }}
     spec:
       {{- with .Values.imagePullSecrets }}
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      serviceAccountName: {{ include "zaakbrug.serviceAccountName" . }}
+      serviceAccountName: {{ include "ff-common.serviceAccountName" . }}
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
       containers:
-        - name: nginx
-          command: [ "/bin/bash", "-c", "nginx -g 'daemon off;'" ]
+        - name: apiProxy
+          command: [ "/bin/bash", "-c", "apiProxy -g 'daemon off;'" ]
           securityContext:
             {{- toYaml .Values.staging.apiProxy.securityContext | nindent 12 }}
           image: "{{ .Values.staging.apiProxy.image.repository }}:{{ .Values.staging.apiProxy.image.tag }}"
@@ -49,16 +49,16 @@ spec:
           resources:
             {{- toYaml .Values.staging.apiProxy.resources | nindent 12 }}
           volumeMounts:
-            - name: nginx-config
-              mountPath: /etc/nginx/conf.d
+            - name: apiProxy-config
+              mountPath: /etc/apiProxy/conf.d
             {{- if .Values.staging.apiProxy.securityContext.readOnlyRootFilesystem }}
             - mountPath: /tmp
               name: tmpfs
             {{- end }}
       volumes:
-        - name: nginx-config
+        - name: apiProxy-config
           configMap:
-            name: {{ if .Values.staging.apiProxy.existingConfigmap }}{{ .Values.staging.apiProxy.existingConfigmap  }}{{- else }}{{ include "zaakbrug.nginxFullname" . }}{{- end }}
+            name: {{ if .Values.staging.apiProxy.existingConfigmap }}{{ .Values.staging.apiProxy.existingConfigmap  }}{{- else }}{{ include "zaakbrug.apiProxyFullname" . }}{{- end }}
         {{- if .Values.staging.apiProxy.securityContext.readOnlyRootFilesystem }}
         - name: tmpfs
           emptyDir: {}

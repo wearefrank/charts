@@ -1,0 +1,97 @@
+{{- template "ff-common.deployment" (list . "ff-test.deployment") -}}
+{{- define "ff-test.deployment" -}}
+spec:
+  template:
+    spec:
+      containers:
+        -
+          {{ include "ff-common.container" (list . "ff-test.deployment.container") | nindent 10}}
+      volumes:
+        {{- if .Values.securityContext.readOnlyRootFilesystem }}
+        - name: tmpfs
+          emptyDir: { }
+        {{- end }}
+        {{- if .Values.frank.credentials.secret }}
+        - name: {{ template "ff-common.fullname" . }}-credentials
+          secret:
+            secretName: {{ .Values.frank.credentials.secret }}
+        {{- end }}
+        {{- if .Values.frank.security.http.localUsers }}
+        - name: {{ template "ff-common.fullname" . }}-tomcat-users
+          configMap:
+            name: {{ template "ff-common.fullname" . }}-tomcat-users
+        {{- end }}
+        {{- if .Values.connections.create }}
+        - name: {{ template "ff-common.fullname" . }}-context
+          configMap:
+            name: {{ template "ff-common.fullname" . }}-context
+        {{- end }}
+        {{- if .Values.frank.security.http.activeDirectory.enabled }}
+        - name: {{ template "ff-common.fullname" . }}-ldap-role-mapping
+          configMap:
+            name: {{ template "ff-common.fullname" . }}-ldap-role-mapping
+        {{- end }}
+        {{- if .Values.zaakbrug.globals }}
+        - name: {{ template "ff-common.fullname" . }}-globals
+          configMap:
+            name: {{ template "ff-common.fullname" . }}-globals
+        {{- end }}
+        {{- if .Values.zaakbrug.profiles }}
+        - name: {{ template "ff-common.fullname" . }}-profiles
+          configMap:
+            name: {{ template "ff-common.fullname" . }}-profiles
+        {{- end -}}
+{{- end -}}
+{{- define "ff-test.deployment.container" -}}
+envFrom:
+  - configMapRef:
+      name: {{ template "ff-common.fullname" . }}-env
+  - configMapRef:
+      name: {{ template "ff-common.fullname" . }}-zaakbrug-env
+volumeMounts:
+  {{- if .Values.securityContext.readOnlyRootFilesystem }}
+  - mountPath: /usr/local/tomcat/logs
+    name: tmpfs
+  - mountPath: /usr/local/tomcat/conf/Catalina
+    name: tmpfs
+  - mountPath: /usr/local/tomcat/work/Catalina/localhost
+    name: tmpfs
+  - mountPath: /usr/local/tomcat/temp
+    name: tmpfs
+  {{- end }}
+  {{- if .Values.frank.security.http.localUsers }}
+  - name: {{ template "ff-common.fullname" . }}-tomcat-users
+    mountPath: /usr/local/tomcat/conf/tomcat-users.xml
+    subPath: tomcat-users.xml
+    readOnly: true
+  {{- end }}
+  {{- if .Values.frank.security.http.activeDirectory.enabled }}
+  - name: {{ template "ff-common.fullname" . }}-ldap-role-mapping
+    mountPath: /usr/local/tomcat/webapps/ROOT/WEB-INF/classes/ldap-role-mapping.properties
+    subPath: ldap-role-mapping.properties
+    readOnly: true
+  {{- end }}
+  {{- if .Values.frank.credentials.secret }}
+  - name: {{ template "ff-common.fullname" . }}-credentials
+    mountPath: /opt/frank/secrets/
+    readOnly: true
+  {{- end }}
+  {{- if .Values.connections.create }}
+  - name: {{ template "ff-common.fullname" . }}-context
+    mountPath: /usr/local/tomcat/conf/Catalina/localhost/iaf-test.xml
+    subPath: context.xml
+    readOnly: true
+  {{- end }}
+  {{- if .Values.zaakbrug.globals }}
+  - name: {{ template "ff-common.fullname" . }}-globals
+    mountPath: /opt/frank/configurations/Translate/Globals.json
+    subPath: Globals.json
+    readOnly: true
+          {{- end }}
+          {{- if .Values.zaakbrug.profiles }}
+  - name: {{ template "ff-common.fullname" . }}-profiles
+    mountPath: /opt/frank/configurations/Translate/Profiles.json
+    subPath: Profiles.json
+    readOnly: true
+  {{- end }}
+{{- end -}}
