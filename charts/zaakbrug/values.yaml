@@ -323,3 +323,255 @@ podSecurityContext: {}
 ##  runAsUser: 1000
 ##
 securityContext: {}
+
+## @section ZaakBrug
+## @descriptionStart
+## Following sections are about the configuration for the ZaakBrug
+## @descriptionEnd
+##
+
+zaakbrug:
+  ## @param zaakbrug.zds.timezone The timezone of the receiving zds service
+  ##
+  zds:
+    timezone: Etc/UTC
+  ## @param zaakbrug.soap.beantwoordVraag.endpoint Set the endpoint the service should be available at
+  ## @param zaakbrug.soap.beantwoordVraag.validationSoftFail Incoming messages are validated, if set to `true` the message still gets processed if it fails
+  ## @param zaakbrug.soap.beantwoordVraag_v2.endpoint Set the endpoint the service should be available at
+  ## @param zaakbrug.soap.beantwoordVraag_v2.validationSoftFail Incoming messages are validated, if set to `true` the message still gets processed if it fails
+  ## @param zaakbrug.soap.ontvangAsynchroon.endpoint Set the endpoint the service should be available at
+  ## @param zaakbrug.soap.ontvangAsynchroon.validationSoftFail Incoming messages are validated, if set to `true` the message still gets processed if it fails
+  ## @param zaakbrug.soap.ontvangAsynchroonMutatie_v2.endpoint Set the endpoint the service should be available at
+  ## @param zaakbrug.soap.ontvangAsynchroonMutatie_v2.validationSoftFail Incoming messages are validated, if set to `true` the message still gets processed if it fails
+  ## @param zaakbrug.soap.ontvangAsynchroonOverdragen_v2.endpoint Set the endpoint the service should be available at
+  ## @param zaakbrug.soap.ontvangAsynchroonOverdragen_v2.validationSoftFail Incoming messages are validated, if set to `true` the message still gets processed if it fails
+  ## @param zaakbrug.soap.vrijeBerichten.endpoint Set the endpoint the service should be available at
+  ## @param zaakbrug.soap.vrijeBerichten.validationSoftFail Incoming messages are validated, if set to `true` the message still gets processed if it fails
+  ## @param zaakbrug.soap.vrijeBerichten_v2.endpoint Set the endpoint the service should be available at
+  ## @param zaakbrug.soap.vrijeBerichten_v2.validationSoftFail Incoming messages are validated, if set to `true` the message still gets processed if it fails
+  ##
+  soap:
+    beantwoordVraag:
+      endpoint: "translate/generic/zds/BeantwoordVraag"
+      validationSoftFail: false
+    beantwoordVraag_v2:
+      endpoint: "translate/generic/zds/v2/BeantwoordVraag"
+      validationSoftFail: false
+    ontvangAsynchroon:
+      endpoint: "translate/generic/zds/OntvangAsynchroon"
+      validationSoftFail: false
+    ontvangAsynchroonMutatie_v2:
+      endpoint: "translate/generic/zds/v2/OntvangAsynchroonMutatie"
+      validationSoftFail: false
+    ontvangAsynchroonOverdragen_v2:
+      endpoint: "translate/generic/zds/v2/OntvangAsynchroonOverdragen"
+      validationSoftFail: false
+    vrijeBerichten:
+      endpoint: "translate/generic/zds/VrijBericht"
+      validationSoftFail: false
+    vrijeBerichten_v2:
+      endpoint: "translate/generic/zds/v2/VrijBericht"
+      validationSoftFail: false
+  zgw:
+    ## @section Identificatie Templates
+    ## @descriptionStart
+    ## Templates used for generating zaak- and documentidentificatie<br/>
+    ## The syntax for variable substitution is as follows {[variable-name][:formatting-string]}
+    ##
+    ## Variables:
+    ## - id          Auto-incrementing identifier with 'D' as formatting option, indicating the amount of digits.
+    ##               example: {id:D5} with id-123 will result in '00123'
+    ## - datetime    The current date and time with '[Y' as formatting option, according to
+    ##               (https://www.oreilly.com/library/view/xslt-2nd-edition/9780596527211/ch04s05.html).
+    ##               Only the '[Y0001]' is currently implemented
+    ##               example: {datetime:[Y001]} with datetime=14-03-2023 produces '2023'
+    ## @descriptionEnd
+    ##
+    ## @param zaakbrug.zgw.zaakIdentificatieTemplate Template for zaakidentificatie
+    ## @param zaakbrug.zgw.documentIdentificatieTemplate Template for documentidentificatie
+    ## @param zaakbrug.zgw.besluitIdentificatieTemplate Template for besluitidentificatie
+    zaakIdentificatieTemplate: ZK{datetime:[Y0001]}-{id:D5}
+    documentIdentificatieTemplate: DC{datetime:[Y0001]}-{id:D5}
+    besluitIdentificatieTemplate: BS{datetime:[Y0001]}-{id:D5}
+    ## @section Api Endpoints
+    ## @descriptionStart
+    ## Make sure that all Url's contain two "parts" e.g. `openzaak-nginx.zaakbrug`. Openzaak can't use a single part domain.
+    ## @descriptionEnd
+    ##
+    ## @param zaakbrug.zgw.zakenApi.rootUrl Endpoint for the zaken API
+    ## @param zaakbrug.zgw.zakenApi.authType Options: 'jwt', 'basic', 'value'. 'value' uses the password field of the given authAlias as Authorization header
+    ## @param zaakbrug.zgw.zakenApi.authAlias Reference to an auth alias configured in credentials.properties
+    ## @param zaakbrug.zgw.catalogiApi.rootUrl Endpoint for the catalogi API
+    ## @param zaakbrug.zgw.catalogiApi.authType Options: 'jwt', 'basic', 'value'. 'value' uses the password field of the given authAlias as Authorization header
+    ## @param zaakbrug.zgw.catalogiApi.authAlias Reference to an auth alias configured in credentials.properties
+    ## @param zaakbrug.zgw.documentenApi.rootUrl Endpoint for the documenten API
+    ## @param zaakbrug.zgw.documentenApi.authType Options: 'jwt', 'basic', 'value'. 'value' uses the password field of the given authAlias as Authorization header
+    ## @param zaakbrug.zgw.documentenApi.authAlias Reference to an auth alias configured in credentials.properties
+    ## @param zaakbrug.zgw.besluitenApi.rootUrl Endpoint for the besluiten API
+    ## @param zaakbrug.zgw.besluitenApi.authType Options: 'jwt', 'basic', 'value'. 'value' uses the password field of the given authAlias as Authorization header
+    ## @param zaakbrug.zgw.besluitenApi.authAlias Reference to an auth alias configured in credentials.properties
+    ##
+    zakenApi:
+      rootUrl: "http://open-zaak/zaken/api/v1/"
+      authType: jwt
+      authAlias: zaken-api.jwt
+    catalogiApi:
+      rootUrl: "http://open-zaak/catalogi/api/v1/"
+      authType: jwt
+      authAlias: zaken-api.jwt
+    documentenApi:
+      rootUrl: "http://open-zaak/documenten/api/v1/"
+      authType: jwt
+      authAlias: zaken-api.jwt
+    besluitenApi:
+      rootUrl: "http://open-zaak/besluiten/api/v1/"
+      authType: jwt
+      authAlias: zaken-api.jwt
+  ## @section Globals
+  ## @param zaakbrug.globals.organizations [array] Map gemeentecode and RSIN
+  ## @param zaakbrug.globals.organizations.gemeenteNaam [string] Name for organisation
+  ## @param zaakbrug.globals.organizations.gemeenteCode [string] Gemeentecode to map to RSIN
+  ## @param zaakbrug.globals.organizations.RSIN [string] RSIN to be mapped to gemeentecode
+  ## @skip zaakbrug.globals.rolMapping
+  ##
+  globals:
+    organizations:
+      - gemeenteNaam: "Súdwest-Fryslân"
+        gemeenteCode: "1900"
+        RSIN: "823288444"
+    rolMapping:
+      heeftBetrekkingOp: "BetrekkingOp"
+      heeftAlsBelanghebbende: "Belanghebbende"
+      heeftAlsInitiator: "Initiator"
+      heeftAlsUitvoerende: "Uitvoerende"
+      heeftAlsVerantwoordelijke: "Verantwoordelijke"
+      heeftAlsGemachtigde: "Gemachtigde"
+      heeftAlsOverigBetrokkene: "OverigeBetrokkene"
+  ## @section Profiles
+  ## @param zaakbrug.profiles.profile [array] Translation profile, specific per zaakType
+  ## @param zaakbrug.profiles.profile.zaakTypeIdentificatie [string] Zaaktype the profile is for
+  ## @param zaakbrug.profiles.profile.endCaseEndDate [object, nullable]
+  ## @param zaakbrug.profiles.profile.endCaseEndDate.coalesceResultaat [string] Options: `Onbekend`, `Toegekend`
+  ## @param zaakbrug.profiles.profile.endDateAndResultLastStatus [object, nullable]
+  ## @param zaakbrug.profiles.profile.endDateAndResultLastStatus.coalesceResultaat [string] Options: `Onbekend`, `Toegekend`
+  ##
+  profiles:
+    profile:
+      - zaakTypeIdentificatie: "B9999"
+        endCaseEndDate:
+          coalesceResultaat: "Onbekend"
+        endDateAndResultLastStatus:
+          coalesceResultaat: "Onbekend"
+      - zaakTypeIdentificatie: "B1026"
+        endCaseEndDate:
+          coalesceResultaat: "Toegekend"
+
+## @section Staging
+## @descriptionStart
+## Staging is needed if you want to use zgw-to-zds.
+##
+## Following sections are about configuring OpenZaak (used as staging zaaksysteem) and the API proxy.
+##
+## OpenZaak needs a Postgres database with PostGIS
+##
+## Ref: https://github.com/maykinmedia/charts/tree/main/charts/openzaak
+##
+## @descriptionEnd
+
+staging:
+  ## @param staging.enabled Enable the staging environment
+  ##
+  enabled: false
+  ## @param staging.zakenApi.rootUrl Endpoint of the zaken API of the staging zaaksysteem
+  ## @param staging.documentenApi.rootUrl Endpoint of the documenten API of the staging zaaksysteem
+  ## @param staging.catalogiApi.rootUrl Endpoint of the catalogi API of the staging zaaksysteem
+  ## @param staging.besluitenApi.rootUrl Endpoint of the besluiten API of the staging zaaksysteem
+  ##
+  zakenApi:
+    rootUrl: http://zaakbrug-staging-nginx.zaakbrug/zaken/api/v1/
+  documentenApi:
+    rootUrl: http://zaakbrug-staging-nginx.zaakbrug/documenten/api/v1/
+  catalogiApi:
+    rootUrl: http://zaakbrug-staging-nginx.zaakbrug/catalogi/api/v1/
+  besluitenApi:
+    rootUrl: http://zaakbrug-staging-nginx.zaakbrug/besluiten/api/v1/
+  ## @param staging.extraEnvVars [array] Extra environment variables that should be set on the zaaksysteem
+  ## @extra staging.extraEnvVars The notifications should be disabled
+  ## @param staging.extraEnvVars.name [string] Name of the variable
+  ## @param staging.extraEnvVars.value [string, nullable] Value of the variable
+  ##
+  extraEnvVars:
+    - name: NOTIFICATIONS_DISABLED
+      value: "yes"
+  settings:
+    ## @param staging.settings.useXForwardedHost Add `X-Forwarded-Host` to proxy header
+    ## @extra staging.settings.useXForwardedHost Leave this to false, so absolute URL's make their way though te reverse proxies.
+    ##
+    useXForwardedHost: false
+    ## @param staging.settings.debug Set the debug mode of the zaaksysteem
+    ##
+    debug: false
+    ## @param staging.settings.allowedHosts Set the (v)hosts that need to be accessible for OpenZaak
+    ## @extra staging.settings.allowedHosts Add the ingress route if you have one. Change the service names and include namespace
+    ##
+    allowedHosts: "zaakbrug-staging.zaakbrug,zaakbrug-staging-nginx.zaakbrug,zaakbrug-staging.zaakbrug.svc.cluster.local,zaakbrug-staging-nginx.svc.cluster.local,localhost"
+    ## @param staging.settings.secretKey Secret key that’s used for certain cryptographic utilities. Use [Djecrety](https://djecrety.ir/) to generate one
+    ##
+    secretKey: ""
+    ## @param staging.settings.database.host Host for the database
+    ## @param staging.settings.database.port Port for the database
+    ## @param staging.settings.database.username User to log in to the database
+    ## @param staging.settings.database.password Password for the user
+    ## @param staging.settings.database.name Name of the database
+    ## @param staging.settings.database.sslmode Configure SSLMode
+    ##
+    database:
+      host: ""
+      port: 5432
+      username: ""
+      password: ""
+      name: ""
+      sslmode: prefer
+  ## @param staging.persistence.enabled Toggle persistence
+  ## @param staging.persistence.storageClassName Configure which storage class should be used
+  ##
+  persistence:
+    enabled: true
+    storageClassName: ""
+
+  ## @skip staging.apiProxy
+  apiProxy:
+    autoscaling:
+      enabled: false
+    replicaCount: 1
+    podLabels: {}
+    securityContext:
+      readOnlyRootFilesystem: true
+      runAsGroup: 1000
+      runAsNonRoot: true
+      runAsUser: 1000
+    image:
+      repository: nginxinc/nginx-unprivileged
+      tag: stable
+      pullPolicy: IfNotPresent
+    resources: {}
+    existingConfigmap: ''
+    service:
+      type: ClusterIP
+      port: 80
+      annotations: {}
+    ingress:
+      enabled: false
+      className: ""
+      annotations: { }
+      # kubernetes.io/ingress.class: nginx
+      # kubernetes.io/tls-acme: "true"
+      hosts:
+        - host: chart-example.local
+          paths:
+            - path: /
+              pathType: ImplementationSpecific
+      tls: [ ]
+      #  - secretName: chart-example-tls
+      #    hosts:
+      #      - chart-example.local

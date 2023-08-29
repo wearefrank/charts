@@ -36,13 +36,13 @@ To uninstall the chart:
 
 ### Frank!Framework image parameters
 
-| Name                | Description                                                | Value                      |
-| ------------------- | ---------------------------------------------------------- | -------------------------- |
-| `image.registry`    | Frank!Framework image registry                             | `nexus.frankframework.org` |
-| `image.repository`  | Frank!Framework image repository                           | `frank-framework`          |
-| `image.tag`         | Frank!Framework image tag (immutable tags are recommended) | `""`                       |
-| `image.pullPolicy`  | Frank!Framework image pull policy                          | `IfNotPresent`             |
-| `image.pullSecrets` | Frank!Framework image pull secrets                         | `[]`                       |
+| Name                | Description                                                | Value          |
+| ------------------- | ---------------------------------------------------------- | -------------- |
+| `image.registry`    | Frank!Framework image registry                             | `wearefrank`   |
+| `image.repository`  | Frank!Framework image repository                           | `zaakbrug`     |
+| `image.tag`         | Frank!Framework image tag (immutable tags are recommended) | `""`           |
+| `image.pullPolicy`  | Frank!Framework image pull policy                          | `IfNotPresent` |
+| `image.pullSecrets` | Frank!Framework image pull secrets                         | `[]`           |
 
 ### Frank! Configuration parameters
 
@@ -137,3 +137,130 @@ To uninstall the chart:
 | `podLabels`                  | Extra labels for Frank!Framework pods                     | `{}`   |
 | `podSecurityContext`         | Set Frank!Framework pod's Security Context                | `{}`   |
 | `securityContext`            | Set Frank!Framework container's Security Context          | `{}`   |
+
+### ZaakBrug
+
+Following sections are about the configuration for the ZaakBrug
+
+| Name                                                              | Description                                                                                    | Value                                                  |
+| ----------------------------------------------------------------- | ---------------------------------------------------------------------------------------------- | ------------------------------------------------------ |
+| `zaakbrug.zds.timezone`                                           | The timezone of the receiving zds service                                                      | `Etc/UTC`                                              |
+| `zaakbrug.soap.beantwoordVraag.endpoint`                          | Set the endpoint the service should be available at                                            | `translate/generic/zds/BeantwoordVraag`                |
+| `zaakbrug.soap.beantwoordVraag.validationSoftFail`                | Incoming messages are validated, if set to `true` the message still gets processed if it fails | `false`                                                |
+| `zaakbrug.soap.beantwoordVraag_v2.endpoint`                       | Set the endpoint the service should be available at                                            | `translate/generic/zds/v2/BeantwoordVraag`             |
+| `zaakbrug.soap.beantwoordVraag_v2.validationSoftFail`             | Incoming messages are validated, if set to `true` the message still gets processed if it fails | `false`                                                |
+| `zaakbrug.soap.ontvangAsynchroon.endpoint`                        | Set the endpoint the service should be available at                                            | `translate/generic/zds/OntvangAsynchroon`              |
+| `zaakbrug.soap.ontvangAsynchroon.validationSoftFail`              | Incoming messages are validated, if set to `true` the message still gets processed if it fails | `false`                                                |
+| `zaakbrug.soap.ontvangAsynchroonMutatie_v2.endpoint`              | Set the endpoint the service should be available at                                            | `translate/generic/zds/v2/OntvangAsynchroonMutatie`    |
+| `zaakbrug.soap.ontvangAsynchroonMutatie_v2.validationSoftFail`    | Incoming messages are validated, if set to `true` the message still gets processed if it fails | `false`                                                |
+| `zaakbrug.soap.ontvangAsynchroonOverdragen_v2.endpoint`           | Set the endpoint the service should be available at                                            | `translate/generic/zds/v2/OntvangAsynchroonOverdragen` |
+| `zaakbrug.soap.ontvangAsynchroonOverdragen_v2.validationSoftFail` | Incoming messages are validated, if set to `true` the message still gets processed if it fails | `false`                                                |
+| `zaakbrug.soap.vrijeBerichten.endpoint`                           | Set the endpoint the service should be available at                                            | `translate/generic/zds/VrijBericht`                    |
+| `zaakbrug.soap.vrijeBerichten.validationSoftFail`                 | Incoming messages are validated, if set to `true` the message still gets processed if it fails | `false`                                                |
+| `zaakbrug.soap.vrijeBerichten_v2.endpoint`                        | Set the endpoint the service should be available at                                            | `translate/generic/zds/v2/VrijBericht`                 |
+| `zaakbrug.soap.vrijeBerichten_v2.validationSoftFail`              | Incoming messages are validated, if set to `true` the message still gets processed if it fails | `false`                                                |
+
+### Identificatie Templates
+
+Templates used for generating zaak- and documentidentificatie<br/>
+The syntax for variable substitution is as follows {[variable-name][:formatting-string]}
+
+Variables:
+- id          Auto-incrementing identifier with 'D' as formatting option, indicating the amount of digits.
+example: {id:D5} with id-123 will result in '00123'
+- datetime    The current date and time with '[Y' as formatting option, according to
+(https://www.oreilly.com/library/view/xslt-2nd-edition/9780596527211/ch04s05.html).
+Only the '[Y0001]' is currently implemented
+example: {datetime:[Y001]} with datetime=14-03-2023 produces '2023'
+
+| Name                                         | Description                        | Value                          |
+| -------------------------------------------- | ---------------------------------- | ------------------------------ |
+| `zaakbrug.zgw.zaakIdentificatieTemplate`     | Template for zaakidentificatie     | `ZK{datetime:[Y0001]}-{id:D5}` |
+| `zaakbrug.zgw.documentIdentificatieTemplate` | Template for documentidentificatie | `DC{datetime:[Y0001]}-{id:D5}` |
+| `zaakbrug.zgw.besluitIdentificatieTemplate`  | Template for besluitidentificatie  | `BS{datetime:[Y0001]}-{id:D5}` |
+
+### Api Endpoints
+
+Make sure that all Url's contain two "parts" e.g. `openzaak-nginx.zaakbrug`. Openzaak can't use a single part domain.
+
+| Name                                   | Description                                                                                                      | Value                                 |
+| -------------------------------------- | ---------------------------------------------------------------------------------------------------------------- | ------------------------------------- |
+| `zaakbrug.zgw.zakenApi.rootUrl`        | Endpoint for the zaken API                                                                                       | `http://open-zaak/zaken/api/v1/`      |
+| `zaakbrug.zgw.zakenApi.authType`       | Options: 'jwt', 'basic', 'value'. 'value' uses the password field of the given authAlias as Authorization header | `jwt`                                 |
+| `zaakbrug.zgw.zakenApi.authAlias`      | Reference to an auth alias configured in credentials.properties                                                  | `zaken-api.jwt`                       |
+| `zaakbrug.zgw.catalogiApi.rootUrl`     | Endpoint for the catalogi API                                                                                    | `http://open-zaak/catalogi/api/v1/`   |
+| `zaakbrug.zgw.catalogiApi.authType`    | Options: 'jwt', 'basic', 'value'. 'value' uses the password field of the given authAlias as Authorization header | `jwt`                                 |
+| `zaakbrug.zgw.catalogiApi.authAlias`   | Reference to an auth alias configured in credentials.properties                                                  | `zaken-api.jwt`                       |
+| `zaakbrug.zgw.documentenApi.rootUrl`   | Endpoint for the documenten API                                                                                  | `http://open-zaak/documenten/api/v1/` |
+| `zaakbrug.zgw.documentenApi.authType`  | Options: 'jwt', 'basic', 'value'. 'value' uses the password field of the given authAlias as Authorization header | `jwt`                                 |
+| `zaakbrug.zgw.documentenApi.authAlias` | Reference to an auth alias configured in credentials.properties                                                  | `zaken-api.jwt`                       |
+| `zaakbrug.zgw.besluitenApi.rootUrl`    | Endpoint for the besluiten API                                                                                   | `http://open-zaak/besluiten/api/v1/`  |
+| `zaakbrug.zgw.besluitenApi.authType`   | Options: 'jwt', 'basic', 'value'. 'value' uses the password field of the given authAlias as Authorization header | `jwt`                                 |
+| `zaakbrug.zgw.besluitenApi.authAlias`  | Reference to an auth alias configured in credentials.properties                                                  | `zaken-api.jwt`                       |
+
+### Globals
+
+| Name                                          | Description                       | Value |
+| --------------------------------------------- | --------------------------------- | ----- |
+| `zaakbrug.globals.organizations`              | Map gemeentecode and RSIN         | `[]`  |
+| `zaakbrug.globals.organizations.gemeenteNaam` | Name for organisation             | `""`  |
+| `zaakbrug.globals.organizations.gemeenteCode` | Gemeentecode to map to RSIN       | `""`  |
+| `zaakbrug.globals.organizations.RSIN`         | RSIN to be mapped to gemeentecode | `""`  |
+
+### Profiles
+
+| Name                                                                     | Description                                | Value       |
+| ------------------------------------------------------------------------ | ------------------------------------------ | ----------- |
+| `zaakbrug.profiles.profile`                                              | Translation profile, specific per zaakType | `[]`        |
+| `zaakbrug.profiles.profile.zaakTypeIdentificatie`                        | Zaaktype the profile is for                | `""`        |
+| `zaakbrug.profiles.profile.endCaseEndDate`                               |                                            | `undefined` |
+| `zaakbrug.profiles.profile.endCaseEndDate.coalesceResultaat`             | Options: `Onbekend`, `Toegekend`           | `""`        |
+| `zaakbrug.profiles.profile.endDateAndResultLastStatus`                   |                                            | `undefined` |
+| `zaakbrug.profiles.profile.endDateAndResultLastStatus.coalesceResultaat` | Options: `Onbekend`, `Toegekend`           | `""`        |
+
+### Staging
+
+Staging is needed if you want to use zgw-to-zds.
+
+Following sections are about configuring OpenZaak (used as staging zaaksysteem) and the API proxy.
+
+OpenZaak needs a Postgres database with PostGIS
+
+Ref: https://github.com/maykinmedia/charts/tree/main/charts/openzaak
+
+
+| Name                                   | Description                                                                                                      | Value                                                                                                                                                      |
+| -------------------------------------- | ---------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `staging.enabled`                      | Enable the staging environment                                                                                   | `false`                                                                                                                                                    |
+| `staging.zakenApi.rootUrl`             | Endpoint of the zaken API of the staging zaaksysteem                                                             | `http://zaakbrug-staging-nginx.zaakbrug/zaken/api/v1/`                                                                                                     |
+| `staging.documentenApi.rootUrl`        | Endpoint of the documenten API of the staging zaaksysteem                                                        | `http://zaakbrug-staging-nginx.zaakbrug/documenten/api/v1/`                                                                                                |
+| `staging.catalogiApi.rootUrl`          | Endpoint of the catalogi API of the staging zaaksysteem                                                          | `http://zaakbrug-staging-nginx.zaakbrug/catalogi/api/v1/`                                                                                                  |
+| `staging.besluitenApi.rootUrl`         | Endpoint of the besluiten API of the staging zaaksysteem                                                         | `http://zaakbrug-staging-nginx.zaakbrug/besluiten/api/v1/`                                                                                                 |
+| `staging.extraEnvVars`                 | Extra environment variables that should be set on the zaaksysteem                                                | `[]`                                                                                                                                                       |
+| `staging.extraEnvVars`                 | The notifications should be disabled                                                                             |                                                                                                                                                            |
+| `staging.extraEnvVars.name`            | Name of the variable                                                                                             | `""`                                                                                                                                                       |
+| `staging.extraEnvVars.value`           | Value of the variable                                                                                            | `undefined`                                                                                                                                                |
+| `staging.settings.useXForwardedHost`   | Add `X-Forwarded-Host` to proxy header                                                                           | `false`                                                                                                                                                    |
+| `staging.settings.useXForwardedHost`   | Leave this to false, so absolute URL's make their way though te reverse proxies.                                 |                                                                                                                                                            |
+| `staging.settings.debug`               | Set the debug mode of the zaaksysteem                                                                            | `false`                                                                                                                                                    |
+| `staging.settings.allowedHosts`        | Set the (v)hosts that need to be accessible for OpenZaak                                                         | `zaakbrug-staging.zaakbrug,zaakbrug-staging-nginx.zaakbrug,zaakbrug-staging.zaakbrug.svc.cluster.local,zaakbrug-staging-nginx.svc.cluster.local,localhost` |
+| `staging.settings.allowedHosts`        | Add the ingress route if you have one. Change the service names and include namespace                            |                                                                                                                                                            |
+| `staging.settings.secretKey`           | Secret key that’s used for certain cryptographic utilities. Use [Djecrety](https://djecrety.ir/) to generate one | `""`                                                                                                                                                       |
+| `staging.settings.database.host`       | Host for the database                                                                                            | `""`                                                                                                                                                       |
+| `staging.settings.database.port`       | Port for the database                                                                                            | `5432`                                                                                                                                                     |
+| `staging.settings.database.username`   | User to log in to the database                                                                                   | `""`                                                                                                                                                       |
+| `staging.settings.database.password`   | Password for the user                                                                                            | `""`                                                                                                                                                       |
+| `staging.settings.database.name`       | Name of the database                                                                                             | `""`                                                                                                                                                       |
+| `staging.settings.database.sslmode`    | Configure SSLMode                                                                                                | `prefer`                                                                                                                                                   |
+| `staging.persistence.enabled`          | Toggle persistence                                                                                               | `true`                                                                                                                                                     |
+| `staging.persistence.storageClassName` | Configure which storage class should be used                                                                     | `""`                                                                                                                                                       |
+
+Staging is needed if you want to use zgw-to-zds.
+
+Following sections are about configuring OpenZaak (used as staging zaaksysteem) and the API proxy.
+
+
+Staging is needed if you want to use zgw-to-zds.
+
+Following sections are about configuring OpenZaak (used as staging zaaksysteem) and the API proxy.
+

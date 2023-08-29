@@ -9,4 +9,9 @@ version: 0.1.0
 dependencies:
   - name: ff-common
     version: ~0.1.12
-    repository: file://../../ibissource/charts/ff-common
+    repository: https://ibissource.github.io/charts/
+  - name: openzaak
+    alias: staging
+    version: 1.1.0
+    repository: https://maykinmedia.github.io/charts/
+    condition: staging.enabled

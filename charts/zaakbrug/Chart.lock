@@ -1,6 +1,6 @@
 dependencies:
 - name: ff-common
-  repository: file://../charts/ff-common
+  repository: https://ibissource.github.io/charts/
   version: 0.1.12
-digest: sha256:c928f71e67db934e1cb8c454e846c45b8f92a35de13dad83c3f91d16a6b5886b
-generated: "2023-08-18T16:50:34.558397599+02:00"
+digest: sha256:d1d31d5733360841234b51fc09488ba8f4a23076b3632a833d637743f284ee3f
+generated: "2023-08-28T16:39:18.395550431+02:00"

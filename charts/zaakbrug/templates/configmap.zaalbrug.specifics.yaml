@@ -1,0 +1,48 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ template "zaakbrug.fullname" . }}-specifics
+  labels:
+    {{- include "zaakbrug.labels" . | nindent 4 }}
+data:
+  {{- with .Values.zaakbrug.soap }}
+  {{- with .beantwoordVraag }}
+  zaakbrug.soap.beantwoord-vraag.endpoint: {{ .endpoint }}
+  zaakbrug.soap.beantwoord-vraag.validation-soft-fail: "{{ .validationSoftFail }}"
+  {{- end }}
+  {{- with .ontvangAsynchroon }}
+  zaakbrug.soap.ontvang-asynchroon.endpoint: {{ .endpoint }}
+  zaakbrug.soap.ontvang-asynchroon.validation-soft-fail: "{{ .validationSoftFail }}"
+  {{- end }}
+  {{- with .vrijeBerichten }}
+  zaakbrug.soap.vrije-berichten.endpoint: {{ .endpoint }}
+  zaakbrug.soap.vrije-berichten.validation-soft-fail: "{{ .validationSoftFail }}"
+  {{- end }}
+  {{- end }}
+  {{- with .Values.zaakbrug.zgw }}
+  zaakbrug.zgw.zaak-identificatie-template: {{ .zaakIdentificatieTemplate }}
+  zaakbrug.zgw.document-identificatie-template: {{ .documentIdentificatieTemplate }}
+  {{- with .zakenApi }}
+  zaakbrug.zgw.zaken-api.root-url: {{ .rootUrl }}
+  zaakbrug.zgw.zaken-api.timeout: {{ toString (.timeout | default 20000 | quote) }}
+  zaakbrug.zgw.zaken-api.auth-type: {{ .authType }}
+  zaakbrug.zgw.zaken-api.auth-alias: {{ .authAlias }}
+  {{- end }}
+  {{- with .documentenApi }}
+  zaakbrug.zgw.documenten-api.root-url: {{ .rootUrl }}
+  zaakbrug.zgw.documenten-api.timeout: {{ toString (.timeout | default 20000 | quote) }}
+  zaakbrug.zgw.documenten-api.auth-type: {{ .authType }}
+  zaakbrug.zgw.documenten-api.auth-alias: {{ .authAlias }}
+  {{- end }}
+  {{- with .catalogiApi }}
+  zaakbrug.zgw.catalogi-api.root-url: {{ .rootUrl }}
+  zaakbrug.zgw.catalogi-api.timeout: {{ toString (.timeout | default 20000 | quote) }}
+  zaakbrug.zgw.catalogi-api.auth-type: {{ .authType }}
+  zaakbrug.zgw.catalogi-api.auth-alias: {{ .authAlias }}
+  {{- end }}
+  {{- end }}
+  {{- with .Values.staging }}
+  zaakbrug.staging.zaken-api.root-url: {{ .zakenApi.rootUrl }}
+  zaakbrug.staging.documenten-api.root-url: {{ .documentenApi.rootUrl }}
+  zaakbrug.staging.catalogi-api.root-url: {{ .catalogiApi.rootUrl }}
+  {{- end }}

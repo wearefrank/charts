@@ -18,12 +18,12 @@
                 "registry": {
                     "type": "string",
                     "description": "Frank!Framework image registry",
-                    "default": "nexus.frankframework.org"
+                    "default": "wearefrank"
                 },
                 "repository": {
                     "type": "string",
                     "description": "Frank!Framework image repository",
-                    "default": "frank-framework"
+                    "default": "zaakbrug"
                 },
                 "tag": {
                     "type": "string",
@@ -384,6 +384,333 @@
                 }
             }
         },
+        "zaakbrug": {
+            "type": "object",
+            "properties": {
+                "globals": {
+                    "type": "object",
+                    "properties": {
+                        "organizations": {
+                            "type": "array",
+                            "description": "",
+                            "items": {
+                                "type": "object",
+                                "properties": {
+                                    "gemeenteNaam": {
+                                        "type": "string",
+                                        "description": ""
+                                    },
+                                    "gemeenteCode": {
+                                        "type": "string",
+                                        "description": ""
+                                    },
+                                    "RSIN": {
+                                        "type": "string",
+                                        "description": ""
+                                    }
+                                }
+                            }
+                        },
+                        "rolMapping": {
+                            "type": "object",
+                            "properties": {
+                                "heeftBetrekkingOp": {
+                                    "type": "string",
+                                    "description": "",
+                                    "default": "BetrekkingOp"
+                                },
+                                "heeftAlsBelanghebbende": {
+                                    "type": "string",
+                                    "description": "",
+                                    "default": "Belanghebbende"
+                                },
+                                "heeftAlsInitiator": {
+                                    "type": "string",
+                                    "description": "",
+                                    "default": "Initiator"
+                                },
+                                "heeftAlsUitvoerende": {
+                                    "type": "string",
+                                    "description": "",
+                                    "default": "Uitvoerende"
+                                },
+                                "heeftAlsVerantwoordelijke": {
+                                    "type": "string",
+                                    "description": "",
+                                    "default": "Verantwoordelijke"
+                                },
+                                "heeftAlsGemachtigde": {
+                                    "type": "string",
+                                    "description": "",
+                                    "default": "Gemachtigde"
+                                },
+                                "heeftAlsOverigBetrokkene": {
+                                    "type": "string",
+                                    "description": "",
+                                    "default": "OverigeBetrokkene"
+                                }
+                            }
+                        }
+                    }
+                },
+                "profiles": {
+                    "type": "object",
+                    "properties": {
+                        "profile": {
+                            "type": "array",
+                            "description": "",
+                            "items": {
+                                "type": "object",
+                                "properties": {
+                                    "zaakTypeIdentificatie": {
+                                        "type": "string",
+                                        "description": ""
+                                    },
+                                    "endCaseEndDate": {
+                                        "type": "object",
+                                        "properties": {
+                                            "coalesceResultaat": {
+                                                "type": "string",
+                                                "description": ""
+                                            }
+                                        }
+                                    },
+                                    "endDateAndResultLastStatus": {
+                                        "type": "object",
+                                        "properties": {
+                                            "coalesceResultaat": {
+                                                "type": "string",
+                                                "description": ""
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "zds": {
+                    "type": "object",
+                    "properties": {
+                        "timezone": {
+                            "type": "string",
+                            "description": "The timezone of the receiving zds service",
+                            "default": "Etc/UTC"
+                        }
+                    }
+                },
+                "soap": {
+                    "type": "object",
+                    "properties": {
+                        "beantwoordVraag": {
+                            "type": "object",
+                            "properties": {
+                                "endpoint": {
+                                    "type": "string",
+                                    "description": "Set the endpoint the service should be available at",
+                                    "default": "translate/generic/zds/BeantwoordVraag"
+                                },
+                                "validationSoftFail": {
+                                    "type": "boolean",
+                                    "description": "Incoming messages are validated, if set to `true` the message still gets processed if it fails",
+                                    "default": false
+                                }
+                            }
+                        },
+                        "beantwoordVraag_v2": {
+                            "type": "object",
+                            "properties": {
+                                "endpoint": {
+                                    "type": "string",
+                                    "description": "Set the endpoint the service should be available at",
+                                    "default": "translate/generic/zds/v2/BeantwoordVraag"
+                                },
+                                "validationSoftFail": {
+                                    "type": "boolean",
+                                    "description": "Incoming messages are validated, if set to `true` the message still gets processed if it fails",
+                                    "default": false
+                                }
+                            }
+                        },
+                        "ontvangAsynchroon": {
+                            "type": "object",
+                            "properties": {
+                                "endpoint": {
+                                    "type": "string",
+                                    "description": "Set the endpoint the service should be available at",
+                                    "default": "translate/generic/zds/OntvangAsynchroon"
+                                },
+                                "validationSoftFail": {
+                                    "type": "boolean",
+                                    "description": "Incoming messages are validated, if set to `true` the message still gets processed if it fails",
+                                    "default": false
+                                }
+                            }
+                        },
+                        "ontvangAsynchroonMutatie_v2": {
+                            "type": "object",
+                            "properties": {
+                                "endpoint": {
+                                    "type": "string",
+                                    "description": "Set the endpoint the service should be available at",
+                                    "default": "translate/generic/zds/v2/OntvangAsynchroonMutatie"
+                                },
+                                "validationSoftFail": {
+                                    "type": "boolean",
+                                    "description": "Incoming messages are validated, if set to `true` the message still gets processed if it fails",
+                                    "default": false
+                                }
+                            }
+                        },
+                        "ontvangAsynchroonOverdragen_v2": {
+                            "type": "object",
+                            "properties": {
+                                "endpoint": {
+                                    "type": "string",
+                                    "description": "Set the endpoint the service should be available at",
+                                    "default": "translate/generic/zds/v2/OntvangAsynchroonOverdragen"
+                                },
+                                "validationSoftFail": {
+                                    "type": "boolean",
+                                    "description": "Incoming messages are validated, if set to `true` the message still gets processed if it fails",
+                                    "default": false
+                                }
+                            }
+                        },
+                        "vrijeBerichten": {
+                            "type": "object",
+                            "properties": {
+                                "endpoint": {
+                                    "type": "string",
+                                    "description": "Set the endpoint the service should be available at",
+                                    "default": "translate/generic/zds/VrijBericht"
+                                },
+                                "validationSoftFail": {
+                                    "type": "boolean",
+                                    "description": "Incoming messages are validated, if set to `true` the message still gets processed if it fails",
+                                    "default": false
+                                }
+                            }
+                        },
+                        "vrijeBerichten_v2": {
+                            "type": "object",
+                            "properties": {
+                                "endpoint": {
+                                    "type": "string",
+                                    "description": "Set the endpoint the service should be available at",
+                                    "default": "translate/generic/zds/v2/VrijBericht"
+                                },
+                                "validationSoftFail": {
+                                    "type": "boolean",
+                                    "description": "Incoming messages are validated, if set to `true` the message still gets processed if it fails",
+                                    "default": false
+                                }
+                            }
+                        }
+                    }
+                },
+                "zgw": {
+                    "type": "object",
+                    "properties": {
+                        "zaakIdentificatieTemplate": {
+                            "type": "string",
+                            "description": "Template for zaakidentificatie",
+                            "default": "ZK{datetime:[Y0001]}-{id:D5}"
+                        },
+                        "documentIdentificatieTemplate": {
+                            "type": "string",
+                            "description": "Template for documentidentificatie",
+                            "default": "DC{datetime:[Y0001]}-{id:D5}"
+                        },
+                        "besluitIdentificatieTemplate": {
+                            "type": "string",
+                            "description": "Template for besluitidentificatie",
+                            "default": "BS{datetime:[Y0001]}-{id:D5}"
+                        },
+                        "zakenApi": {
+                            "type": "object",
+                            "properties": {
+                                "rootUrl": {
+                                    "type": "string",
+                                    "description": "Endpoint for the zaken API",
+                                    "default": "http://open-zaak/zaken/api/v1/"
+                                },
+                                "authType": {
+                                    "type": "string",
+                                    "description": "Options: 'jwt', 'basic', 'value'. 'value' uses the password field of the given authAlias as Authorization header",
+                                    "default": "jwt"
+                                },
+                                "authAlias": {
+                                    "type": "string",
+                                    "description": "Reference to an auth alias configured in credentials.properties",
+                                    "default": "zaken-api.jwt"
+                                }
+                            }
+                        },
+                        "catalogiApi": {
+                            "type": "object",
+                            "properties": {
+                                "rootUrl": {
+                                    "type": "string",
+                                    "description": "Endpoint for the catalogi API",
+                                    "default": "http://open-zaak/catalogi/api/v1/"
+                                },
+                                "authType": {
+                                    "type": "string",
+                                    "description": "Options: 'jwt', 'basic', 'value'. 'value' uses the password field of the given authAlias as Authorization header",
+                                    "default": "jwt"
+                                },
+                                "authAlias": {
+                                    "type": "string",
+                                    "description": "Reference to an auth alias configured in credentials.properties",
+                                    "default": "zaken-api.jwt"
+                                }
+                            }
+                        },
+                        "documentenApi": {
+                            "type": "object",
+                            "properties": {
+                                "rootUrl": {
+                                    "type": "string",
+                                    "description": "Endpoint for the documenten API",
+                                    "default": "http://open-zaak/documenten/api/v1/"
+                                },
+                                "authType": {
+                                    "type": "string",
+                                    "description": "Options: 'jwt', 'basic', 'value'. 'value' uses the password field of the given authAlias as Authorization header",
+                                    "default": "jwt"
+                                },
+                                "authAlias": {
+                                    "type": "string",
+                                    "description": "Reference to an auth alias configured in credentials.properties",
+                                    "default": "zaken-api.jwt"
+                                }
+                            }
+                        },
+                        "besluitenApi": {
+                            "type": "object",
+                            "properties": {
+                                "rootUrl": {
+                                    "type": "string",
+                                    "description": "Endpoint for the besluiten API",
+                                    "default": "http://open-zaak/besluiten/api/v1/"
+                                },
+                                "authType": {
+                                    "type": "string",
+                                    "description": "Options: 'jwt', 'basic', 'value'. 'value' uses the password field of the given authAlias as Authorization header",
+                                    "default": "jwt"
+                                },
+                                "authAlias": {
+                                    "type": "string",
+                                    "description": "Reference to an auth alias configured in credentials.properties",
+                                    "default": "zaken-api.jwt"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "podAnnotations": {
             "type": "object",
             "description": "Annotations for Frank!Framework pods",
@@ -393,6 +720,304 @@
             "type": "object",
             "description": "Extra labels for Frank!Framework pods",
             "default": {}
+        },
+        "staging": {
+            "type": "object",
+            "properties": {
+                "extraEnvVars": {
+                    "type": "array",
+                    "description": "",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "name": {
+                                "type": "string",
+                                "description": ""
+                            },
+                            "value": {
+                                "type": "string",
+                                "description": ""
+                            }
+                        }
+                    }
+                },
+                "apiProxy": {
+                    "type": "object",
+                    "properties": {
+                        "autoscaling": {
+                            "type": "object",
+                            "properties": {
+                                "enabled": {
+                                    "type": "boolean",
+                                    "description": "",
+                                    "default": false
+                                }
+                            }
+                        },
+                        "replicaCount": {
+                            "type": "number",
+                            "description": "",
+                            "default": 1
+                        },
+                        "podLabels": {
+                            "type": "object",
+                            "description": "",
+                            "default": {}
+                        },
+                        "securityContext": {
+                            "type": "object",
+                            "properties": {
+                                "readOnlyRootFilesystem": {
+                                    "type": "boolean",
+                                    "description": "",
+                                    "default": true
+                                },
+                                "runAsGroup": {
+                                    "type": "number",
+                                    "description": "",
+                                    "default": 1000
+                                },
+                                "runAsNonRoot": {
+                                    "type": "boolean",
+                                    "description": "",
+                                    "default": true
+                                },
+                                "runAsUser": {
+                                    "type": "number",
+                                    "description": "",
+                                    "default": 1000
+                                }
+                            }
+                        },
+                        "image": {
+                            "type": "object",
+                            "properties": {
+                                "repository": {
+                                    "type": "string",
+                                    "description": "",
+                                    "default": "nginxinc/nginx-unprivileged"
+                                },
+                                "tag": {
+                                    "type": "string",
+                                    "description": "",
+                                    "default": "stable"
+                                },
+                                "pullPolicy": {
+                                    "type": "string",
+                                    "description": "",
+                                    "default": "IfNotPresent"
+                                }
+                            }
+                        },
+                        "resources": {
+                            "type": "object",
+                            "description": "",
+                            "default": {}
+                        },
+                        "existingConfigmap": {
+                            "type": "string",
+                            "description": "",
+                            "default": ""
+                        },
+                        "service": {
+                            "type": "object",
+                            "properties": {
+                                "type": {
+                                    "type": "string",
+                                    "description": "",
+                                    "default": "ClusterIP"
+                                },
+                                "port": {
+                                    "type": "number",
+                                    "description": "",
+                                    "default": 80
+                                },
+                                "annotations": {
+                                    "type": "object",
+                                    "description": "",
+                                    "default": {}
+                                }
+                            }
+                        },
+                        "ingress": {
+                            "type": "object",
+                            "properties": {
+                                "enabled": {
+                                    "type": "boolean",
+                                    "description": "",
+                                    "default": false
+                                },
+                                "className": {
+                                    "type": "string",
+                                    "description": "",
+                                    "default": ""
+                                },
+                                "annotations": {
+                                    "type": "object",
+                                    "description": "",
+                                    "default": {}
+                                },
+                                "hosts": {
+                                    "type": "array",
+                                    "description": "",
+                                    "items": {
+                                        "type": "object",
+                                        "properties": {
+                                            "host": {
+                                                "type": "string",
+                                                "description": ""
+                                            },
+                                            "paths": {
+                                                "type": "array",
+                                                "description": "",
+                                                "items": {
+                                                    "type": "object",
+                                                    "properties": {
+                                                        "path": {
+                                                            "type": "string",
+                                                            "description": ""
+                                                        },
+                                                        "pathType": {
+                                                            "type": "string",
+                                                            "description": ""
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                },
+                                "tls": {
+                                    "type": "array",
+                                    "description": "",
+                                    "default": [],
+                                    "items": {}
+                                }
+                            }
+                        }
+                    }
+                },
+                "enabled": {
+                    "type": "boolean",
+                    "description": "Enable the staging environment",
+                    "default": false
+                },
+                "zakenApi": {
+                    "type": "object",
+                    "properties": {
+                        "rootUrl": {
+                            "type": "string",
+                            "description": "Endpoint of the zaken API of the staging zaaksysteem",
+                            "default": "http://zaakbrug-staging-nginx.zaakbrug/zaken/api/v1/"
+                        }
+                    }
+                },
+                "documentenApi": {
+                    "type": "object",
+                    "properties": {
+                        "rootUrl": {
+                            "type": "string",
+                            "description": "Endpoint of the documenten API of the staging zaaksysteem",
+                            "default": "http://zaakbrug-staging-nginx.zaakbrug/documenten/api/v1/"
+                        }
+                    }
+                },
+                "catalogiApi": {
+                    "type": "object",
+                    "properties": {
+                        "rootUrl": {
+                            "type": "string",
+                            "description": "Endpoint of the catalogi API of the staging zaaksysteem",
+                            "default": "http://zaakbrug-staging-nginx.zaakbrug/catalogi/api/v1/"
+                        }
+                    }
+                },
+                "besluitenApi": {
+                    "type": "object",
+                    "properties": {
+                        "rootUrl": {
+                            "type": "string",
+                            "description": "Endpoint of the besluiten API of the staging zaaksysteem",
+                            "default": "http://zaakbrug-staging-nginx.zaakbrug/besluiten/api/v1/"
+                        }
+                    }
+                },
+                "settings": {
+                    "type": "object",
+                    "properties": {
+                        "useXForwardedHost": {
+                            "type": "boolean",
+                            "description": "Add `X-Forwarded-Host` to proxy header",
+                            "default": false
+                        },
+                        "debug": {
+                            "type": "boolean",
+                            "description": "Set the debug mode of the zaaksysteem",
+                            "default": false
+                        },
+                        "allowedHosts": {
+                            "type": "string",
+                            "description": "Set the (v)hosts that need to be accessible for OpenZaak",
+                            "default": "zaakbrug-staging.zaakbrug,zaakbrug-staging-nginx.zaakbrug,zaakbrug-staging.zaakbrug.svc.cluster.local,zaakbrug-staging-nginx.svc.cluster.local,localhost"
+                        },
+                        "secretKey": {
+                            "type": "string",
+                            "description": "Secret key that’s used for certain cryptographic utilities. Use [Djecrety](https://djecrety.ir/) to generate one",
+                            "default": ""
+                        },
+                        "database": {
+                            "type": "object",
+                            "properties": {
+                                "host": {
+                                    "type": "string",
+                                    "description": "Host for the database",
+                                    "default": ""
+                                },
+                                "port": {
+                                    "type": "number",
+                                    "description": "Port for the database",
+                                    "default": 5432
+                                },
+                                "username": {
+                                    "type": "string",
+                                    "description": "User to log in to the database",
+                                    "default": ""
+                                },
+                                "password": {
+                                    "type": "string",
+                                    "description": "Password for the user",
+                                    "default": ""
+                                },
+                                "name": {
+                                    "type": "string",
+                                    "description": "Name of the database",
+                                    "default": ""
+                                },
+                                "sslmode": {
+                                    "type": "string",
+                                    "description": "Configure SSLMode",
+                                    "default": "prefer"
+                                }
+                            }
+                        }
+                    }
+                },
+                "persistence": {
+                    "type": "object",
+                    "properties": {
+                        "enabled": {
+                            "type": "boolean",
+                            "description": "Toggle persistence",
+                            "default": true
+                        },
+                        "storageClassName": {
+                            "type": "string",
+                            "description": "Configure which storage class should be used",
+                            "default": ""
+                        }
+                    }
+                }
+            }
         }
     }
 }
