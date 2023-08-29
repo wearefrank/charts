@@ -33,8 +33,8 @@ spec:
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
       containers:
-        - name: apiProxy
-          command: [ "/bin/bash", "-c", "apiProxy -g 'daemon off;'" ]
+        - name: api-proxy
+          command: [ "/bin/bash", "-c", "nginx -g 'daemon off;'" ]
           securityContext:
             {{- toYaml .Values.staging.apiProxy.securityContext | nindent 12 }}
           image: "{{ .Values.staging.apiProxy.image.repository }}:{{ .Values.staging.apiProxy.image.tag }}"
@@ -49,14 +49,14 @@ spec:
           resources:
             {{- toYaml .Values.staging.apiProxy.resources | nindent 12 }}
           volumeMounts:
-            - name: apiProxy-config
+            - name: api-proxy-config
               mountPath: /etc/apiProxy/conf.d
             {{- if .Values.staging.apiProxy.securityContext.readOnlyRootFilesystem }}
             - mountPath: /tmp
               name: tmpfs
             {{- end }}
       volumes:
-        - name: apiProxy-config
+        - name: api-proxy-config
           configMap:
             name: {{ if .Values.staging.apiProxy.existingConfigmap }}{{ .Values.staging.apiProxy.existingConfigmap  }}{{- else }}{{ include "zaakbrug.apiProxyFullname" . }}{{- end }}
         {{- if .Values.staging.apiProxy.securityContext.readOnlyRootFilesystem }}

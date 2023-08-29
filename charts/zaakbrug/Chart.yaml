@@ -2,7 +2,7 @@ apiVersion: v2
 appVersion: "latest" # TODO: Set version
 description: A Helm chart for running ZaakBrug on Kubernetes
 name: zaakbrug
-icon: https://raw.githubusercontent.com/wearefrank/charts/master/zaakbrug/icon.svg
+icon: https://raw.githubusercontent.com/wearefrank/charts/master/zaakbrug/icon.png
 type: application
 version: 2.0.0
 
