@@ -28,7 +28,7 @@ helm install zaakbrug wearefrank/zaakbrug
 To uninstall the chart:
 
 ```shell
-    helm delete zaakbrug
+helm delete zaakbrug
 ```
 
 ## Parameters
