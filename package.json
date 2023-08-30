@@ -1,5 +1,0 @@
-{
-  "devDependencies": {
-    "@bitnami/readme-generator-for-helm": "^2.5.1"
-  }
-}
