@@ -228,12 +228,10 @@ Make sure that all Url's contain two "parts" e.g. `openzaak-nginx.zaakbrug`. Ope
 
 Staging is needed if you want to use zgw-to-zds.
 
-Following sections are about configuring OpenZaak (used as staging zaaksysteem) and the API proxy.
-
+Following sections are about configuring OpenZaak (used as staging zaaksysteem) and the API proxy.<br />
 Ref: https://open-zaak.readthedocs.io/en/stable/installation/kubernetes.html
 
-OpenZaak needs a Postgres database with PostGIS
-
+OpenZaak needs a Postgres database with PostGIS<br />
 ref: https://open-zaak.readthedocs.io/en/stable/installation/prerequisites.html#postgresql-with-postgis
 
 | Name                                            | Description                                                                                                                      | Value                                                                                                                                                      |
@@ -288,12 +286,4 @@ ref: https://open-zaak.readthedocs.io/en/stable/installation/prerequisites.html#
 | `staging.apiProxy.ingress.hosts.paths.pathType` | Set type of path                                                                                                                 | `""`                                                                                                                                                       |
 | `staging.apiProxy.ingress.tls`                  | Define tls secrets for hosts (implementation not done yet)                                                                       | `[]`                                                                                                                                                       |
 
-Staging is needed if you want to use zgw-to-zds.
-
-Following sections are about configuring OpenZaak (used as staging zaaksysteem) and the API proxy.
-
-
-Staging is needed if you want to use zgw-to-zds.
-
-Following sections are about configuring OpenZaak (used as staging zaaksysteem) and the API proxy.
 
