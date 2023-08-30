@@ -10,7 +10,7 @@ export default defineNuxtConfig({
         driver: 'github',
         prefix: '/charts',
         repo: 'wearefrank/charts',
-        branch: 'master',
+        branch: 'main',
         dir: 'charts'
       },
       index: {
