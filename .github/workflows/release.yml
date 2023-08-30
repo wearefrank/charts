@@ -1,0 +1,63 @@
+name: Release Charts
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  release:
+    name: Release charts
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - name: Configure Git
+        run: |
+          git config user.name "$GITHUB_ACTOR"
+          git config user.email "$GITHUB_ACTOR@users.noreply.github.com"
+      - name: Run chart-releaser
+        uses: helm/chart-releaser-action@v1.5.0
+        continue-on-error: true
+        with:
+          charts_dir: charts
+        env:
+          CR_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+  docs:
+    needs: release
+    name: Build documentation
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+    env:
+      NUXT_APP_BASE_URL: /charts/
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v1
+      - name: Installing project dependencies
+        run: yarn install
+      - name: Build site
+        run: yarn generate
+      - name: Deploy to GitHub Pages
+        uses: JamesIves/github-pages-deploy-action@v4.4.3
+        with:
+          branch: gh-pages
+          folder: frontend/.output/public
+          target-folder: docs
+          clean-exclude: |-
+            .nojekyll
+  copy:
+    needs: docs
+    name: Copy index.yaml
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout gh-pages branch
+        uses: actions/checkout@v3
+        with:
+          ref: gh-pages
+      - name: Copy index.yaml
+        run: cp index.yaml docs/index.yaml
+      - uses: stefanzweifel/git-auto-commit-action@v4
