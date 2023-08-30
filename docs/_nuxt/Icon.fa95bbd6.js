@@ -1,0 +1,1 @@
+import{_ as n,j as s,o,c as r,s as t}from"./entry.532d491b.js";const a=s({props:{name:{type:String,required:!0}}});function c(e,p,_,m,i,l){return o(),r("span",{class:t(e.name)},null,2)}const f=n(a,[["render",c]]);export{f as _};
