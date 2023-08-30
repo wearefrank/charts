@@ -25,6 +25,8 @@ export default defineNuxtConfig({
       '/templates/',
       '/docs/',
       '\\.svg$',
+      '\\.tgz$',
+      '\\.png$',
       '\\.lock$'
     ],
     highlight: {
