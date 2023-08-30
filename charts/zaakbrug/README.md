@@ -2,16 +2,18 @@
 
 An app for Dutch municipalities that supports the transition from "zaak- en documentatieservices" (zds) to "zaakgericht werken" (zgw).
 
-[ZaakBrug source on :octocat:](https://github.com/ibissource/zaakbrug)
+[ZaakBrug source on GitHub](https://github.com/ibissource/zaakbrug)
 
 ## Usage
 
-[Helm](https://helm.sh) must be installed to use the charts.  Please refer to
-Helm's [documentation](https://helm.sh/docs) to get started.
+[Helm](https://helm.sh) must be installed to use the charts. 
+Please refer to Helm's [documentation](https://helm.sh/docs) to get started.
 
 Once Helm has been set up correctly, add the repo as follows:
 
-    helm repo add wearefrank https://wearefrank.github.io/charts
+```shell
+helm repo add wearefrank https://wearefrank.github.io/charts
+```
 
 If you had already added this repo earlier, run `helm repo update` to retrieve
 the latest versions of the packages.  You can then run `helm search repo
@@ -19,11 +21,15 @@ wearefrank` to see the charts.
 
 To install the ZaakBrug chart:
 
-    helm install zaakbrug wearefrank/zaakbrug
+```shell
+helm install zaakbrug wearefrank/zaakbrug
+```
 
 To uninstall the chart:
 
+```shell
     helm delete zaakbrug
+```
 
 ## Parameters
 
