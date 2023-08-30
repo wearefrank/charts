@@ -472,10 +472,11 @@ zaakbrug:
 ##
 ## Following sections are about configuring OpenZaak (used as staging zaaksysteem) and the API proxy.
 ##
+## Ref: https://open-zaak.readthedocs.io/en/stable/installation/kubernetes.html
+##
 ## OpenZaak needs a Postgres database with PostGIS
 ##
-## Ref: https://github.com/maykinmedia/charts/tree/main/charts/openzaak
-##
+## ref: https://open-zaak.readthedocs.io/en/stable/installation/prerequisites.html#postgresql-with-postgis
 ## @descriptionEnd
 
 staging:
@@ -532,46 +533,142 @@ staging:
       password: ""
       name: ""
       sslmode: prefer
-  ## @param staging.persistence.enabled Toggle persistence
+  ## @param staging.persistence.enabled Toggle persistence for the staging zaaksysteem
   ## @param staging.persistence.storageClassName Configure which storage class should be used
   ##
   persistence:
     enabled: true
     storageClassName: ""
 
-  ## @skip staging.apiProxy
   apiProxy:
+    ## @skip staging.apiProxy.autoscaling
+    ##
     autoscaling:
       enabled: false
+    ## @param staging.apiProxy.replicaCount Number of API proxy replicas to deploy
+    ## NOTE: ReadWriteMany PVC(s) are required if replicaCount > 1
+    ##
     replicaCount: 1
+    ## @param staging.apiProxy.podAnnotations Annotations for API proxy pods
+    ## ref: https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/
+    ##
+    podAnnotations: {}
+    ## @param staging.apiProxy.podLabels Extra labels for API proxy pods
+    ## ref: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/
+    ##
     podLabels: { }
+    ## Configure Pods Security Context
+    ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container
+    ## @param staging.apiProxy.securityContext [object] Set API proxy container's Security Context
+    ## e.g.
+    ## securityContext: {}
+    ##  capabilities:
+    ##    drop:
+    ##      - ALL
+    ##  readOnlyRootFilesystem: true
+    ##  runAsNonRoot: true
+    ##  runAsUser: 1000
+    ##
     securityContext:
       readOnlyRootFilesystem: true
       runAsGroup: 1000
       runAsNonRoot: true
       runAsUser: 1000
+    ## API proxy image
+    ## ref: https://https://nexus.frankframework.org/#browse/browse:frankframework-docker:v2%2Ffrank-framework%2Ftags/
+    ## @param staging.apiProxy.image.registry API proxy image registry
+    ## @param staging.apiProxy.image.repository API proxy image repository
+    ## @param staging.apiProxy.image.tag API proxy image tag (immutable tags are recommended)
+    ##
     image:
+      registry: ""
       repository: nginxinc/nginx-unprivileged
       tag: stable
+      ## @param staging.apiProxy.image.pullPolicy API proxy image pull policy
+      ## Specify a imagePullPolicy
+      ## Defaults to 'Always' if image tag is 'latest', else set to 'IfNotPresent'
+      ## ref: https://kubernetes.io/docs/user-guide/images/#pre-pulling-images
+      ##
       pullPolicy: IfNotPresent
+      ## @param staging.apiProxy.image.pullSecrets API proxy image pull secrets
+      ## Optionally specify an array of imagePullSecrets.
+      ## Secrets must be manually created in the namespace.
+      ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
+      ## e.g:
+      ## pullSecrets:
+      ##   - myRegistryKeySecretName
+      ##
+      pullSecrets: [ ]
+    ## API proxy container's resource requests and limits
+    ## ref: https://kubernetes.io/docs/user-guide/compute-resources/
+    ## @param staging.apiProxy.resources [object] Set the resources for the API proxy containers
+    ## @param staging.apiProxy.resources.limits [string] The resources limits for the API proxy containers
+    ## @param staging.apiProxy.resources.requests.memory [string] The requested memory for the API proxy containers
+    ## @param staging.apiProxy.resources.requests.cpu [string] The requested cpu for the API proxy containers
+    ## e.g.:
+    ## resources
+    ##   limits:
+    ##     cpu: 2000m
+    ##     memory: 4200M
+    ##   requests:
+    ##     cpu: 2000m
+    ##     memory: 4200M
+    ##
     resources: { }
+    ## @param staging.apiProxy.existingConfigmap Set the name of an existing config-map to use as configuration for the API proxy
+    ##
     existingConfigmap: ''
+    ## API proxy service parameters
+    ##
     service:
+      ## @param staging.apiProxy.service.type API proxy service type
+      ##
       type: ClusterIP
+      ## @param staging.apiProxy.service.port API proxy service port
+      ##
       port: 80
-      annotations: { }
+      ## @param staging.apiProxy.service.annotations Annotations for the API proxy service
+      ##
+      annotations: {}
+    ## Configure the ingress resource that allows you to access the API proxy installation
+    ## ref: https://kubernetes.io/docs/concepts/services-networking/ingress/
+    ##
     ingress:
+      ## @param staging.apiProxy.ingress.enabled Enable ingress record generation for Frank!
+      ##
       enabled: false
+      ## @param staging.apiProxy.ingress.className IngressClass that will be used to implement the Ingress (Kubernetes 1.18+)
+      ## This is supported in Kubernetes 1.18+ and required if you have more than one IngressClass marked as the default for your cluster .
+      ## ref: https://kubernetes.io/blog/2020/04/02/improvements-to-the-ingress-api-in-kubernetes-1.18/
+      ##
       className: ""
+      ## @param staging.apiProxy.ingress.annotations Additional annotations for the Ingress resource. To enable certificate autogeneration, place here your cert-manager annotations.
+      ## For a full list of possible ingress annotations, please see
+      ## ref: https://github.com/kubernetes/ingress-nginx/blob/master/docs/user-guide/nginx-configuration/annotations.md
+      ## Use this parameter to set the required annotations for cert-manager, see
+      ## ref: https://cert-manager.io/docs/usage/ingress/#supported-annotations
+      ## e.g:
+      ## annotations:
+      ##   kubernetes.io/ingress.class: nginx
+      ##   kubernetes.io/tls-acme: 'true'
+      ##
       annotations: { }
-      # kubernetes.io/ingress.class: nginx
-      # kubernetes.io/tls-acme: "true"
+      ## @param staging.apiProxy.ingress.hosts [array] Set hosts for ingress
+      ## @param staging.apiProxy.ingress.hosts.host [string] Set hostname
+      ## @param staging.apiProxy.ingress.hosts.paths [array] Set multiple paths
+      ## @param staging.apiProxy.ingress.hosts.paths.path [string] Set path (context url)
+      ## @param staging.apiProxy.ingress.hosts.paths.pathType [string] Set type of path
+      ##
       hosts:
         - host: chart-example.local
           paths:
             - path: /
               pathType: ImplementationSpecific
+      ## @param staging.apiProxy.ingress.tls [array] Define tls secrets for hosts (implementation not done yet)
+      ## e.g.
+      ## tls:
+      ##   - secretName: chart-example-tls
+      ##     hosts:
+      ##       - chart-example.local
+      ##
       tls: [ ]
-      #  - secretName: chart-example-tls
-      #    hosts:
-      #      - chart-example.local

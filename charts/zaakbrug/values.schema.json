@@ -754,16 +754,6 @@
                                 }
                             }
                         },
-                        "replicaCount": {
-                            "type": "number",
-                            "description": "",
-                            "default": 1
-                        },
-                        "podLabels": {
-                            "type": "object",
-                            "description": "",
-                            "default": {}
-                        },
                         "securityContext": {
                             "type": "object",
                             "properties": {
@@ -789,74 +779,9 @@
                                 }
                             }
                         },
-                        "image": {
-                            "type": "object",
-                            "properties": {
-                                "repository": {
-                                    "type": "string",
-                                    "description": "",
-                                    "default": "nginxinc/nginx-unprivileged"
-                                },
-                                "tag": {
-                                    "type": "string",
-                                    "description": "",
-                                    "default": "stable"
-                                },
-                                "pullPolicy": {
-                                    "type": "string",
-                                    "description": "",
-                                    "default": "IfNotPresent"
-                                }
-                            }
-                        },
-                        "resources": {
-                            "type": "object",
-                            "description": "",
-                            "default": {}
-                        },
-                        "existingConfigmap": {
-                            "type": "string",
-                            "description": "",
-                            "default": ""
-                        },
-                        "service": {
-                            "type": "object",
-                            "properties": {
-                                "type": {
-                                    "type": "string",
-                                    "description": "",
-                                    "default": "ClusterIP"
-                                },
-                                "port": {
-                                    "type": "number",
-                                    "description": "",
-                                    "default": 80
-                                },
-                                "annotations": {
-                                    "type": "object",
-                                    "description": "",
-                                    "default": {}
-                                }
-                            }
-                        },
                         "ingress": {
                             "type": "object",
                             "properties": {
-                                "enabled": {
-                                    "type": "boolean",
-                                    "description": "",
-                                    "default": false
-                                },
-                                "className": {
-                                    "type": "string",
-                                    "description": "",
-                                    "default": ""
-                                },
-                                "annotations": {
-                                    "type": "object",
-                                    "description": "",
-                                    "default": {}
-                                },
                                 "hosts": {
                                     "type": "array",
                                     "description": "",
@@ -887,11 +812,97 @@
                                         }
                                     }
                                 },
+                                "enabled": {
+                                    "type": "boolean",
+                                    "description": "Enable ingress record generation for Frank!",
+                                    "default": false
+                                },
+                                "className": {
+                                    "type": "string",
+                                    "description": "IngressClass that will be used to implement the Ingress (Kubernetes 1.18+)",
+                                    "default": ""
+                                },
+                                "annotations": {
+                                    "type": "object",
+                                    "description": "Additional annotations for the Ingress resource. To enable certificate autogeneration, place here your cert-manager annotations.",
+                                    "default": {}
+                                },
                                 "tls": {
                                     "type": "array",
-                                    "description": "",
+                                    "description": "Define tls secrets for hosts (implementation not done yet)",
                                     "default": [],
                                     "items": {}
+                                }
+                            }
+                        },
+                        "replicaCount": {
+                            "type": "number",
+                            "description": "Number of API proxy replicas to deploy",
+                            "default": 1
+                        },
+                        "podAnnotations": {
+                            "type": "object",
+                            "description": "Annotations for API proxy pods",
+                            "default": {}
+                        },
+                        "podLabels": {
+                            "type": "object",
+                            "description": "Extra labels for API proxy pods",
+                            "default": {}
+                        },
+                        "image": {
+                            "type": "object",
+                            "properties": {
+                                "registry": {
+                                    "type": "string",
+                                    "description": "API proxy image registry",
+                                    "default": ""
+                                },
+                                "repository": {
+                                    "type": "string",
+                                    "description": "API proxy image repository",
+                                    "default": "nginxinc/nginx-unprivileged"
+                                },
+                                "tag": {
+                                    "type": "string",
+                                    "description": "API proxy image tag (immutable tags are recommended)",
+                                    "default": "stable"
+                                },
+                                "pullPolicy": {
+                                    "type": "string",
+                                    "description": "API proxy image pull policy",
+                                    "default": "IfNotPresent"
+                                },
+                                "pullSecrets": {
+                                    "type": "array",
+                                    "description": "API proxy image pull secrets",
+                                    "default": [],
+                                    "items": {}
+                                }
+                            }
+                        },
+                        "existingConfigmap": {
+                            "type": "string",
+                            "description": "Set the name of an existing config-map to use as configuration for the API proxy",
+                            "default": ""
+                        },
+                        "service": {
+                            "type": "object",
+                            "properties": {
+                                "type": {
+                                    "type": "string",
+                                    "description": "API proxy service type",
+                                    "default": "ClusterIP"
+                                },
+                                "port": {
+                                    "type": "number",
+                                    "description": "API proxy service port",
+                                    "default": 80
+                                },
+                                "annotations": {
+                                    "type": "object",
+                                    "description": "Annotations for the API proxy service",
+                                    "default": {}
                                 }
                             }
                         }
@@ -1007,7 +1018,7 @@
                     "properties": {
                         "enabled": {
                             "type": "boolean",
-                            "description": "Toggle persistence",
+                            "description": "Toggle persistence for the staging zaaksysteem",
                             "default": true
                         },
                         "storageClassName": {

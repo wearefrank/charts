@@ -1,5 +1,5 @@
 apiVersion: v2
-appVersion: "latest"
+appVersion: "1.12.34"
 description: A Helm chart for running ZaakBrug on Kubernetes
 name: zaakbrug
 icon: https://raw.githubusercontent.com/wearefrank/charts/master/charts/zaakbrug/icon.png
@@ -8,7 +8,7 @@ version: 2.0.0
 
 dependencies:
   - name: ff-common
-    version: ~0.1.12
+    version: ~0.1.13
     repository: https://ibissource.github.io/charts/
   - name: openzaak
     alias: staging

@@ -16,7 +16,7 @@ spec:
     metadata:
       annotations:
         checksum/configmap-apiProxy: {{ include (print $.Template.BasePath "/configmap.api-proxy.yaml") . | sha256sum }}
-        {{- with .Values.podAnnotations }}
+        {{- with .Values.staging.apiProxy.podAnnotations }}
           {{- toYaml . | nindent 10 }}
         {{- end }}
       labels:
@@ -25,19 +25,19 @@ spec:
             {{- toYaml . | nindent 12 }}
         {{- end }}
     spec:
-      {{- with .Values.imagePullSecrets }}
+      {{- with .Values.staging.apiProxy.image.pullSecrets }}
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       serviceAccountName: {{ include "ff-common.serviceAccountName" . }}
       securityContext:
-        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+        {{- toYaml .Values.staging.apiProxy.securityContext | nindent 8 }}
       containers:
         - name: api-proxy
           command: [ "/bin/bash", "-c", "nginx -g 'daemon off;'" ]
           securityContext:
             {{- toYaml .Values.staging.apiProxy.securityContext | nindent 12 }}
-          image: "{{ .Values.staging.apiProxy.image.repository }}:{{ .Values.staging.apiProxy.image.tag }}"
+          image: "{{ .Values.staging.apiProxy.image.repository }}{{ if .Values.staging.apiProxy.image.repository }}/{{ end }}{{ .Values.staging.apiProxy.image.repository }}:{{ .Values.staging.apiProxy.image.tag }}"
           imagePullPolicy: {{ .Values.staging.apiProxy.image.pullPolicy }}
           livenessProbe:
             httpGet:
