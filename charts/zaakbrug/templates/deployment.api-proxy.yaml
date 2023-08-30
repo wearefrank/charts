@@ -50,7 +50,7 @@ spec:
             {{- toYaml .Values.staging.apiProxy.resources | nindent 12 }}
           volumeMounts:
             - name: api-proxy-config
-              mountPath: /etc/apiProxy/conf.d
+              mountPath: /etc/nginx/conf.d
             {{- if .Values.staging.apiProxy.securityContext.readOnlyRootFilesystem }}
             - mountPath: /tmp
               name: tmpfs
