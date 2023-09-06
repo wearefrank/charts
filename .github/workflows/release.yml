@@ -35,6 +35,7 @@ jobs:
           charts_dir: charts
         env:
           CR_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+          CR_SKIP_EXISTING: true
   docs:
     needs: release
     name: Build documentation
