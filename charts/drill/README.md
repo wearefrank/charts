@@ -10,7 +10,7 @@ This repository contains a collection of files that can be used to deploy [Apach
 Kubernetes using Helm Charts. Supports single-node
 and [cluster](http://drill.apache.org/docs/installing-drill-in-distributed-mode/) modes.
 
-#### What are Helm and Charts?
+### What are Helm and Charts?
 
 [Helm](https://helm.sh/) is a package manager
 for [Kubernetes](https://kubernetes.io/). [Charts](https://helm.sh/docs/topics/charts/) are a packaging format in Helm
@@ -21,38 +21,6 @@ that can simplify deploying Kubernetes applications such as Drill Clusters.
 - A Kubernetes Cluster (this project is tested on a [K3s](https://k3s.io/) cluster)
 - [Helm](https://github.com/helm/helm#install) version 3 or greater
 - [Kubectl](https://kubernetes.io/docs/tasks/tools/install-kubectl/) version 1.16.0 or greater
-
-## Chart Structure
-
-Drill Helm charts are organized as a collection of files inside the `drill` directory. As Drill depends on Zookeeper for
-cluster co-ordination, a zookeeper chart is inside the [dependencies'](drill/charts) directory. The Zookeeper chart
-follows a similar structure as the Drill chart.
-
-```
-drill/   
-  Chart.yaml    # A YAML file with information about the chart
-  Chart.lock    # A YAML file containing information about the fetched dependencies
-  values.yaml   # The default configuration values for this chart
-  charts/       # A directory containing the ZK charts
-  templates/    # A directory of templates, when combined with values, will generate valid Kubernetes manifest files
-  docs/			# A directory containing files for the documentation
-```
-
-### Templates
-
-Helm Charts contain `templates` which are used to generate Kubernetes manifest files. These are YAML-formatted resource
-descriptions that Kubernetes can understand. These templates contain 'variables', values for which are picked up from
-the `values.yaml` file.
-
-Drill Helm Charts contain the following templates:
-
-### Values
-
-Helm Charts use `values.yaml` for providing default values to 'variables' used in the chart templates. These values may
-be overridden either by editing the `values.yaml` file or during `helm install`. For example, such as the namespace,
-number of drillbits and more to the `template` files
-
-Please refer to the [values.yaml](drill/values.yaml) file for details on default values for Drill Helm Charts.
 
 ## Usage
 
@@ -81,12 +49,43 @@ To uninstall the chart:
 helm delete zaakbrug
 ```
 
-#### Access Drill Web UI
+### Values
+
+Helm Charts use `values.yaml` for providing default values to 'variables' used in the chart templates. These values may
+be overridden either by editing the `values.yaml` file or during `helm install`. For example, such as the namespace,
+number of drillbits and more to the `template` files
+
+Please refer to the [values.yaml](values.yaml) file for details on default values for Drill Helm Charts.
+
+### Access Drill Web UI
 
 There is a service that can be used, but this one will jump from pod, which isn't very unfriendly. This will be fixed in
 the future. A ingress can be made to the service.
 
-### Autoscaling Drill Clusters
+## Chart Structure
+
+Drill Helm charts are organized as a collection of files inside the `drill` directory. As Drill depends on Zookeeper for
+cluster co-ordination, a zookeeper chart added as dependency in the [chart definition](Chart.yaml). The Zookeeper chart is maintained by Bitnami.
+
+```shell
+drill/   
+  Chart.yaml    # A YAML file with information about the chart
+  Chart.lock    # A YAML file containing information about the fetched dependencies
+  values.yaml   # The default configuration values for this chart
+  charts/       # A directory containing the ZK charts
+  templates/    # A directory of templates, when combined with values, will generate valid Kubernetes manifest files
+  docs/			# A directory containing files for the documentation
+```
+
+### Templates
+
+Helm Charts contain `templates` which are used to generate Kubernetes manifest files. These are YAML-formatted resource
+descriptions that Kubernetes can understand. These templates contain 'variables', values for which are picked up from
+the `values.yaml` file.
+
+Drill Helm Charts contain the following templates:
+
+## Autoscaling Drill Clusters
 
 The size of the Drill cluster (number of Drill Pod replicas / number of drill-bits) can not only be manually scaled up
 or down as shown above, but can also be autoscaled to simplify cluster management. When enabled, with a higher CPU
