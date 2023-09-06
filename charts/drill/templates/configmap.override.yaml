@@ -1,0 +1,20 @@
+{{/*
+ConfigMap for generating a context.xml including all connections
+*/}}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "drill.fullname" . }}-override
+  labels:
+    {{- include "drill.labels" . | nindent 4 }}
+data:
+  drill-override.conf: |-
+    drill.exec: {
+      cluster-id: "{{ include "drill.fullname" . }}",
+      zk.connect: "{{ include "zookeeper.fullname" . }}:2181",
+      http: {
+        enabled: true,
+        port: 8047
+      }
+    }
+

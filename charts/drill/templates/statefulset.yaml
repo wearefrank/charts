@@ -1,0 +1,107 @@
+apiVersion: apps/v1
+kind: StatefulSet
+{{ template "drill.metadata" . }}
+spec:
+  serviceName: {{ include "drill.fullname" . }}
+  podManagementPolicy: Parallel
+  {{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.replicaCount }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "drill.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "drill.selectorLabels" . | nindent 8 }}
+        {{- with .Values.podLabels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+     {{- end }}
+    spec:
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchExpressions:
+                  - key: app
+                    operator: In
+                    values:
+                      - drill-app
+              topologyKey: "kubernetes.io/hostname"
+      {{- with .Values.image.pullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "drill.serviceAccountName" . }}
+      containers:
+        - name: {{ .Chart.Name }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          image: "{{ .Values.image.registry }}{{ if .Values.image.registry }}/{{ end }}{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          stdin: true
+          command:
+            - /bin/bash
+            - -c
+            - "/opt/drill/bin/drillbit.sh start; tail -f /var/lib/drill/log/drillbit.out"
+{{/*          command:*/}}
+{{/*            - /bin/bash*/}}
+{{/*            - -c*/}}
+{{/*            - "sleep 9 && /opt/drill/bin/drillbit.sh restart && /opt/drill/bin/drill-embedded"*/}}
+          ports:
+            - containerPort: 8047
+              name: web
+            - containerPort: 31010
+              name: user
+            - containerPort: 31011
+              name: control
+            - containerPort: 31012
+              name: data
+{{/*          livenessProbe:*/}}
+{{/*            {{- toYaml .Values.livenessProbe | nindent 12 }}*/}}
+{{/*            exec:*/}}
+{{/*              command:*/}}
+{{/*                - /opt/drill/bin/drillbit.sh*/}}
+{{/*                - status*/}}
+{{/*          readinessProbe:*/}}
+{{/*            {{- toYaml .Values.livenessProbe | nindent 12 }}*/}}
+{{/*            exec:*/}}
+{{/*              command:*/}}
+{{/*                - /opt/drill/bin/drillbit.sh*/}}
+{{/*                - status*/}}
+          lifecycle:
+{{/*            postStart:*/}}
+{{/*              exec:*/}}
+{{/*                command:*/}}
+{{/*                  - /opt/drill/bin/drillbit.sh*/}}
+{{/*                  - start*/}}
+            preStop:
+              exec:
+                command:
+                  - /opt/drill/bin/drillbit.sh
+                  - stop # TODO: implement graceful_stop
+          {{- with .Values.resources }}
+          resources:
+            {{- toYaml . | nindent 2 }}
+          {{- end -}}
+          {{- if .Values.drill.drillConf.override }}
+          volumeMounts:
+            - mountPath: /opt/drill/conf/drill-override.conf
+              name: {{ template "drill.fullname" . }}-override
+              subPath: drill-override.conf
+          {{ end }}
+      terminationGracePeriodSeconds: {{ .Values.terminationGracePeriodSeconds }}
+      {{- if .Values.drill.drillConf.override }}
+      volumes:
+        - name: {{ template "drill.fullname" . }}-override
+          configMap:
+            name: {{ template "drill.fullname" . }}-override
+      {{ end }}
+      initContainers:
+        - name: zk-available
+          image: busybox
+          command: [ 'sh', '-c', 'until nc -z {{ include "zookeeper.fullname" . }} 2181; do echo Waiting for ZK to come up; sleep 5; done; ' ]

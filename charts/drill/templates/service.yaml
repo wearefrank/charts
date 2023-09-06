@@ -1,0 +1,20 @@
+apiVersion: v1
+kind: Service
+{{ template "drill.metadata" . }}
+spec:
+  ports:
+  - name: http
+    port: {{ .Values.service.webPort }}
+    targetPort: 8047
+  - name: user
+    port: {{ .Values.service.userPort }}
+    targetPort: 31010
+  - name: control
+    port: {{ .Values.service.controlPort }}
+    targetPort: 31011
+  - name: data
+    port: {{ add .Values.service.dataPort 2 }}
+    targetPort: 31012
+  type: {{ .Values.service.type }}
+  selector:
+    {{- include "drill.selectorLabels" . | nindent 4 }}
