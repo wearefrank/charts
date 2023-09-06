@@ -1,0 +1,274 @@
+{
+    "title": "Chart Values",
+    "type": "object",
+    "properties": {
+        "nameOverride": {
+            "type": "string",
+            "description": "String to partially override common.names.fullname template (will maintain the release name)",
+            "default": ""
+        },
+        "fullnameOverride": {
+            "type": "string",
+            "description": "String to fully override common.names.fullname template",
+            "default": ""
+        },
+        "image": {
+            "type": "object",
+            "properties": {
+                "registry": {
+                    "type": "string",
+                    "description": "Drill image registry",
+                    "default": ""
+                },
+                "repository": {
+                    "type": "string",
+                    "description": "Drill image repository",
+                    "default": "apache/drill"
+                },
+                "tag": {
+                    "type": "string",
+                    "description": "Drill image tag (immutable tags are recommended)",
+                    "default": ""
+                },
+                "pullPolicy": {
+                    "type": "string",
+                    "description": "Drill image pull policy",
+                    "default": "IfNotPresent"
+                },
+                "pullSecrets": {
+                    "type": "array",
+                    "description": "Drill image pull secrets",
+                    "default": [],
+                    "items": {}
+                }
+            }
+        },
+        "replicaCount": {
+            "type": "number",
+            "description": "Number of Drill replicas to deploy",
+            "default": 3
+        },
+        "livenessProbe": {
+            "type": "object",
+            "properties": {
+                "initialDelaySeconds": {
+                    "type": "number",
+                    "description": "Initial delay seconds for livenessProbe",
+                    "default": 40
+                },
+                "periodSeconds": {
+                    "type": "number",
+                    "description": "Period seconds for livenessProbe",
+                    "default": 10
+                },
+                "timeoutSeconds": {
+                    "type": "number",
+                    "description": "Timeout seconds for livenessProbe",
+                    "default": 1
+                },
+                "failureThreshold": {
+                    "type": "number",
+                    "description": "Failure threshold for livenessProbe",
+                    "default": 6
+                },
+                "successThreshold": {
+                    "type": "number",
+                    "description": "Success threshold for livenessProbe",
+                    "default": 1
+                }
+            }
+        },
+        "autoscaling": {
+            "type": "object",
+            "properties": {
+                "enabled": {
+                    "type": "boolean",
+                    "description": "",
+                    "default": false
+                },
+                "minReplicas": {
+                    "type": "number",
+                    "description": "",
+                    "default": 1
+                },
+                "maxReplicas": {
+                    "type": "number",
+                    "description": "",
+                    "default": 100
+                },
+                "targetCPUUtilizationPercentage": {
+                    "type": "number",
+                    "description": "",
+                    "default": 80
+                },
+                "targetMemoryUtilizationPercentage": {
+                    "type": "number",
+                    "description": "",
+                    "default": 80
+                }
+            }
+        },
+        "terminationGracePeriodSeconds": {
+            "type": "number",
+            "description": "Number of seconds after which pods are forcefully killed",
+            "default": 60
+        },
+        "nodeSelector": {
+            "type": "object",
+            "description": "Node labels for pod assignment",
+            "default": {}
+        },
+        "tolerations": {
+            "type": "array",
+            "description": "Set tolerations for pod assignment",
+            "default": [],
+            "items": {}
+        },
+        "affinity": {
+            "type": "object",
+            "description": "Set affinity for pod assignment",
+            "default": {}
+        },
+        "timeZone": {
+            "type": "string",
+            "description": "used for database connection and log timestamps",
+            "default": "Etc/UTC"
+        },
+        "service": {
+            "type": "object",
+            "properties": {
+                "type": {
+                    "type": "string",
+                    "description": "Drill service type",
+                    "default": "ClusterIP"
+                },
+                "webPort": {
+                    "type": "number",
+                    "description": "Needed for the Drill Web UI.",
+                    "default": 80
+                },
+                "userPort": {
+                    "type": "number",
+                    "description": "User port address. Used between nodes in a Drill cluster. Needed for an external client, such as Tableau, to connect into the cluster nodes. Also needed for the Drill Web UI.",
+                    "default": 31010
+                },
+                "controlPort": {
+                    "type": "number",
+                    "description": "Control port address. Used between nodes in a Drill cluster. Needed for multi-node installation of Apache Drill.",
+                    "default": 31011
+                },
+                "dataPort": {
+                    "type": "number",
+                    "description": "Data port address. Used between nodes in a Drill cluster. Needed for multi-node installation of Apache Drill.",
+                    "default": 31012
+                }
+            }
+        },
+        "ingress": {
+            "type": "object",
+            "properties": {
+                "hosts": {
+                    "type": "array",
+                    "description": "",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "host": {
+                                "type": "string",
+                                "description": ""
+                            },
+                            "paths": {
+                                "type": "array",
+                                "description": "",
+                                "items": {
+                                    "type": "object",
+                                    "properties": {
+                                        "path": {
+                                            "type": "string",
+                                            "description": ""
+                                        },
+                                        "pathType": {
+                                            "type": "string",
+                                            "description": ""
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "enabled": {
+                    "type": "boolean",
+                    "description": "Enable ingress record generation for Frank!",
+                    "default": false
+                },
+                "className": {
+                    "type": "string",
+                    "description": "IngressClass that will be used to implement the Ingress (Kubernetes 1.18+)",
+                    "default": ""
+                },
+                "annotations": {
+                    "type": "object",
+                    "description": "Additional annotations for the Ingress resource. To enable certificate autogeneration, place here your cert-manager annotations.",
+                    "default": {}
+                },
+                "tls": {
+                    "type": "array",
+                    "description": "Define tls secrets for hosts (implementation not done yet)",
+                    "default": [],
+                    "items": {}
+                }
+            }
+        },
+        "drill": {
+            "type": "object",
+            "properties": {
+                "drillConf": {
+                    "type": "object",
+                    "properties": {
+                        "override": {
+                            "type": "boolean",
+                            "description": "",
+                            "default": true
+                        },
+                        "configMapName": {
+                            "type": "string",
+                            "description": "",
+                            "default": "drill-config-override-cm"
+                        }
+                    }
+                }
+            }
+        },
+        "serviceAccount": {
+            "type": "object",
+            "properties": {
+                "create": {
+                    "type": "boolean",
+                    "description": "Enable creation of ServiceAccount for Drill pod",
+                    "default": true
+                },
+                "annotations": {
+                    "type": "object",
+                    "description": "Additional custom annotations for the ServiceAccount",
+                    "default": {}
+                },
+                "name": {
+                    "type": "string",
+                    "description": "The name of the ServiceAccount to use.",
+                    "default": ""
+                }
+            }
+        },
+        "podAnnotations": {
+            "type": "object",
+            "description": "Annotations for Drill pods",
+            "default": {}
+        },
+        "podLabels": {
+            "type": "object",
+            "description": "Extra labels for Drill pods",
+            "default": {}
+        }
+    }
+}

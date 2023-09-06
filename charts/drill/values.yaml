@@ -1,0 +1,246 @@
+## @section Common parameters
+##
+
+## @param nameOverride String to partially override common.names.fullname template (will maintain the release name)
+##
+nameOverride: ""
+## @param fullnameOverride String to fully override common.names.fullname template
+##
+fullnameOverride: ""
+
+## @section Drill image parameters
+##
+
+## Drill image
+## ref: https://hub.docker.com/r/apache/drill
+## @param image.registry Drill image registry
+## @param image.repository Drill image repository
+## @param image.tag Drill image tag (immutable tags are recommended)
+##
+image:
+  registry: ""
+  repository: apache/drill
+  tag: ""
+  ## @param image.pullPolicy Drill image pull policy
+  ## Specify a imagePullPolicy
+  ## Defaults to 'Always' if image tag is 'latest', else set to 'IfNotPresent'
+  ## ref: https://kubernetes.io/docs/user-guide/images/#pre-pulling-images
+  ##
+  pullPolicy: IfNotPresent
+  ## @param image.pullSecrets Drill image pull secrets
+  ## Optionally specify an array of imagePullSecrets.
+  ## Secrets must be manually created in the namespace.
+  ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
+  ## e.g:
+  ## pullSecrets:
+  ##   - myRegistryKeySecretName
+  ##
+  pullSecrets: []
+
+## @section Drill deployment parameters
+##
+
+## @param replicaCount Number of Drill replicas to deploy
+## NOTE: ReadWriteMany PVC(s) are required if replicaCount > 1
+##
+replicaCount: 3
+
+## Configure extra options for Drill containers' liveness, readiness and startup probes
+## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/#configure-probes
+## @param livenessProbe.initialDelaySeconds Initial delay seconds for livenessProbe
+## @param livenessProbe.periodSeconds Period seconds for livenessProbe
+## @param livenessProbe.timeoutSeconds Timeout seconds for livenessProbe
+## @param livenessProbe.failureThreshold Failure threshold for livenessProbe
+## @param livenessProbe.successThreshold Success threshold for livenessProbe
+##
+livenessProbe:
+  initialDelaySeconds: 40
+  periodSeconds: 10
+  timeoutSeconds: 1
+  failureThreshold: 6
+  successThreshold: 1
+## Drill container's resource requests and limits
+## ref: https://kubernetes.io/docs/user-guide/compute-resources/
+## @param resources [object] Set the resources for the Drill containers
+## @param resources.limits [string] The resources limits for the Drill containers
+## @param resources.requests.memory [string] The requested memory for the Drill containers
+## @param resources.requests.cpu [string] The requested cpu for the Drill containers
+## e.g.:
+## resources
+##   limits:
+##     cpu: 2000m
+##     memory: 4200M
+##   requests:
+##     cpu: 2000m
+##     memory: 4200M
+##
+resources: {}
+
+## @skip autoscaling
+##
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 100
+  targetCPUUtilizationPercentage: 80
+  targetMemoryUtilizationPercentage: 80
+
+## @param terminationGracePeriodSeconds Number of seconds after which pods are forcefully killed
+## @extra terminationGracePeriodSeconds Note: Lower values may cause running queries to fail
+terminationGracePeriodSeconds: 60
+
+## @param nodeSelector Node labels for pod assignment
+## ref: https://kubernetes.io/docs/user-guide/node-selection/
+##
+nodeSelector: {}
+
+## @param tolerations Set tolerations for pod assignment
+## ref: https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/
+##
+tolerations: []
+
+## @param affinity Set affinity for pod assignment
+## Ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity
+## NOTE: podAffinityPreset, podAntiAffinityPreset, and nodeAffinityPreset will be ignored when it's set
+##
+affinity: {}
+
+## @param timeZone used for database connection and log timestamps
+##
+timeZone: Etc/UTC
+
+## @section Traffic Exposure Parameters
+##
+
+## Drill service parameters
+##
+service:
+  ## @param service.type Drill service type
+  ##
+  type: ClusterIP
+  ## @param service.webPort Needed for the Drill Web UI.
+  ##
+  webPort: 80
+  ## @param service.userPort User port address. Used between nodes in a Drill cluster. Needed for an external client, such as Tableau, to connect into the cluster nodes. Also needed for the Drill Web UI.
+  ##
+  userPort: 31010
+  ## @param service.controlPort Control port address. Used between nodes in a Drill cluster. Needed for multi-node installation of Apache Drill.
+  ##
+  controlPort: 31011
+  ## @param service.dataPort Data port address. Used between nodes in a Drill cluster. Needed for multi-node installation of Apache Drill.
+  ##
+  dataPort: 31012
+
+## Configure the ingress resource that allows you to access the Drill installation
+## ref: https://kubernetes.io/docs/concepts/services-networking/ingress/
+##
+ingress:
+  ## @param ingress.enabled Enable ingress record generation for Frank!
+  ##
+  enabled: false
+  ## @param ingress.className IngressClass that will be used to implement the Ingress (Kubernetes 1.18+)
+  ## This is supported in Kubernetes 1.18+ and required if you have more than one IngressClass marked as the default for your cluster .
+  ## ref: https://kubernetes.io/blog/2020/04/02/improvements-to-the-ingress-api-in-kubernetes-1.18/
+  ##
+  className: ""
+  ## @param ingress.annotations Additional annotations for the Ingress resource. To enable certificate autogeneration, place here your cert-manager annotations.
+  ## For a full list of possible ingress annotations, please see
+  ## ref: https://github.com/kubernetes/ingress-nginx/blob/master/docs/user-guide/nginx-configuration/annotations.md
+  ## Use this parameter to set the required annotations for cert-manager, see
+  ## ref: https://cert-manager.io/docs/usage/ingress/#supported-annotations
+  ## e.g:
+  ## annotations:
+  ##   kubernetes.io/ingress.class: nginx
+  ##   kubernetes.io/tls-acme: 'true'
+  ##
+  annotations: {}
+  ## @param ingress.hosts [array] Set hosts for ingress
+  ## @param ingress.hosts.host [string] Set hostname
+  ## @param ingress.hosts.paths [array] Set multiple paths
+  ## @param ingress.hosts.paths.path [string] Set path (context url)
+  ## @param ingress.hosts.paths.pathType [string] Set type of path
+  ##
+  hosts:
+    - host: chart-example.local
+      paths:
+        - path: /
+          pathType: ImplementationSpecific
+  ## @param ingress.tls [array] Define tls secrets for hosts (implementation not done yet)
+  ## e.g.
+  ## tls:
+  ##   - secretName: chart-example-tls
+  ##     hosts:
+  ##       - chart-example.local
+  ##
+  tls: []
+
+## @section Other Parameters
+##
+
+## Drill Service Account
+## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/
+##
+serviceAccount:
+  ## @param serviceAccount.create Enable creation of ServiceAccount for Drill pod
+  ##
+  create: true
+  ## @param serviceAccount.annotations Additional custom annotations for the ServiceAccount
+  ##
+  annotations: {}
+  ## @param serviceAccount.name The name of the ServiceAccount to use.
+  ## If not set and create is true, a name is generated using the ff-common.fullname template
+  ##
+  name: ""
+
+## @param podAnnotations Annotations for Drill pods
+## ref: https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/
+##
+podAnnotations: {}
+
+## @param podLabels Extra labels for Drill pods
+## ref: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/
+##
+podLabels: {}
+
+## Configure Pods Security Context
+## ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod
+## @param podSecurityContext [object] Set Drill pod's Security Context
+##
+podSecurityContext: {}
+
+## Configure Container Security Context (only main container)
+## ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container
+## @param securityContext [object] Set Drill container's Security Context
+## e.g.
+## securityContext: {}
+##  capabilities:
+##    drop:
+##      - ALL
+##  readOnlyRootFilesystem: true
+##  runAsNonRoot: true
+##  runAsUser: 1000
+##
+securityContext: {}
+
+## @skip drill
+drill:
+  # Drill Configuration can be overridden by mounting them on each Drill container.
+  # Edit the files in `conf` with your custom configurations
+  # Use `conf/createCM.sh` to create the ConfigMap
+  drillConf:
+    # Flag to turn-on / turn-off this option
+    # TODO extend this
+    override: true
+    # Name of the ConfigMap with Drill config files
+    # TODO existing
+    configMapName: drill-config-override-cm
+    # TODO Inline in values
+    # TODO persistent
+
+# TODO idea?
+#  config:
+#    drill-override.conf:
+#      existingConfigMap: ""
+#      data: |-
+#
+

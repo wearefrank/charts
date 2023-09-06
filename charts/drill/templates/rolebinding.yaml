@@ -1,0 +1,11 @@
+kind: RoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+{{ template "drill.metadata" . }}
+subjects:
+  - kind: ServiceAccount
+    name: drill-sa
+roleRef:
+  kind: Role
+  name: drill-role
+  apiGroup: rbac.authorization.k8s.io
+
