@@ -21,6 +21,7 @@ jobs:
       - name: Helm repo
         run: |
           helm repo add ibissource https://ibissource.github.io/charts/ &&
+          helm repo add bitnami https://charts.bitnami.com/bitnami &&
           helm repo add maykinmedia https://maykinmedia.github.io/charts/
       - name: Helm Deps
         run: |
