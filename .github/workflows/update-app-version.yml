@@ -1,4 +1,4 @@
-name: update appVersion
+name: Update appVersion
 on:
   workflow_dispatch:
     inputs:
@@ -15,13 +15,16 @@ jobs:
   update:
     runs-on: ubuntu-latest
     steps:
-      - name: echo distinct ID ${{ github.event.inputs.distinct_id }}
-        run: echo ${{ github.event.inputs.distinct_id }}
-      - name: echo actor
-        run: echo ${{ github.actor }}
-      - name: The chart ${{ github.event.inputs.chart }} will be updated to appVersion ${{ github.event.inputs.appVersion }}
-        run: echo The chart ${{ github.event.inputs.chart }} will be updated to appVersion ${{ github.event.inputs.appVersion }}
+      - name: echo distinct ID ${{ inputs.distinct_id }}
+        run: echo ${{ inputs.distinct_id }}
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Install PyBump
+        run: pip install pybump
+      - name: The chart ${{ inputs.chart }} will be updated to appVersion ${{ inputs.appVersion }} and automatically bumped
+        run: echo The chart ${{ inputs.chart }} will be updated to appVersion ${{ inputs.appVersion }}
       - name: update appVersion
-        run: echo WIP
+        run: pybump set --app-version --set-version ${{ inputs.appVersion }} --file ${{ inputs.chart }}/Chart.yaml
       - name: update version
-        run: echo WIP
+        run: pybump bump --level patch --file charts/zaakbrug/Chart.yaml
+#      - uses: stefanzweifel/git-auto-commit-action@v4
