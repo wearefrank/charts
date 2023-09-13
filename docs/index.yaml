@@ -1,0 +1,44 @@
+apiVersion: v1
+entries:
+  drill:
+  - apiVersion: v2
+    appVersion: 1.21.1
+    created: "2023-09-06T08:44:06.019942778Z"
+    dependencies:
+    - name: zookeeper
+      repository: https://charts.bitnami.com/bitnami
+      version: 12.1.2
+    description: Helm Charts for deploying Apache Drill Clusters on Kubernetes
+    digest: 3ac00656cff0c71b8244193aac7a2af0b51ff47421aaa82635d4ebb6347c78eb
+    home: https://drill.apache.org/
+    keywords:
+    - drill
+    name: drill
+    sources:
+    - https://github.com/wearefrank/charts
+    type: application
+    urls:
+    - https://github.com/wearefrank/charts/releases/download/drill-1.1.0/drill-1.1.0.tgz
+    version: 1.1.0
+  zaakbrug:
+  - apiVersion: v2
+    appVersion: 1.12.34
+    created: "2023-08-30T15:02:47.327211654Z"
+    dependencies:
+    - name: ff-common
+      repository: https://ibissource.github.io/charts/
+      version: ~0.1.13
+    - alias: staging
+      condition: staging.enabled
+      name: openzaak
+      repository: https://maykinmedia.github.io/charts/
+      version: 1.1.0
+    description: A Helm chart for running ZaakBrug on Kubernetes
+    digest: 26471aa4c1408d50da27962da141d743302bf80ec644768b9934f41bff65c7d9
+    icon: https://raw.githubusercontent.com/wearefrank/charts/master/charts/zaakbrug/icon.png
+    name: zaakbrug
+    type: application
+    urls:
+    - https://github.com/wearefrank/charts/releases/download/zaakbrug-2.0.0/zaakbrug-2.0.0.tgz
+    version: 2.0.0
+generated: "2023-09-06T08:44:06.019949778Z"
