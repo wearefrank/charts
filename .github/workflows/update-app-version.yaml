@@ -1,0 +1,25 @@
+name: update-app-version
+on:
+  workflow_dispatch:
+    inputs:
+      distinct_id:
+      chart:
+        required: true
+        description: Path to chart to update
+      appVersion:
+        required: true
+        description: The desired version
+
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - name: echo actor
+        run: echo ${{ github.actor }}
+      - name: The chart ${{ github.event.inputs.chart }} will be updated to appVersion ${{ github.event.inputs.appVersion }}
+        run: echo The chart ${{ github.event.inputs.chart }} will be updated to appVersion ${{ github.event.inputs.appVersion }}
+      - name: update appVersion
+        run: echo WIP
+      - name: update version
+        run: echo WIP
