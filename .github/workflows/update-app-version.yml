@@ -1,4 +1,4 @@
-name: update-app-version
+name: update appVersion
 on:
   workflow_dispatch:
     inputs:
