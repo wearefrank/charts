@@ -1,6 +1,6 @@
 {
   "devDependencies": {
-    "@bitnami/readme-generator-for-helm": "^2.5.0",
+    "@bitnami/readme-generator-for-helm": "^2.5.1",
     "fs-extra": "^11.1.1",
     "husky": "^8.0.3"
   },

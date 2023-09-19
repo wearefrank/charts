@@ -230,7 +230,8 @@ drill:
     ## @param drill.overrideConfiguration.existingConfigMap The name of the configmap, containing configuration files to override
     ##
     existingConfigMap: ""
-    ## @param drill.overrideConfiguration.drill Multiline value for drill-override.conf
+    ## @skip drill.overrideConfiguration.drill
+    ## @extra drill.overrideConfiguration.drill Multiline value for drill-override.conf
     ##
     drill: >-
       drill.exec: {

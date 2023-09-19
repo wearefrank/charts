@@ -1,8 +1,9 @@
 apiVersion: v2
 name: drill
-version: 1.2.0
+version: 1.2.1
 appVersion: 1.21.1
 description: Helm Charts for deploying Apache Drill Clusters on Kubernetes
+icon: https://raw.githubusercontent.com/wearefrank/charts/master/charts/drill/icon.svg
 type: application
 keywords:
   - drill
