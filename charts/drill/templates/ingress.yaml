@@ -1,6 +1,7 @@
 {{/*
 Create an ingress for the service
 */}}
+{{- if .Values.ingress.enabled -}}
 {{- $fullName := include "drill.fullname" . -}}
 {{- if and .Values.ingress.className (not (semverCompare ">=1.18-0" .Capabilities.KubeVersion.GitVersion)) }}
   {{- if not (hasKey .Values.ingress.annotations "kubernetes.io/ingress.class") }}
@@ -52,8 +53,9 @@ spec:
               service:
                 name: {{ $fullName }}
                 port:
-                  name: web
+                  name: http
               {{- else }}
               {{- end }}
           {{- end }}
     {{- end }}
+{{- end -}}

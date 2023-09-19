@@ -129,7 +129,7 @@ Enable autoscaling by editing the autoscale section in `drill/values.yaml` file.
 | `resources.limits`                  | The resources limits for the Drill containers            | `""`      |
 | `resources.requests.memory`         | The requested memory for the Drill containers            | `""`      |
 | `resources.requests.cpu`            | The requested cpu for the Drill containers               | `""`      |
-| `terminationGracePeriodSeconds`     | Number of seconds after which pods are forcefully killed | `60`      |
+| `terminationGracePeriodSeconds`     | Number of seconds after which pods are forcefully killed | `25`      |
 | `terminationGracePeriodSeconds`     | Note: Lower values may cause running queries to fail     |           |
 | `nodeSelector`                      | Node labels for pod assignment                           | `{}`      |
 | `tolerations`                       | Set tolerations for pod assignment                       | `[]`      |
@@ -145,7 +145,7 @@ Enable autoscaling by editing the autoscale section in `drill/values.yaml` file.
 | `service.userPort`             | User port address. Used between nodes in a Drill cluster. Needed for an external client, such as Tableau, to connect into the cluster nodes. Also needed for the Drill Web UI. | `31010`     |
 | `service.controlPort`          | Control port address. Used between nodes in a Drill cluster. Needed for multi-node installation of Apache Drill.                                                               | `31011`     |
 | `service.dataPort`             | Data port address. Used between nodes in a Drill cluster. Needed for multi-node installation of Apache Drill.                                                                  | `31012`     |
-| `ingress.enabled`              | Enable ingress record generation for Frank!                                                                                                                                    | `false`     |
+| `ingress.enabled`              | Enable ingress record generation for Frank!                                                                                                                                    | `true`      |
 | `ingress.className`            | IngressClass that will be used to implement the Ingress (Kubernetes 1.18+)                                                                                                     | `""`        |
 | `ingress.annotations`          | Additional annotations for the Ingress resource. To enable certificate autogeneration, place here your cert-manager annotations.                                               | `{}`        |
 | `ingress.hosts`                | Set hosts for ingress                                                                                                                                                          | `[]`        |
@@ -166,3 +166,34 @@ Enable autoscaling by editing the autoscale section in `drill/values.yaml` file.
 | `podLabels`                  | Extra labels for Drill pods                          | `{}`   |
 | `podSecurityContext`         | Set Drill pod's Security Context                     | `{}`   |
 | `securityContext`            | Set Drill container's Security Context               | `{}`   |
+
+### Drill configuration
+
+| Name                                            | Description                                                                                                              | Value                                                                                                                                                                                                                                                                                                                                |
+| ----------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `drill.overrideConfiguration.existingConfigMap` | The name of the configmap, containing configuration files to override                                                    | `""`                                                                                                                                                                                                                                                                                                                                 |
+| `drill.overrideConfiguration.drill`             | Multiline value for drill-override.conf                                                                                  | `drill.exec: {
+  http.enabled: true,
+  impersonation: {
+    enabled: true,
+    max_chained_user_hops: 3
+  },
+  security: {
+    auth.mechanisms: ["PLAIN"]
+  },
+  security.user.auth: {
+    enabled: true,
+    packages += "org.apache.drill.exec.rpc.user.security",
+    impl: "pam4j",
+    pam_profiles: [ "sudo", "login" ]
+  }
+}` |
+| `drill.overrideConfiguration.drillMetastore`    | Multiline value for drill-metastore-override.conf                                                                        | `""`                                                                                                                                                                                                                                                                                                                                 |
+| `drill.overrideConfiguration.drillOnYarn`       | Multiline value for drill-on-yarn-override.conf                                                                          | `""`                                                                                                                                                                                                                                                                                                                                 |
+| `drill.overrideConfiguration.drillSqlLine`      | Multiline value for drill-sqlline-override.conf                                                                          | `""`                                                                                                                                                                                                                                                                                                                                 |
+| `drill.overrideConfiguration.storagePlugins`    | Multiline value for storage-plugins-override.conf Can also be configured in the Web UI and saved by persistent ZooKeeper | `""`                                                                                                                                                                                                                                                                                                                                 |
+| `drill.authentication.existingSecret`           | Name of the secret containing a passwd file                                                                              | `""`                                                                                                                                                                                                                                                                                                                                 |
+| `drill.authentication.users`                    | Users to create on the system                                                                                            | `[]`                                                                                                                                                                                                                                                                                                                                 |
+| `drill.authentication.users.name`               | Username for the user                                                                                                    | `""`                                                                                                                                                                                                                                                                                                                                 |
+| `drill.authentication.users.password`           | Password for the user                                                                                                    | `""`                                                                                                                                                                                                                                                                                                                                 |
+| `drill.authentication.users.admin`              | Configures if the user should be admin                                                                                   | `""`                                                                                                                                                                                                                                                                                                                                 |

@@ -111,7 +111,7 @@
         "terminationGracePeriodSeconds": {
             "type": "number",
             "description": "Number of seconds after which pods are forcefully killed",
-            "default": 60
+            "default": 25
         },
         "nodeSelector": {
             "type": "object",
@@ -200,7 +200,7 @@
                 "enabled": {
                     "type": "boolean",
                     "description": "Enable ingress record generation for Frank!",
-                    "default": false
+                    "default": true
                 },
                 "className": {
                     "type": "string",
@@ -217,26 +217,6 @@
                     "description": "Define tls secrets for hosts (implementation not done yet)",
                     "default": [],
                     "items": {}
-                }
-            }
-        },
-        "drill": {
-            "type": "object",
-            "properties": {
-                "drillConf": {
-                    "type": "object",
-                    "properties": {
-                        "override": {
-                            "type": "boolean",
-                            "description": "",
-                            "default": true
-                        },
-                        "configMapName": {
-                            "type": "string",
-                            "description": "",
-                            "default": "drill-config-override-cm"
-                        }
-                    }
                 }
             }
         },
@@ -269,6 +249,77 @@
             "type": "object",
             "description": "Extra labels for Drill pods",
             "default": {}
+        },
+        "drill": {
+            "type": "object",
+            "properties": {
+                "authentication": {
+                    "type": "object",
+                    "properties": {
+                        "users": {
+                            "type": "array",
+                            "description": "",
+                            "items": {
+                                "type": "object",
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "description": ""
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "description": ""
+                                    },
+                                    "admin": {
+                                        "type": "boolean",
+                                        "description": ""
+                                    }
+                                }
+                            }
+                        },
+                        "existingSecret": {
+                            "type": "string",
+                            "description": "Name of the secret containing a passwd file",
+                            "default": ""
+                        }
+                    }
+                },
+                "overrideConfiguration": {
+                    "type": "object",
+                    "properties": {
+                        "existingConfigMap": {
+                            "type": "string",
+                            "description": "The name of the configmap, containing configuration files to override",
+                            "default": ""
+                        },
+                        "drill": {
+                            "type": "string",
+                            "description": "Multiline value for drill-override.conf",
+                            "default": "drill.exec: {\n  http.enabled: true,\n  impersonation: {\n    enabled: true,\n    max_chained_user_hops: 3\n  },\n  security: {\n    auth.mechanisms: [\"PLAIN\"]\n  },\n  security.user.auth: {\n    enabled: true,\n    packages += \"org.apache.drill.exec.rpc.user.security\",\n    impl: \"pam4j\",\n    pam_profiles: [ \"sudo\", \"login\" ]\n  }\n}"
+                        },
+                        "drillMetastore": {
+                            "type": "string",
+                            "description": "Multiline value for drill-metastore-override.conf",
+                            "default": ""
+                        },
+                        "drillOnYarn": {
+                            "type": "string",
+                            "description": "Multiline value for drill-on-yarn-override.conf",
+                            "default": ""
+                        },
+                        "drillSqlLine": {
+                            "type": "string",
+                            "description": "Multiline value for drill-sqlline-override.conf",
+                            "default": ""
+                        },
+                        "storagePlugins": {
+                            "type": "string",
+                            "description": "Multiline value for storage-plugins-override.conf Can also be configured in the Web UI and saved by persistent ZooKeeper",
+                            "default": ""
+                        }
+                    }
+                }
+            }
         }
     }
 }

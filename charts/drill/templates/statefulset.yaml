@@ -48,10 +48,6 @@ spec:
             - /bin/bash
             - -c
             - "/opt/drill/bin/drillbit.sh start; tail -f /var/lib/drill/log/drillbit.out"
-{{/*          command:*/}}
-{{/*            - /bin/bash*/}}
-{{/*            - -c*/}}
-{{/*            - "sleep 9 && /opt/drill/bin/drillbit.sh restart && /opt/drill/bin/drill-embedded"*/}}
           ports:
             - containerPort: 8047
               name: web
@@ -74,11 +70,6 @@ spec:
 {{/*                - /opt/drill/bin/drillbit.sh*/}}
 {{/*                - status*/}}
           lifecycle:
-{{/*            postStart:*/}}
-{{/*              exec:*/}}
-{{/*                command:*/}}
-{{/*                  - /opt/drill/bin/drillbit.sh*/}}
-{{/*                  - start*/}}
             preStop:
               exec:
                 command:
@@ -86,22 +77,31 @@ spec:
                   - stop # TODO: implement graceful_stop
           {{- with .Values.resources }}
           resources:
-            {{- toYaml . | nindent 2 }}
-          {{- end -}}
-          {{- if .Values.drill.drillConf.override }}
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
           volumeMounts:
-            - mountPath: /opt/drill/conf/drill-override.conf
+            - mountPath: /opt/drill/conf/
               name: {{ template "drill.fullname" . }}-override
-              subPath: drill-override.conf
-          {{ end }}
+            - mountPath: /etc/passwd
+              name: {{ template "drill.fullname" . }}-users
+              subPath: passwd
       terminationGracePeriodSeconds: {{ .Values.terminationGracePeriodSeconds }}
-      {{- if .Values.drill.drillConf.override }}
       volumes:
         - name: {{ template "drill.fullname" . }}-override
           configMap:
+            {{- if .Values.drill.overrideConfiguration.existingConfigMap }}
+            name: {{ .Values.drill.overrideConfiguration.existingConfigMap }}
+            {{- else }}
             name: {{ template "drill.fullname" . }}-override
-      {{ end }}
+            {{- end }}
+        - name: {{ template "drill.fullname" . }}-users
+          secret:
+            {{- if .Values.drill.authentication.existingSecret }}
+            secretName: {{ .Values.drill.authentication.existingSecret }}
+            {{- else }}
+            secretName: {{ template "drill.fullname" . }}-users
+            {{- end }}
       initContainers:
-        - name: zk-available
+        - name: zookeeper-available
           image: busybox
-          command: [ 'sh', '-c', 'until nc -z {{ include "zookeeper.fullname" . }} 2181; do echo Waiting for ZK to come up; sleep 5; done; ' ]
+          command: [ 'sh', '-c', 'until nc -z {{ include "zookeeper.fullname" . }} 2181; do echo Waiting for ZooKeeper to come up; sleep 5; done; ' ]

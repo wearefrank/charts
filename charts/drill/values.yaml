@@ -59,6 +59,7 @@ livenessProbe:
   timeoutSeconds: 1
   failureThreshold: 6
   successThreshold: 1
+
 ## Drill container's resource requests and limits
 ## ref: https://kubernetes.io/docs/user-guide/compute-resources/
 ## @param resources [object] Set the resources for the Drill containers
@@ -87,7 +88,7 @@ autoscaling:
 
 ## @param terminationGracePeriodSeconds Number of seconds after which pods are forcefully killed
 ## @extra terminationGracePeriodSeconds Note: Lower values may cause running queries to fail
-terminationGracePeriodSeconds: 60
+terminationGracePeriodSeconds: 25
 
 ## @param nodeSelector Node labels for pod assignment
 ## ref: https://kubernetes.io/docs/user-guide/node-selection/
@@ -137,7 +138,7 @@ service:
 ingress:
   ## @param ingress.enabled Enable ingress record generation for Frank!
   ##
-  enabled: false
+  enabled: true
   ## @param ingress.className IngressClass that will be used to implement the Ingress (Kubernetes 1.18+)
   ## This is supported in Kubernetes 1.18+ and required if you have more than one IngressClass marked as the default for your cluster .
   ## ref: https://kubernetes.io/blog/2020/04/02/improvements-to-the-ingress-api-in-kubernetes-1.18/
@@ -161,7 +162,7 @@ ingress:
   ## @param ingress.hosts.paths.pathType [string] Set type of path
   ##
   hosts:
-    - host: chart-example.local
+    - host: drill.k8s.interpar.nl
       paths:
         - path: /
           pathType: ImplementationSpecific
@@ -222,25 +223,93 @@ podSecurityContext: {}
 ##
 securityContext: {}
 
-## @skip drill
+## @section Drill configuration
+##
 drill:
-  # Drill Configuration can be overridden by mounting them on each Drill container.
-  # Edit the files in `conf` with your custom configurations
-  # Use `conf/createCM.sh` to create the ConfigMap
-  drillConf:
-    # Flag to turn-on / turn-off this option
-    # TODO extend this
-    override: true
-    # Name of the ConfigMap with Drill config files
-    # TODO existing
-    configMapName: drill-config-override-cm
-    # TODO Inline in values
-    # TODO persistent
+  overrideConfiguration:
+    ## @param drill.overrideConfiguration.existingConfigMap The name of the configmap, containing configuration files to override
+    ##
+    existingConfigMap: ""
+    ## @param drill.overrideConfiguration.drill Multiline value for drill-override.conf
+    ##
+    drill: >-
+      drill.exec: {
+        http.enabled: true,
+        impersonation: {
+          enabled: true,
+          max_chained_user_hops: 3
+        },
+        security: {
+          auth.mechanisms: ["PLAIN"]
+        },
+        security.user.auth: {
+          enabled: true,
+          packages += "org.apache.drill.exec.rpc.user.security",
+          impl: "pam4j",
+          pam_profiles: [ "sudo", "login" ]
+        }
+      }
+    ## @param drill.overrideConfiguration.drillMetastore Multiline value for drill-metastore-override.conf
+    ##
+    drillMetastore: ""
+    ## @param drill.overrideConfiguration.drillOnYarn Multiline value for drill-on-yarn-override.conf
+    ##
+    drillOnYarn: ""
+    ## @param drill.overrideConfiguration.drillSqlLine Multiline value for drill-sqlline-override.conf
+    ##
+    drillSqlLine: ""
+    ## @param drill.overrideConfiguration.storagePlugins Multiline value for storage-plugins-override.conf Can also be configured in the Web UI and saved by persistent ZooKeeper
+    ##
+    storagePlugins: ""
+  authentication:
+    ## @param drill.authentication.existingSecret Name of the secret containing a passwd file
+    ##
+    existingSecret: ""
+    ## @param drill.authentication.users [array] Users to create on the system
+    ## @param drill.authentication.users.name [string] Username for the user
+    ## @param drill.authentication.users.password [string] Password for the user
+    ## @param drill.authentication.users.admin [nullable, string] Configures if the user should be admin
+    users:
+      - name: user
+        password: changeit
+      - name: admin
+        admin: true
+        password: changeit
 
-# TODO idea?
-#  config:
-#    drill-override.conf:
-#      existingConfigMap: ""
-#      data: |-
-#
-
+#persistence:
+#  ## @param persistence.enabled Enable persistence using Persistent Volume Claims
+#  ##
+#  enabled: true
+#  ## @param persistence.storageClass Persistent Volume storage class
+#  ## If defined, storageClassName: <storageClass>
+#  ## If set to "-", storageClassName: "", which disables dynamic provisioning
+#  ## If undefined (the default) or set to null, no storageClassName spec is set, choosing the default provisioner
+#  ##
+#  storageClass: ""
+#  ## @param persistence.accessModes [array] Persistent Volume access modes
+#  ##
+#  accessModes:
+#    - ReadWriteOnce
+#  ## @param persistence.accessMode Persistent Volume access mode (DEPRECATED: use `persistence.accessModes` instead)
+#  ##
+#  accessMode: ReadWriteOnce
+#  ## @param persistence.size Persistent Volume size
+#  ##
+#  size: 10Gi
+#  ## @param persistence.dataSource Custom PVC data source
+#  ##
+#  dataSource: {}
+#  ## @param persistence.existingClaim The name of an existing PVC to use for persistence
+#  ##
+#  existingClaim: ""
+#  ## @param persistence.selector Selector to match an existing Persistent Volume for WordPress data PVC
+#  ## If set, the PVC can't have a PV dynamically provisioned for it
+#  ## E.g.
+#  ## selector:
+#  ##   matchLabels:
+#  ##     app: my-app
+#  ##
+#  selector: {}
+#  ## @param persistence.annotations Persistent Volume Claim annotations
+#  ##
+#  annotations: {}

@@ -1,6 +1,7 @@
 {{/*
-ConfigMap for generating a context.xml including all connections
+ConfigMap for generating override.conf files
 */}}
+{{- if (not .Values.drill.overrideConfiguration.existingConfigMap) -}}
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -12,9 +13,23 @@ data:
     drill.exec: {
       cluster-id: "{{ include "drill.fullname" . }}",
       zk.connect: "{{ include "zookeeper.fullname" . }}:2181",
-      http: {
-        enabled: true,
-        port: 8047
-      }
+      http.port: 8047
     }
-
+    {{- toString .Values.drill.overrideConfiguration.drill | nindent 4 }}
+  {{- with .Values.drill.overrideConfiguration.drillMetastore }}
+  drill-metastore-override.conf: |-
+    {{- toString . | nindent 4 }}
+  {{- end }}
+  {{- with .Values.drill.overrideConfiguration.drillOnYarn}}
+  drill-on-yarn.conf: |-
+    {{- toString . | nindent 4 }}
+  {{- end }}
+  {{- with .Values.drill.overrideConfiguration.drillSqlLine }}
+  drill-sqlline-override.conf: |-
+    {{- toString . | nindent 4 }}
+  {{- end }}
+  {{- with .Values.drill.overrideConfiguration.storagePlugins }}
+  storage-plugins-override.conf: |-
+    {{- toString . | nindent 4 }}
+  {{- end }}
+{{- end -}}
