@@ -59,6 +59,12 @@ data:
         proxy_http_version 1.1;  # required if you're using istio, otherwise you get HTTP 426 errors
       }
 
+      location /_health/ {
+        access_log off;
+        error_log /var/log/nginx/error.log error;
+        return 200 'OK';
+      }
+
       error_page  404              /404.html;
       error_page  413              /413.json;
       error_page  500 502 503 504  /500.json;
