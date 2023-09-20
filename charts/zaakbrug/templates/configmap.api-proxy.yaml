@@ -19,6 +19,7 @@ data:
     {{- else }}
     proxy_set_header Host $http_host;
     {{- end }}
+
     proxy_redirect off;
     proxy_pass_request_headers on;
     proxy_pass http://{{ include "zaakbrug.fullname" . }}.{{ .Release.Namespace }}:{{ .Values.service.port }}/api/;
@@ -28,6 +29,7 @@ data:
       listen 8080 default_server;
       server_name {{ .Values.staging.settings.allowedHosts  | replace "," " "}} localhost;
       server_tokens off;
+
       gzip on;
       gzip_http_version 1.0;
       gzip_comp_level 2;
@@ -53,18 +55,23 @@ data:
       gzip_proxied  expired no-cache no-store private auth;
       gzip_disable "MSIE [1-6]\.";
       gzip_vary on;
+
       add_header Feature-Policy "autoplay 'none'; camera 'none'" always;
       add_header Referrer-Policy "same-origin";
       add_header X-Content-Type-Options "nosniff";
       add_header X-XSS-Protection "1; mode=block";
+
       location / {
+        client_max_body_size 4G;
         include conf.d/proxy;
       }
+
       location /_health/ {
         access_log off;
         error_log /tmp/error.log error;
         return 200 'OK';
       }
+
       error_page  404              /404.html;
       error_page  413              /413.json;
       error_page  500 502 503 504  /500.json;
