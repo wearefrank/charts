@@ -14,11 +14,7 @@ data:
     proxy_set_header X-Scheme $scheme;
     proxy_connect_timeout 300s;
     proxy_read_timeout 300s;
-    {{- if .Values.staging.settings.useXForwardedHost }}
-    proxy_set_header X-Forwarded-Host $http_host;
-    {{- else }}
     proxy_set_header Host $http_host;
-    {{- end }}
 
     proxy_redirect off;
     proxy_pass_request_headers on;
