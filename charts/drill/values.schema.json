@@ -200,7 +200,7 @@
                 "enabled": {
                     "type": "boolean",
                     "description": "Enable ingress record generation for Frank!",
-                    "default": true
+                    "default": false
                 },
                 "className": {
                     "type": "string",
@@ -253,37 +253,6 @@
         "drill": {
             "type": "object",
             "properties": {
-                "authentication": {
-                    "type": "object",
-                    "properties": {
-                        "users": {
-                            "type": "array",
-                            "description": "",
-                            "items": {
-                                "type": "object",
-                                "properties": {
-                                    "name": {
-                                        "type": "string",
-                                        "description": ""
-                                    },
-                                    "password": {
-                                        "type": "string",
-                                        "description": ""
-                                    },
-                                    "admin": {
-                                        "type": "boolean",
-                                        "description": ""
-                                    }
-                                }
-                            }
-                        },
-                        "existingSecret": {
-                            "type": "string",
-                            "description": "Name of the secret containing a passwd file",
-                            "default": ""
-                        }
-                    }
-                },
                 "overrideConfiguration": {
                     "type": "object",
                     "properties": {
@@ -295,7 +264,7 @@
                         "drill": {
                             "type": "string",
                             "description": "",
-                            "default": "drill.exec: {\n  http.enabled: true,\n  impersonation: {\n    enabled: true,\n    max_chained_user_hops: 3\n  },\n  security: {\n    auth.mechanisms: [\"PLAIN\"]\n  },\n  security.user.auth: {\n    enabled: true,\n    packages += \"org.apache.drill.exec.rpc.user.security\",\n    impl: \"pam4j\",\n    pam_profiles: [ \"sudo\", \"login\" ]\n  }\n}"
+                            "default": "drill.exec: {\n  http.enabled: true,\n}"
                         },
                         "drillMetastore": {
                             "type": "string",
@@ -316,6 +285,22 @@
                             "type": "string",
                             "description": "Multiline value for storage-plugins-override.conf Can also be configured in the Web UI and saved by persistent ZooKeeper",
                             "default": ""
+                        }
+                    }
+                },
+                "authentication": {
+                    "type": "object",
+                    "properties": {
+                        "existingSecret": {
+                            "type": "string",
+                            "description": "Name of the secret containing a passwd file",
+                            "default": ""
+                        },
+                        "users": {
+                            "type": "array",
+                            "description": "Users to create on the system",
+                            "default": [],
+                            "items": {}
                         }
                     }
                 }

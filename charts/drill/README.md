@@ -59,8 +59,7 @@ Please refer to the [values.yaml](values.yaml) file for details on default value
 
 ### Access Drill Web UI
 
-There is a service that can be used, but this one will jump from pod, which isn't very unfriendly. This will be fixed in
-the future. A ingress can be made to the service.
+There is a service that can be used, but this one will jump from pod, which isn't very friendly. Depending on ingress class you can make this sticky with annotations. You could also change the 
 
 ## Chart Structure
 
@@ -145,7 +144,7 @@ Enable autoscaling by editing the autoscale section in `drill/values.yaml` file.
 | `service.userPort`             | User port address. Used between nodes in a Drill cluster. Needed for an external client, such as Tableau, to connect into the cluster nodes. Also needed for the Drill Web UI. | `31010`     |
 | `service.controlPort`          | Control port address. Used between nodes in a Drill cluster. Needed for multi-node installation of Apache Drill.                                                               | `31011`     |
 | `service.dataPort`             | Data port address. Used between nodes in a Drill cluster. Needed for multi-node installation of Apache Drill.                                                                  | `31012`     |
-| `ingress.enabled`              | Enable ingress record generation for Frank!                                                                                                                                    | `true`      |
+| `ingress.enabled`              | Enable ingress record generation for Frank!                                                                                                                                    | `false`     |
 | `ingress.className`            | IngressClass that will be used to implement the Ingress (Kubernetes 1.18+)                                                                                                     | `""`        |
 | `ingress.annotations`          | Additional annotations for the Ingress resource. To enable certificate autogeneration, place here your cert-manager annotations.                                               | `{}`        |
 | `ingress.hosts`                | Set hosts for ingress                                                                                                                                                          | `[]`        |
@@ -168,6 +167,32 @@ Enable autoscaling by editing the autoscale section in `drill/values.yaml` file.
 | `securityContext`            | Set Drill container's Security Context               | `{}`   |
 
 ### Drill configuration
+
+Configuring Drill can be done with override files or in the web ui, altough some properties can only be set in the override file.
+When using the web ui, ZooKeeper will be used to store the values. Make sure that the storage of ZooKeeper is persistent if you intent to configure this way.
+
+This is an example where the web ui and authentication for local (plain) users is enabled.
+
+```json
+drill.exec: {
+http.enabled: true,
+impersonation: {
+enabled: true,
+max_chained_user_hops: 3
+},
+security: {
+auth.mechanisms: ["PLAIN"]
+},
+security.user.auth: {
+enabled: true,
+packages += "org.apache.drill.exec.rpc.user.security",
+impl: "pam4j",
+pam_profiles: [ "sudo", "login" ]
+}
+}
+```
+
+For more options refer to the [Apache Drill documentation](https://drill.apache.org/docs/configuration-options-introduction/).
 
 | Name                                            | Description                                                                                                              | Value |
 | ----------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ | ----- |

@@ -138,7 +138,7 @@ service:
 ingress:
   ## @param ingress.enabled Enable ingress record generation for Frank!
   ##
-  enabled: true
+  enabled: false
   ## @param ingress.className IngressClass that will be used to implement the Ingress (Kubernetes 1.18+)
   ## This is supported in Kubernetes 1.18+ and required if you have more than one IngressClass marked as the default for your cluster .
   ## ref: https://kubernetes.io/blog/2020/04/02/improvements-to-the-ingress-api-in-kubernetes-1.18/
@@ -162,7 +162,7 @@ ingress:
   ## @param ingress.hosts.paths.pathType [string] Set type of path
   ##
   hosts:
-    - host: drill.k8s.interpar.nl
+    - host: drill.example.com
       paths:
         - path: /
           pathType: ImplementationSpecific
@@ -224,6 +224,33 @@ podSecurityContext: {}
 securityContext: {}
 
 ## @section Drill configuration
+## @descriptionStart
+## Configuring Drill can be done with override files or in the web ui, altough some properties can only be set in the override file.
+## When using the web ui, ZooKeeper will be used to store the values. Make sure that the storage of ZooKeeper is persistent if you intent to configure this way.
+##
+## This is an example where the web ui and authentication for local (plain) users is enabled.
+##
+## ```json
+## drill.exec: {
+##   http.enabled: true,
+##   impersonation: {
+##     enabled: true,
+##     max_chained_user_hops: 3
+##   },
+##   security: {
+##     auth.mechanisms: ["PLAIN"]
+##   },
+##   security.user.auth: {
+##     enabled: true,
+##     packages += "org.apache.drill.exec.rpc.user.security",
+##     impl: "pam4j",
+##     pam_profiles: [ "sudo", "login" ]
+##   }
+## }
+## ```
+##
+## For more options refer to the [Apache Drill documentation](https://drill.apache.org/docs/configuration-options-introduction/).
+## @descriptionEnd
 ##
 drill:
   overrideConfiguration:
@@ -236,19 +263,6 @@ drill:
     drill: >-
       drill.exec: {
         http.enabled: true,
-        impersonation: {
-          enabled: true,
-          max_chained_user_hops: 3
-        },
-        security: {
-          auth.mechanisms: ["PLAIN"]
-        },
-        security.user.auth: {
-          enabled: true,
-          packages += "org.apache.drill.exec.rpc.user.security",
-          impl: "pam4j",
-          pam_profiles: [ "sudo", "login" ]
-        }
       }
     ## @param drill.overrideConfiguration.drillMetastore Multiline value for drill-metastore-override.conf
     ##
@@ -260,6 +274,7 @@ drill:
     ##
     drillSqlLine: ""
     ## @param drill.overrideConfiguration.storagePlugins Multiline value for storage-plugins-override.conf Can also be configured in the Web UI and saved by persistent ZooKeeper
+    ## Ref: https://drill.apache.org/docs/plugin-configuration-basics/
     ##
     storagePlugins: ""
   authentication:
@@ -270,12 +285,15 @@ drill:
     ## @param drill.authentication.users.name [string] Username for the user
     ## @param drill.authentication.users.password [string] Password for the user
     ## @param drill.authentication.users.admin [nullable, string] Configures if the user should be admin
-    users:
-      - name: user
-        password: changeit
-      - name: admin
-        admin: true
-        password: changeit
+    ## e.g.
+    ## users:
+    ##   - name: user
+    ##     password: changeit
+    ##   - name: admin
+    ##     admin: true
+    ##     password: changeit
+    ##
+    users: []
 
 #persistence:
 #  ## @param persistence.enabled Enable persistence using Persistent Volume Claims
