@@ -59,11 +59,6 @@ data:
       add_header X-XSS-Protection "1; mode=block";
       location / {
         include conf.d/proxy;
-
-        location /documenten/api/v1/enkelvoudiginformatieobjecten {
-          client_max_body_size 4G;
-          include conf.d/proxy;
-        }
       }
       location /_health/ {
         access_log off;
