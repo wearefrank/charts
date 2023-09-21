@@ -1,10 +1,10 @@
 ## @section Common parameters
 ##
 
-## @param nameOverride String to partially override common.names.fullname template (will maintain the release name)
+## @param nameOverride String to partially override ff-common.fullname template (will maintain the release name)
 ##
 nameOverride: ""
-## @param fullnameOverride String to fully override common.names.fullname template
+## @param fullnameOverride String to fully override ff-common.fullname template
 ##
 fullnameOverride: ""
 
@@ -539,6 +539,12 @@ staging:
     storageClassName: ""
 
   apiProxy:
+    ## @param staging.apiProxy.nameOverride String to partially override zaakbrug.apiProxyFullname template (will maintain the release name)
+    ##
+    nameOverride: ""
+    ## @param staging.apiProxy.fullnameOverride String to fully override zaakbrug.apiProxyFullname template
+    ##
+    fullnameOverride: ""
     ## @skip staging.apiProxy.autoscaling
     ##
     autoscaling:

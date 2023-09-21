@@ -35,10 +35,10 @@ helm delete zaakbrug
 
 ### Common parameters
 
-| Name               | Description                                                                                  | Value |
-| ------------------ | -------------------------------------------------------------------------------------------- | ----- |
-| `nameOverride`     | String to partially override common.names.fullname template (will maintain the release name) | `""`  |
-| `fullnameOverride` | String to fully override common.names.fullname template                                      | `""`  |
+| Name               | Description                                                                               | Value |
+| ------------------ | ----------------------------------------------------------------------------------------- | ----- |
+| `nameOverride`     | String to partially override ff-common.fullname template (will maintain the release name) | `""`  |
+| `fullnameOverride` | String to fully override ff-common.fullname template                                      | `""`  |
 
 ### Frank!Framework image parameters
 
@@ -259,6 +259,8 @@ ref: https://open-zaak.readthedocs.io/en/stable/installation/prerequisites.html#
 | `staging.settings.database.sslmode`             | Configure SSLMode                                                                                                                | `prefer`                                                                                                                                                   |
 | `staging.persistence.enabled`                   | Toggle persistence for the staging zaaksysteem                                                                                   | `true`                                                                                                                                                     |
 | `staging.persistence.storageClassName`          | Configure which storage class should be used                                                                                     | `""`                                                                                                                                                       |
+| `staging.apiProxy.nameOverride`                 | String to partially override zaakbrug.apiProxyFullname template (will maintain the release name)                                 | `""`                                                                                                                                                       |
+| `staging.apiProxy.fullnameOverride`             | String to fully override zaakbrug.apiProxyFullname template                                                                      | `""`                                                                                                                                                       |
 | `staging.apiProxy.replicaCount`                 | Number of API proxy replicas to deploy                                                                                           | `1`                                                                                                                                                        |
 | `staging.apiProxy.podAnnotations`               | Annotations for API proxy pods                                                                                                   | `{}`                                                                                                                                                       |
 | `staging.apiProxy.podLabels`                    | Extra labels for API proxy pods                                                                                                  | `{}`                                                                                                                                                       |

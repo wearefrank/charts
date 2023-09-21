@@ -4,12 +4,12 @@
     "properties": {
         "nameOverride": {
             "type": "string",
-            "description": "String to partially override common.names.fullname template (will maintain the release name)",
+            "description": "String to partially override ff-common.fullname template (will maintain the release name)",
             "default": ""
         },
         "fullnameOverride": {
             "type": "string",
-            "description": "String to fully override common.names.fullname template",
+            "description": "String to fully override ff-common.fullname template",
             "default": ""
         },
         "image": {
@@ -834,6 +834,16 @@
                                     "items": {}
                                 }
                             }
+                        },
+                        "nameOverride": {
+                            "type": "string",
+                            "description": "String to partially override zaakbrug.apiProxyFullname template (will maintain the release name)",
+                            "default": ""
+                        },
+                        "fullnameOverride": {
+                            "type": "string",
+                            "description": "String to fully override zaakbrug.apiProxyFullname template",
+                            "default": ""
                         },
                         "replicaCount": {
                             "type": "number",
