@@ -78,7 +78,7 @@ volumeMounts:
   {{- end }}
   {{- if .Values.connections.create }}
   - name: {{ template "ff-common.fullname" . }}-context
-    mountPath: /usr/local/tomcat/conf/Catalina/localhost/iaf-test.xml
+    mountPath: /usr/local/tomcat/conf/Catalina/localhost/ROOT.xml
     subPath: context.xml
     readOnly: true
   {{- end }}
