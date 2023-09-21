@@ -37,7 +37,7 @@ spec:
           command: [ "/bin/bash", "-c", "nginx -g 'daemon off;'" ]
           securityContext:
             {{- toYaml .Values.staging.apiProxy.securityContext | nindent 12 }}
-          image: "{{ .Values.staging.apiProxy.image.repository }}{{ if .Values.staging.apiProxy.image.repository }}/{{ end }}{{ .Values.staging.apiProxy.image.repository }}:{{ .Values.staging.apiProxy.image.tag }}"
+          image: "{{ .Values.staging.apiProxy.image.registry }}{{ if .Values.staging.apiProxy.image.registry }}/{{ end }}{{ .Values.staging.apiProxy.image.repository }}:{{ .Values.staging.apiProxy.image.tag }}"
           imagePullPolicy: {{ .Values.staging.apiProxy.image.pullPolicy }}
           livenessProbe:
             httpGet:
