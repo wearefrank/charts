@@ -15,5 +15,6 @@ Selector labels
 */}}
 {{- define "drill.selectorLabels" -}}
 app.kubernetes.io/name: {{ include "drill.name" . }}
+app.kubernetes.io/component: {{ include "drill.name" . }}
 app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end -}}

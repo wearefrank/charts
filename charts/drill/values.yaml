@@ -295,40 +295,45 @@ drill:
     ##
     users: []
 
-#persistence:
-#  ## @param persistence.enabled Enable persistence using Persistent Volume Claims
-#  ##
-#  enabled: true
-#  ## @param persistence.storageClass Persistent Volume storage class
-#  ## If defined, storageClassName: <storageClass>
-#  ## If set to "-", storageClassName: "", which disables dynamic provisioning
-#  ## If undefined (the default) or set to null, no storageClassName spec is set, choosing the default provisioner
-#  ##
-#  storageClass: ""
-#  ## @param persistence.accessModes [array] Persistent Volume access modes
-#  ##
-#  accessModes:
-#    - ReadWriteOnce
-#  ## @param persistence.accessMode Persistent Volume access mode (DEPRECATED: use `persistence.accessModes` instead)
-#  ##
-#  accessMode: ReadWriteOnce
-#  ## @param persistence.size Persistent Volume size
-#  ##
-#  size: 10Gi
-#  ## @param persistence.dataSource Custom PVC data source
-#  ##
-#  dataSource: {}
-#  ## @param persistence.existingClaim The name of an existing PVC to use for persistence
-#  ##
-#  existingClaim: ""
-#  ## @param persistence.selector Selector to match an existing Persistent Volume for WordPress data PVC
-#  ## If set, the PVC can't have a PV dynamically provisioned for it
-#  ## E.g.
-#  ## selector:
-#  ##   matchLabels:
-#  ##     app: my-app
-#  ##
-#  selector: {}
-#  ## @param persistence.annotations Persistent Volume Claim annotations
-#  ##
-#  annotations: {}
+## @section Persistence
+## @descriptionStart
+## Persistence is currently only for login. Configuration for Drill will be saved in ZooKeeper. Make sure that ZooKeeper is persistent if you want to keep changes in the Web UI.
+## @sectionEnd
+##
+persistence:
+  ## @param persistence.enabled Enable persistence using Persistent Volume Claims
+  ##
+  enabled: false
+  ## @param persistence.storageClass Persistent Volume storage class
+  ## If defined, storageClassName: <storageClass>
+  ## If set to "-", storageClassName: "", which disables dynamic provisioning
+  ## If undefined (the default) or set to null, no storageClassName spec is set, choosing the default provisioner
+  ##
+  storageClass: ""
+  ## @param persistence.accessModes [array] Persistent Volume access modes
+  ##
+  accessModes:
+    - ReadWriteOnce
+  ## @param persistence.size Persistent Volume size
+  ##
+  size: 2Gi
+  ## @param persistence.dataSource Custom PVC data source
+  ##
+  dataSource: {}
+  ## @param persistence.existingClaim The name of an existing PVC to use for persistence
+  ##
+  existingClaim: ""
+  ## @param persistence.selector Selector to match an existing Persistent Volume for WordPress data PVC
+  ## If set, the PVC can't have a PV dynamically provisioned for it
+  ## E.g.
+  ## selector:
+  ##   matchLabels:
+  ##     app: my-app
+  ##
+  selector: {}
+  ## @param persistence.annotations Persistent Volume Claim annotations
+  ## You might need to add an annotation for selected node:
+  ## E.g: volume.kubernetes.io/selected-node: nodeName
+  ## Ref: https://kubernetes.io/docs/reference/labels-annotations-taints/#volume-kubernetes-io-selected-node
+  ##
+  annotations: {}

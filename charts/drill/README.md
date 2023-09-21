@@ -207,3 +207,51 @@ For more options refer to the [Apache Drill documentation](https://drill.apache.
 | `drill.authentication.users.name`               | Username for the user                                                                                                    | `""`  |
 | `drill.authentication.users.password`           | Password for the user                                                                                                    | `""`  |
 | `drill.authentication.users.admin`              | Configures if the user should be admin                                                                                   | `""`  |
+
+### Persistence
+
+Persistence is currently only for login. Configuration for Drill will be saved in ZooKeeper. Make sure that ZooKeeper is persistent if you want to keep changes in the Web UI.
+
+
+### End
+
+@sectionEnd
+
+@param persistence.enabled Enable persistence using Persistent Volume Claims
+
+@param persistence.storageClass Persistent Volume storage class
+If defined, storageClassName: <storageClass>
+If set to "-", storageClassName: "", which disables dynamic provisioning
+If undefined (the default) or set to null, no storageClassName spec is set, choosing the default provisioner
+
+@param persistence.accessModes [array] Persistent Volume access modes
+
+@param persistence.size Persistent Volume size
+
+@param persistence.dataSource Custom PVC data source
+
+@param persistence.existingClaim The name of an existing PVC to use for persistence
+
+@param persistence.selector Selector to match an existing Persistent Volume for WordPress data PVC
+If set, the PVC can't have a PV dynamically provisioned for it
+E.g.
+selector:
+matchLabels:
+app: my-app
+
+@param persistence.annotations Persistent Volume Claim annotations
+You might need to add an annotation for selected node:
+E.g: volume.kubernetes.io/selected-node: nodeName
+Ref: https://kubernetes.io/docs/reference/labels-annotations-taints/#volume-kubernetes-io-selected-node
+
+
+| Name                        | Description                                                            | Value   |
+| --------------------------- | ---------------------------------------------------------------------- | ------- |
+| `persistence.enabled`       | Enable persistence using Persistent Volume Claims                      | `false` |
+| `persistence.storageClass`  | Persistent Volume storage class                                        | `""`    |
+| `persistence.accessModes`   | Persistent Volume access modes                                         | `[]`    |
+| `persistence.size`          | Persistent Volume size                                                 | `2Gi`   |
+| `persistence.dataSource`    | Custom PVC data source                                                 | `{}`    |
+| `persistence.existingClaim` | The name of an existing PVC to use for persistence                     | `""`    |
+| `persistence.selector`      | Selector to match an existing Persistent Volume for WordPress data PVC | `{}`    |
+| `persistence.annotations`   | Persistent Volume Claim annotations                                    | `{}`    |
