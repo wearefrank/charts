@@ -2,7 +2,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "zaakbrug.apiProxyFullname" . }}
+  name: {{ template "zaakbrug.apiProxyFullname" . }}
   labels:
     {{- include "zaakbrug.apiProxyLabels" . | nindent 4 }}
 spec:

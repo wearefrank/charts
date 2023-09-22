@@ -1,9 +1,8 @@
-{{- if .Values.staging.enabled -}}
-{{- if not .Values.staging.apiProxy.existingConfigmap -}}
+{{- if and .Values.staging.enabled (not .Values.staging.apiProxy.existingConfigmap) -}}
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: {{ include "zaakbrug.apiProxyFullname" . }}
+  name: {{ template "zaakbrug.apiProxyFullname" . }}
   labels:
     {{- include "zaakbrug.apiProxyLabels" . | nindent 4 }}
 data:
@@ -72,5 +71,4 @@ data:
       error_page  413              /413.json;
       error_page  500 502 503 504  /500.json;
     }
-{{- end -}}
 {{- end -}}
