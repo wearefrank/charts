@@ -3,7 +3,7 @@ Create a name for apiProxy
 We truncate at 54 chars in order to provide space for the "-api-proxy" suffix
 */}}
 {{- define "zaakbrug.apiProxyName" -}}
-{{ include "ff-common.name" . | trunc 54 | trimSuffix "-" }}-api-proxy
+{{ include "ff-common.name" . | trunc 54 | trimSuffix "-" }}-{{ default "api-proxy" .Values.staging.apiProxy.nameOverride }}
 {{- end }}
 
 {{/*
@@ -11,7 +11,7 @@ Create a default fully qualified name for apiProxy.
 We truncate at 54 chars in order to provide space for the "-api-proxy" suffix
 */}}
 {{- define "zaakbrug.apiProxyFullname" -}}
-{{- if .Values.fullnameOverride }}
+{{- if .Values.staging.apiProxy.fullnameOverride }}
 {{- .Values.staging.apiProxy.fullnameOverride | trunc 63 | trimSuffix "-" }}
 {{- else }}
 {{- $name := default "api-proxy" .Values.staging.apiProxy.nameOverride }}
