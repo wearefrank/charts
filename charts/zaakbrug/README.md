@@ -77,6 +77,17 @@ helm delete zaakbrug
 | `frank.server.transactionManager`                            | Set the transaction manager for Tomcat. Options: `NARAYANA`, `BTM`, ``                                           | `""`      |
 | `frank.environmentVariables`                                 | Set extra environment variables for the Frank!                                                                   | `{}`      |
 
+### Section CA Certificates
+
+Adds given CA Certificated to the truststore.
+
+The key in the secret will be used as filename.
+
+| Name                           | Description             | Value   |
+| ------------------------------ | ----------------------- | ------- |
+| `frank.caCertificates.enabled` | Use system certificates | `false` |
+| `frank.caCertificates.secrets` | List of secretNames     | `[]`    |
+
 ### Frank!Framework Connection parameters
 
 | Name                        | Description                                                                                                                                          | Value  |

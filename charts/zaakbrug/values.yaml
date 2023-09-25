@@ -124,6 +124,21 @@ frank:
   ## @param frank.environmentVariables [object] Set extra environment variables for the Frank!
   ##
   environmentVariables: { }
+  ## @section Section CA Certificates
+  ## @descriptionStart
+  ## Adds given CA Certificated to the truststore.
+  ##
+  ## The key in the secret will be used as filename.
+  ##
+  ## Ref: https://github.com/docker-library/docs/blob/master/eclipse-temurin/README.md#can-i-add-my-internal-ca-certificates-to-the-truststore
+  ## @descriptionEnd
+  ##
+  ## @param frank.caCertificates.enabled Use system certificates
+  ## @param frank.caCertificates.secrets [array] List of secretNames
+  ##
+  caCertificates:
+    enabled: false
+    secrets: []
 
 ## @section Frank!Framework Connection parameters
 ##

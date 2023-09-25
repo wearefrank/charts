@@ -182,6 +182,22 @@
                             "default": "NARAYANA"
                         }
                     }
+                },
+                "caCertificates": {
+                    "type": "object",
+                    "properties": {
+                        "enabled": {
+                            "type": "boolean",
+                            "description": "Use system certificates",
+                            "default": false
+                        },
+                        "secrets": {
+                            "type": "array",
+                            "description": "List of secretNames",
+                            "default": [],
+                            "items": {}
+                        }
+                    }
                 }
             }
         },
