@@ -1,11 +1,11 @@
-{{- template "ff-common.deployment" (list . "ff-test.deployment") -}}
-{{- define "ff-test.deployment" -}}
+{{- template "ff-common.deployment" (list . "zaakbrug.deployment") -}}
+{{- define "zaakbrug.deployment" -}}
 spec:
   template:
     spec:
       containers:
         -
-          {{ include "ff-common.container" (list . "ff-test.deployment.container") | nindent 10}}
+          {{ include "ff-common.container" (list . "zaakbrug.deployment.container") | nindent 10}}
       volumes:
         {{- if .Values.securityContext.readOnlyRootFilesystem }}
         - name: tmpfs
@@ -41,8 +41,15 @@ spec:
           configMap:
             name: {{ template "ff-common.fullname" . }}-profiles
         {{- end -}}
+        {{- if .Values.frank.caCertificates.enabled }}
+        {{- range $index, $value := .Values.frank.caCertificates.secrets }}
+        - name: ca-cert-{{ $index }}
+          secret:
+            secretName: {{ $value.secretName }}
+        {{- end }}
+        {{- end }}
 {{- end -}}
-{{- define "ff-test.deployment.container" -}}
+{{- define "zaakbrug.deployment.container" -}}
 envFrom:
   - configMapRef:
       name: {{ template "ff-common.fullname" . }}-env
@@ -93,5 +100,14 @@ volumeMounts:
     mountPath: /opt/frank/configurations/Translate/Profiles.json
     subPath: Profiles.json
     readOnly: true
+  {{- end }}
+  {{- if .Values.frank.caCertificates.enabled }}
+  {{- range $index, $value := .Values.frank.caCertificates.secrets }}
+  - name: ca-cert-{{ $index }}
+    mountPath: "/certificates/{{ default "" $value.mountPath }}"
+    {{- with $value.subPath }}
+    subPath: {{ . }}
+    {{- end }}
+  {{- end }}
   {{- end }}
 {{- end -}}

@@ -182,6 +182,22 @@
                             "default": "NARAYANA"
                         }
                     }
+                },
+                "caCertificates": {
+                    "type": "object",
+                    "properties": {
+                        "enabled": {
+                            "type": "boolean",
+                            "description": "Use system certificates",
+                            "default": false
+                        },
+                        "secrets": {
+                            "type": "array",
+                            "description": "List of secretNames",
+                            "default": [],
+                            "items": {}
+                        }
+                    }
                 }
             }
         },
@@ -361,26 +377,6 @@
                     "type": "number",
                     "description": "Frank!Framework service port",
                     "default": 80
-                }
-            }
-        },
-        "serviceAccount": {
-            "type": "object",
-            "properties": {
-                "create": {
-                    "type": "boolean",
-                    "description": "Enable creation of ServiceAccount for Frank!Framework pod",
-                    "default": true
-                },
-                "annotations": {
-                    "type": "object",
-                    "description": "Additional custom annotations for the ServiceAccount",
-                    "default": {}
-                },
-                "name": {
-                    "type": "string",
-                    "description": "The name of the ServiceAccount to use.",
-                    "default": ""
                 }
             }
         },
@@ -708,6 +704,26 @@
                             }
                         }
                     }
+                }
+            }
+        },
+        "serviceAccount": {
+            "type": "object",
+            "properties": {
+                "create": {
+                    "type": "boolean",
+                    "description": "Enable creation of ServiceAccount for Frank!Framework pod",
+                    "default": true
+                },
+                "annotations": {
+                    "type": "object",
+                    "description": "Additional custom annotations for the ServiceAccount",
+                    "default": {}
+                },
+                "name": {
+                    "type": "string",
+                    "description": "The name of the ServiceAccount to use.",
+                    "default": ""
                 }
             }
         },
