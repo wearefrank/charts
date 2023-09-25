@@ -48,6 +48,8 @@ envFrom:
       name: {{ template "ff-common.fullname" . }}-env
   - configMapRef:
       name: {{ template "ff-common.fullname" . }}-zaakbrug-env
+  - configMapRef:
+      name: {{ template "ff-common.fullname" . }}-specifics
 volumeMounts:
   {{- if .Values.securityContext.readOnlyRootFilesystem }}
   - mountPath: /usr/local/tomcat/logs
