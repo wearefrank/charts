@@ -42,10 +42,10 @@ spec:
             name: {{ template "ff-common.fullname" . }}-profiles
         {{- end -}}
         {{- if .Values.frank.caCertificates.enabled }}
-        {{- range .Values.frank.caCertificates.secrets }}
-        - name: {{ . }}-ca-cert
+        {{- range $index, $value := .Values.frank.caCertificates.secrets }}
+        - name: ca-cert-{{ $index }}
           secret:
-            secretName: {{ . }}
+            secretName: {{ $value.secretName }}
         {{- end }}
         {{- end }}
 {{- end -}}
@@ -102,9 +102,12 @@ volumeMounts:
     readOnly: true
   {{- end }}
   {{- if .Values.frank.caCertificates.enabled }}
-  {{- range .Values.frank.caCertificates.secrets }}
-  - name: {{ . }}-ca-cert
-    mountPath: /certificates/
+  {{- range $index, $value := .Values.frank.caCertificates.secrets }}
+  - name: ca-cert-{{ $index }}
+    mountPath: "/certificates/{{ default "" $value.mountPath }}"
+    {{- with $value.subPath }}
+    subPath: {{ . }}
+    {{- end }}
   {{- end }}
   {{- end }}
 {{- end -}}

@@ -83,10 +83,15 @@ Adds given CA Certificated to the truststore.
 
 The key in the secret will be used as filename.
 
-| Name                           | Description             | Value   |
-| ------------------------------ | ----------------------- | ------- |
-| `frank.caCertificates.enabled` | Use system certificates | `false` |
-| `frank.caCertificates.secrets` | List of secretNames     | `[]`    |
+Ref: https://github.com/docker-library/docs/blob/master/eclipse-temurin/README.md#can-i-add-my-internal-ca-certificates-to-the-truststore
+
+| Name                                      | Description                                  | Value   |
+| ----------------------------------------- | -------------------------------------------- | ------- |
+| `frank.caCertificates.enabled`            | Use system certificates                      | `false` |
+| `frank.caCertificates.secrets`            | List of secretNames                          | `[]`    |
+| `frank.caCertificates.secrets.secretName` | Name of the secret to use                    | `""`    |
+| `frank.caCertificates.secrets.subPath`    | Key in the secret to use                     | `""`    |
+| `frank.caCertificates.secrets.mountPath`  | Filename to mount in `/certificates/` folder | `""`    |
 
 ### Frank!Framework Connection parameters
 

@@ -380,26 +380,6 @@
                 }
             }
         },
-        "serviceAccount": {
-            "type": "object",
-            "properties": {
-                "create": {
-                    "type": "boolean",
-                    "description": "Enable creation of ServiceAccount for Frank!Framework pod",
-                    "default": true
-                },
-                "annotations": {
-                    "type": "object",
-                    "description": "Additional custom annotations for the ServiceAccount",
-                    "default": {}
-                },
-                "name": {
-                    "type": "string",
-                    "description": "The name of the ServiceAccount to use.",
-                    "default": ""
-                }
-            }
-        },
         "zaakbrug": {
             "type": "object",
             "properties": {
@@ -724,6 +704,26 @@
                             }
                         }
                     }
+                }
+            }
+        },
+        "serviceAccount": {
+            "type": "object",
+            "properties": {
+                "create": {
+                    "type": "boolean",
+                    "description": "Enable creation of ServiceAccount for Frank!Framework pod",
+                    "default": true
+                },
+                "annotations": {
+                    "type": "object",
+                    "description": "Additional custom annotations for the ServiceAccount",
+                    "default": {}
+                },
+                "name": {
+                    "type": "string",
+                    "description": "The name of the ServiceAccount to use.",
+                    "default": ""
                 }
             }
         },
