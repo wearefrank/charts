@@ -56,13 +56,13 @@
                     "properties": {
                         "stage": {
                             "type": "string",
-                            "description": "Set the `DTAP` stage. Options: `LOC`, `DEV`, `TST`, `ACC`, `PRD`",
-                            "default": "TST"
+                            "description": "(Required) Set the `DTAP` stage. Options: `LOC`, `DEV`, `TST`, `ACC`, `PRD`",
+                            "default": ""
                         },
                         "side": {
                             "type": "string",
                             "description": "Set the `DTAP` side of where the instance is running",
-                            "default": "cluster"
+                            "default": ""
                         }
                     }
                 },

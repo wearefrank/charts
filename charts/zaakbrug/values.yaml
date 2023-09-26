@@ -48,12 +48,12 @@ frank:
   ##
   memory: 4G
   ## @skip frank.dtap [object]
-  ## @param frank.dtap.stage Set the `DTAP` stage. Options: `LOC`, `DEV`, `TST`, `ACC`, `PRD`
+  ## @param frank.dtap.stage (Required) Set the `DTAP` stage. Options: `LOC`, `DEV`, `TST`, `ACC`, `PRD`
   ## @param frank.dtap.side Set the `DTAP` side of where the instance is running
   ##
   dtap:
-    stage: TST
-    side: cluster
+    stage: ""
+    side: ""
   ## @skip frank.credentials [object]
   ## @param frank.credentials.secret Set the secret name of the existing secret
   ## @param frank.credentials.key Set the key inside the secret that contains the data (e.g. `credentials.properties`)
