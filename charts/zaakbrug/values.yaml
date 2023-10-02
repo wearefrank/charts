@@ -43,10 +43,17 @@ image:
 ## @skip frank [object]
 ##
 frank:
-  ## @param frank.memory Sets the initial and maximum size of the heap that will be used by the Frank!Framework
+  ## @param frank.memory.percentage Set if the values for the memory are in percentages
+  ## @param frank.memory.minimum Sets the initial size of the heap that will be used by the Frank!Framework
+  ## @param frank.memory.maximum Sets the maximum size of the heap that will be used by the Frank!Framework
+  ## For Java 8 it is best suited to use the same amount of memory for both the minimum and maximum.
+  ## For Java 11 and above, it is possible to use percentages. E.g. minimum: 20.0, maximum: 80.0.
   ## ref: https://docs.oracle.com/javase/8/docs/technotes/tools/unix/java.html#BABDJJFI
   ##
-  memory: 4G
+  memory:
+    percentage: false
+    minimum: 4G
+    maximum: 4G
   ## @skip frank.dtap [object]
   ## @param frank.dtap.stage (Required) Set the `DTAP` stage. Options: `LOC`, `DEV`, `TST`, `ACC`, `PRD`
   ## @param frank.dtap.side Set the `DTAP` side of where the instance is running

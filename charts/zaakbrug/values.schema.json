@@ -47,9 +47,24 @@
             "type": "object",
             "properties": {
                 "memory": {
-                    "type": "string",
-                    "description": "Sets the initial and maximum size of the heap that will be used by the Frank!Framework",
-                    "default": "4G"
+                    "type": "object",
+                    "properties": {
+                        "percentage": {
+                            "type": "boolean",
+                            "description": "Set if the values for the memory are in percentages",
+                            "default": false
+                        },
+                        "minimum": {
+                            "type": "string",
+                            "description": "Sets the initial size of the heap that will be used by the Frank!Framework",
+                            "default": "4G"
+                        },
+                        "maximum": {
+                            "type": "string",
+                            "description": "Sets the maximum size of the heap that will be used by the Frank!Framework",
+                            "default": "4G"
+                        }
+                    }
                 },
                 "dtap": {
                     "type": "object",

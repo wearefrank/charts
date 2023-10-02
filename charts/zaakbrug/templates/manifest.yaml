@@ -1,6 +1,6 @@
 {{ template "ff-common.configmap.context.tpl" . }}
 ---
-{{ template "ff-common.configmap.env.tpl" . }}
+{{/*{{ template "ff-common.configmap.env.tpl" . }}*/}}
 ---
 {{ template "ff-common.configmap.tomcat-users.tpl" . }}
 ---
