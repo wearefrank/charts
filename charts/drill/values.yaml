@@ -324,7 +324,7 @@ drill:
 ## @section Persistence
 ## @descriptionStart
 ## Persistence is currently only for login. Configuration for Drill will be saved in ZooKeeper. Make sure that ZooKeeper is persistent if you want to keep changes in the Web UI.
-## @sectionEnd
+## @descriptionEnd
 ##
 persistence:
   ## @param persistence.enabled Enable persistence using Persistent Volume Claims
