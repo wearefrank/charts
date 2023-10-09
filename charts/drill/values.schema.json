@@ -48,13 +48,73 @@
             "description": "Number of Drill replicas to deploy",
             "default": 3
         },
+        "startupProbe": {
+            "type": "object",
+            "properties": {
+                "initialDelaySeconds": {
+                    "type": "number",
+                    "description": "Initial delay seconds for livenessProbe",
+                    "default": 10
+                },
+                "periodSeconds": {
+                    "type": "number",
+                    "description": "Period seconds for livenessProbe",
+                    "default": 10
+                },
+                "timeoutSeconds": {
+                    "type": "number",
+                    "description": "Timeout seconds for livenessProbe",
+                    "default": 1
+                },
+                "failureThreshold": {
+                    "type": "number",
+                    "description": "Failure threshold for livenessProbe",
+                    "default": 6
+                },
+                "successThreshold": {
+                    "type": "number",
+                    "description": "Success threshold for livenessProbe",
+                    "default": 1
+                }
+            }
+        },
+        "readinessProbe": {
+            "type": "object",
+            "properties": {
+                "initialDelaySeconds": {
+                    "type": "number",
+                    "description": "Initial delay seconds for livenessProbe",
+                    "default": 0
+                },
+                "periodSeconds": {
+                    "type": "number",
+                    "description": "Period seconds for livenessProbe",
+                    "default": 5
+                },
+                "timeoutSeconds": {
+                    "type": "number",
+                    "description": "Timeout seconds for livenessProbe",
+                    "default": 1
+                },
+                "failureThreshold": {
+                    "type": "number",
+                    "description": "Failure threshold for livenessProbe",
+                    "default": 3
+                },
+                "successThreshold": {
+                    "type": "number",
+                    "description": "Success threshold for livenessProbe",
+                    "default": 1
+                }
+            }
+        },
         "livenessProbe": {
             "type": "object",
             "properties": {
                 "initialDelaySeconds": {
                     "type": "number",
                     "description": "Initial delay seconds for livenessProbe",
-                    "default": 40
+                    "default": 0
                 },
                 "periodSeconds": {
                     "type": "number",

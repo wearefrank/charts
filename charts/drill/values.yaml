@@ -45,8 +45,34 @@ image:
 ##
 replicaCount: 3
 
-## Configure extra options for Drill containers' liveness, readiness and startup probes
+## Configure extra options for Drill containers' startup probe
 ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/#configure-probes
+## @param startupProbe.initialDelaySeconds Initial delay seconds for livenessProbe
+## @param startupProbe.periodSeconds Period seconds for livenessProbe
+## @param startupProbe.timeoutSeconds Timeout seconds for livenessProbe
+## @param startupProbe.failureThreshold Failure threshold for livenessProbe
+## @param startupProbe.successThreshold Success threshold for livenessProbe
+##
+startupProbe:
+  initialDelaySeconds: 10
+  periodSeconds: 10
+  timeoutSeconds: 1
+  failureThreshold: 6
+  successThreshold: 1
+
+## @param readinessProbe.initialDelaySeconds Initial delay seconds for livenessProbe
+## @param readinessProbe.periodSeconds Period seconds for livenessProbe
+## @param readinessProbe.timeoutSeconds Timeout seconds for livenessProbe
+## @param readinessProbe.failureThreshold Failure threshold for livenessProbe
+## @param readinessProbe.successThreshold Success threshold for livenessProbe
+##
+readinessProbe:
+  initialDelaySeconds: 0
+  periodSeconds: 5
+  timeoutSeconds: 1
+  failureThreshold: 3
+  successThreshold: 1
+
 ## @param livenessProbe.initialDelaySeconds Initial delay seconds for livenessProbe
 ## @param livenessProbe.periodSeconds Period seconds for livenessProbe
 ## @param livenessProbe.timeoutSeconds Timeout seconds for livenessProbe
@@ -54,7 +80,7 @@ replicaCount: 3
 ## @param livenessProbe.successThreshold Success threshold for livenessProbe
 ##
 livenessProbe:
-  initialDelaySeconds: 40
+  initialDelaySeconds: 0
   periodSeconds: 10
   timeoutSeconds: 1
   failureThreshold: 6
@@ -225,12 +251,12 @@ securityContext: {}
 
 ## @section Drill configuration
 ## @descriptionStart
-## Configuring Drill can be done with override files or in the web ui, altough some properties can only be set in the override file.
-## When using the web ui, ZooKeeper will be used to store the values. Make sure that the storage of ZooKeeper is persistent if you intent to configure this way.
+## Configuring Drill can be done with override files or in the web ui, although some properties can only be set in the override file.
+## When using the web ui, ZooKeeper will be used to store the values. Make sure that the storage of ZooKeeper is persistent if you intend to configure this way.
 ##
 ## This is an example where the web ui and authentication for local (plain) users is enabled.
 ##
-## ```json
+## ```hocon
 ## drill.exec: {
 ##   http.enabled: true,
 ##   impersonation: {

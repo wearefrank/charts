@@ -34,19 +34,19 @@ helm repo add wearefrank https://wearefrank.github.io/charts
 ```
 
 If you had already added this repo earlier, run `helm repo update` to retrieve
-the latest versions of the packages.  You can then run `helm search repo
+the latest versions of the packages. You can then run `helm search repo
 wearefrank` to see the charts.
 
-To install the ZaakBrug chart:
+To install the Drill chart:
 
 ```shell
-helm install zaakbrug wearefrank/zaakbrug
+helm install drill wearefrank/drill
 ```
 
 To uninstall the chart:
 
 ```shell
-helm delete zaakbrug
+helm delete drill
 ```
 
 ### Values
@@ -59,12 +59,14 @@ Please refer to the [values.yaml](values.yaml) file for details on default value
 
 ### Access Drill Web UI
 
-There is a service that can be used, but this one will jump from pod, which isn't very friendly. Depending on ingress class you can make this sticky with annotations. You could also change the 
+There is a service that can be used, but this one will jump from pod, which isn't very friendly. Depending on ingress
+class you can make this sticky with annotations. You could also change the
 
 ## Chart Structure
 
 Drill Helm charts are organized as a collection of files inside the `drill` directory. As Drill depends on Zookeeper for
-cluster co-ordination, a zookeeper chart added as dependency in the [chart definition](Chart.yaml). The Zookeeper chart is maintained by Bitnami.
+cluster co-ordination, a zookeeper chart added as dependency in the [chart definition](Chart.yaml). The Zookeeper chart
+is maintained by Bitnami.
 
 ```shell
 drill/   
@@ -87,11 +89,15 @@ Drill Helm Charts contain the following templates:
 ## Autoscaling Drill Clusters
 
 The size of the Drill cluster (number of Drill Pod replicas / number of drill-bits) can not only be manually scaled up
-or down as shown above, but can also be autoscaled to simplify cluster management. When enabled, with a higher CPU
+or down, but can also be autoscaled to simplify cluster management. When enabled, with a higher CPU
 utilization, more drill-bits are added automatically and as the cluster load goes down, so do the number of drill-bits
 in the Drill Cluster. The drill-bits deemed
 excessive [gracefully shut down](https://drill.apache.org/docs/stopping-drill/#gracefully-shutting-down-the-drill-process),
 by going into quiescent mode to permit running queries to complete.
+
+> [!IMPORTANT]
+> For the graceful shutdown to succeed, a sigfile is made in the `$DRILL_HOME` folder. This requires running as `root` (
+> uid 0). If the application is run as `drilluser` the `stop` commando will be used.
 
 Enable autoscaling by editing the autoscale section in `drill/values.yaml` file.
 
@@ -116,24 +122,34 @@ Enable autoscaling by editing the autoscale section in `drill/values.yaml` file.
 
 ### Drill deployment parameters
 
-| Name                                | Description                                              | Value     |
-| ----------------------------------- | -------------------------------------------------------- | --------- |
-| `replicaCount`                      | Number of Drill replicas to deploy                       | `3`       |
-| `livenessProbe.initialDelaySeconds` | Initial delay seconds for livenessProbe                  | `40`      |
-| `livenessProbe.periodSeconds`       | Period seconds for livenessProbe                         | `10`      |
-| `livenessProbe.timeoutSeconds`      | Timeout seconds for livenessProbe                        | `1`       |
-| `livenessProbe.failureThreshold`    | Failure threshold for livenessProbe                      | `6`       |
-| `livenessProbe.successThreshold`    | Success threshold for livenessProbe                      | `1`       |
-| `resources`                         | Set the resources for the Drill containers               | `{}`      |
-| `resources.limits`                  | The resources limits for the Drill containers            | `""`      |
-| `resources.requests.memory`         | The requested memory for the Drill containers            | `""`      |
-| `resources.requests.cpu`            | The requested cpu for the Drill containers               | `""`      |
-| `terminationGracePeriodSeconds`     | Number of seconds after which pods are forcefully killed | `25`      |
-| `terminationGracePeriodSeconds`     | Note: Lower values may cause running queries to fail     |           |
-| `nodeSelector`                      | Node labels for pod assignment                           | `{}`      |
-| `tolerations`                       | Set tolerations for pod assignment                       | `[]`      |
-| `affinity`                          | Set affinity for pod assignment                          | `{}`      |
-| `timeZone`                          | used for database connection and log timestamps          | `Etc/UTC` |
+| Name                                 | Description                                              | Value     |
+| ------------------------------------ | -------------------------------------------------------- | --------- |
+| `replicaCount`                       | Number of Drill replicas to deploy                       | `3`       |
+| `startupProbe.initialDelaySeconds`   | Initial delay seconds for livenessProbe                  | `10`      |
+| `startupProbe.periodSeconds`         | Period seconds for livenessProbe                         | `10`      |
+| `startupProbe.timeoutSeconds`        | Timeout seconds for livenessProbe                        | `1`       |
+| `startupProbe.failureThreshold`      | Failure threshold for livenessProbe                      | `6`       |
+| `startupProbe.successThreshold`      | Success threshold for livenessProbe                      | `1`       |
+| `readinessProbe.initialDelaySeconds` | Initial delay seconds for livenessProbe                  | `0`       |
+| `readinessProbe.periodSeconds`       | Period seconds for livenessProbe                         | `5`       |
+| `readinessProbe.timeoutSeconds`      | Timeout seconds for livenessProbe                        | `1`       |
+| `readinessProbe.failureThreshold`    | Failure threshold for livenessProbe                      | `3`       |
+| `readinessProbe.successThreshold`    | Success threshold for livenessProbe                      | `1`       |
+| `livenessProbe.initialDelaySeconds`  | Initial delay seconds for livenessProbe                  | `0`       |
+| `livenessProbe.periodSeconds`        | Period seconds for livenessProbe                         | `10`      |
+| `livenessProbe.timeoutSeconds`       | Timeout seconds for livenessProbe                        | `1`       |
+| `livenessProbe.failureThreshold`     | Failure threshold for livenessProbe                      | `6`       |
+| `livenessProbe.successThreshold`     | Success threshold for livenessProbe                      | `1`       |
+| `resources`                          | Set the resources for the Drill containers               | `{}`      |
+| `resources.limits`                   | The resources limits for the Drill containers            | `""`      |
+| `resources.requests.memory`          | The requested memory for the Drill containers            | `""`      |
+| `resources.requests.cpu`             | The requested cpu for the Drill containers               | `""`      |
+| `terminationGracePeriodSeconds`      | Number of seconds after which pods are forcefully killed | `25`      |
+| `terminationGracePeriodSeconds`      | Note: Lower values may cause running queries to fail     |           |
+| `nodeSelector`                       | Node labels for pod assignment                           | `{}`      |
+| `tolerations`                        | Set tolerations for pod assignment                       | `[]`      |
+| `affinity`                           | Set affinity for pod assignment                          | `{}`      |
+| `timeZone`                           | used for database connection and log timestamps          | `Etc/UTC` |
 
 ### Traffic Exposure Parameters
 
@@ -168,12 +184,12 @@ Enable autoscaling by editing the autoscale section in `drill/values.yaml` file.
 
 ### Drill configuration
 
-Configuring Drill can be done with override files or in the web ui, altough some properties can only be set in the override file.
-When using the web ui, ZooKeeper will be used to store the values. Make sure that the storage of ZooKeeper is persistent if you intent to configure this way.
+Configuring Drill can be done with override files or in the web ui, although some properties can only be set in the override file.
+When using the web ui, ZooKeeper will be used to store the values. Make sure that the storage of ZooKeeper is persistent if you intend to configure this way.
 
 This is an example where the web ui and authentication for local (plain) users is enabled.
 
-```json
+```hocon
 drill.exec: {
 http.enabled: true,
 impersonation: {

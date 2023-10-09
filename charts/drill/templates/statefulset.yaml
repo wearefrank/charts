@@ -40,14 +40,14 @@ spec:
       containers:
         - name: {{ .Chart.Name }}
           securityContext:
-            {{- toYaml .Values.securityContext | nindent 12 }}
+            {{- toYaml .Values.podSecurityContext | nindent 12 }}
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           image: "{{ .Values.image.registry }}{{ if .Values.image.registry }}/{{ end }}{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           stdin: true
           command:
             - /bin/bash
             - -c
-            - "/opt/drill/bin/drillbit.sh start; tail -f /var/lib/drill/log/drillbit.out"
+            - "${DRILL_HOME}/bin/drillbit.sh start && tail -f /var/lib/drill/log/drillbit.out"
           ports:
             - containerPort: 8047
               name: web
@@ -57,24 +57,34 @@ spec:
               name: control
             - containerPort: 31012
               name: data
-{{/*          livenessProbe:*/}}
-{{/*            {{- toYaml .Values.livenessProbe | nindent 12 }}*/}}
-{{/*            exec:*/}}
-{{/*              command:*/}}
-{{/*                - /opt/drill/bin/drillbit.sh*/}}
-{{/*                - status*/}}
-{{/*          readinessProbe:*/}}
-{{/*            {{- toYaml .Values.livenessProbe | nindent 12 }}*/}}
-{{/*            exec:*/}}
-{{/*              command:*/}}
-{{/*                - /opt/drill/bin/drillbit.sh*/}}
-{{/*                - status*/}}
+          startupProbe:
+            {{- toYaml .Values.startupProbe | nindent 12 }}
+            exec:
+              command:
+                - /bin/bash
+                - -c
+                - "${DRILL_HOME}/bin/drillbit.sh status"
+          readinessProbe:
+            {{- toYaml .Values.readinessProbe | nindent 12 }}
+            exec:
+              command:
+                  - /bin/bash
+                  - -c
+                  - "${DRILL_HOME}/bin/drillbit.sh status"
+          livenessProbe:
+            {{- toYaml .Values.livenessProbe | nindent 12 }}
+            exec:
+              command:
+                - /bin/bash
+                - -c
+                - "${DRILL_HOME}/bin/drillbit.sh status"
           lifecycle:
             preStop:
               exec:
                 command:
-                  - /opt/drill/bin/drillbit.sh
-                  - stop # TODO: implement graceful_stop
+                  - /bin/bash
+                  - -c
+                  - "if [ \"$(id -u)\" -ne 0 ]; then ${DRILL_HOME}/bin/drillbit.sh stop; else ${DRILL_HOME}/bin/drillbit.sh graceful_stop; fi"
           {{- with .Values.resources }}
           resources:
             {{- toYaml . | nindent 12 }}
@@ -86,8 +96,10 @@ spec:
               name: {{ template "drill.fullname" . }}-users
               subPath: passwd
             - name: {{ template "drill.fullname" . }}-logs
-              mountPath: /opt/drill/logs
+              mountPath: /var/lib/drill/log
       terminationGracePeriodSeconds: {{ .Values.terminationGracePeriodSeconds }}
+      securityContext:
+        {{- toYaml .Values.securityContext | nindent 8 }}
       volumes:
         - name: {{ template "drill.fullname" . }}-override
           configMap:
@@ -110,7 +122,7 @@ spec:
         {{- else if (not .Values.persistence.enabled) }}
         - name: {{ template "drill.fullname" . }}-logs
           emptyDir: {}
-        {{- end}}
+        {{- end }}
       initContainers:
         - name: zookeeper-available
           image: busybox
