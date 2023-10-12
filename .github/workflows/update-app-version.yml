@@ -27,6 +27,4 @@ jobs:
         run: pybump set --app-version --set-version ${{ inputs.appVersion }} --file ${{ inputs.chart }}/Chart.yaml
       - name: update version
         run: pybump bump --level patch --file charts/zaakbrug/Chart.yaml
-      - uses: stefanzweifel/git-auto-commit-action@v4
-        with:
-          push_options: '--force'
+      - uses: stefanzweifel/git-auto-commit-action@v5
