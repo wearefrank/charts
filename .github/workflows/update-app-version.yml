@@ -28,3 +28,6 @@ jobs:
       - name: update version
         run: pybump bump --level patch --file charts/zaakbrug/Chart.yaml
       - uses: stefanzweifel/git-auto-commit-action@v5
+    release:
+      uses: ./.github/workflows/release.yml
+      needs: update
