@@ -248,3 +248,14 @@ Make sure that ZooKeeper is persistent if you want to keep changes in the Web UI
 | `persistence.dataLogDir.size`          | PVC Storage Request for Drill's dedicated data log directory             | `2Gi`   |
 | `persistence.dataLogDir.existingClaim` | The name of an existing PVC to use for persistence                       | `""`    |
 | `persistence.dataLogDir.selector`      | Selector to match an existing Persistent Volume for Drill's data log PVC | `{}`    |
+
+## Notable changes
+
+### 1.2.6
+
+`.Values.replicaCount` has been changed from `3` to `1`. This is to default to a less complex install. 
+Having three replicas introduces some complexity regarding, authentication, logging and how queries will be executed. 
+Until features have been added to simple this, the user needs to take these things into account. 
+
+The notation for `.Values.persistence` has changed so storage for logs and data can be configured secretly. 
+The values for persistent logging are now located at `.Values.persistence.dataLogDir`.
