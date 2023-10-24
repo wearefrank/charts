@@ -124,7 +124,7 @@ Enable autoscaling by editing the autoscale section in `drill/values.yaml` file.
 
 | Name                                 | Description                                              | Value     |
 | ------------------------------------ | -------------------------------------------------------- | --------- |
-| `replicaCount`                       | Number of Drill replicas to deploy                       | `3`       |
+| `replicaCount`                       | Number of Drill replicas to deploy                       | `1`       |
 | `startupProbe.initialDelaySeconds`   | Initial delay seconds for livenessProbe                  | `10`      |
 | `startupProbe.periodSeconds`         | Period seconds for livenessProbe                         | `10`      |
 | `startupProbe.timeoutSeconds`        | Timeout seconds for livenessProbe                        | `1`       |
@@ -210,31 +210,52 @@ pam_profiles: [ "sudo", "login" ]
 
 For more options refer to the [Apache Drill documentation](https://drill.apache.org/docs/configuration-options-introduction/).
 
-| Name                                            | Description                                                                                                              | Value |
-| ----------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ | ----- |
-| `drill.overrideConfiguration.existingConfigMap` | The name of the configmap, containing configuration files to override                                                    | `""`  |
-| `drill.overrideConfiguration.drill`             | Multiline value for drill-override.conf                                                                                  |       |
-| `drill.overrideConfiguration.drillMetastore`    | Multiline value for drill-metastore-override.conf                                                                        | `""`  |
-| `drill.overrideConfiguration.drillOnYarn`       | Multiline value for drill-on-yarn-override.conf                                                                          | `""`  |
-| `drill.overrideConfiguration.drillSqlLine`      | Multiline value for drill-sqlline-override.conf                                                                          | `""`  |
-| `drill.overrideConfiguration.storagePlugins`    | Multiline value for storage-plugins-override.conf Can also be configured in the Web UI and saved by persistent ZooKeeper | `""`  |
-| `drill.authentication.existingSecret`           | Name of the secret containing a passwd file                                                                              | `""`  |
-| `drill.authentication.users`                    | Users to create on the system                                                                                            | `[]`  |
-| `drill.authentication.users.name`               | Username for the user                                                                                                    | `""`  |
-| `drill.authentication.users.password`           | Password for the user                                                                                                    | `""`  |
-| `drill.authentication.users.admin`              | Configures if the user should be admin                                                                                   | `""`  |
+| Name                                            | Description                                                                                                               | Value |
+| ----------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------- | ----- |
+| `drill.drivers`                                 | JDBC Drivers can be configured to download here. This can be used if the Docker image doesn't contain the correct drivers | `[]`  |
+| `drill.drivers.name`                            | The name of the driver, will be used as filename (with `.jar` appended) and as name for initContainer                     | `""`  |
+| `drill.drivers.url`                             | The URL to download the driver from                                                                                       | `""`  |
+| `drill.drivers.noCheckCertificate`              | Skip certificate check                                                                                                    | `""`  |
+| `drill.overrideConfiguration.existingConfigMap` | The name of the configmap, containing configuration files to override                                                     | `""`  |
+| `drill.overrideConfiguration.drill`             | Multiline value for drill-override.conf                                                                                   |       |
+| `drill.overrideConfiguration.drillMetastore`    | Multiline value for drill-metastore-override.conf                                                                         | `""`  |
+| `drill.overrideConfiguration.drillOnYarn`       | Multiline value for drill-on-yarn-override.conf                                                                           | `""`  |
+| `drill.overrideConfiguration.drillSqlLine`      | Multiline value for drill-sqlline-override.conf                                                                           | `""`  |
+| `drill.overrideConfiguration.storagePlugins`    | Multiline value for storage-plugins-override.conf Can also be configured in the Web UI and saved by persistent ZooKeeper  | `""`  |
+| `drill.authentication.existingSecret`           | Name of the secret containing a passwd file                                                                               | `""`  |
+| `drill.authentication.users`                    | Users to create on the system                                                                                             | `[]`  |
+| `drill.authentication.users.name`               | Username for the user                                                                                                     | `""`  |
+| `drill.authentication.users.password`           | Password for the user                                                                                                     | `""`  |
+| `drill.authentication.users.admin`              | Configures if the user should be admin                                                                                    | `""`  |
 
 ### Persistence
 
-Persistence is currently only for login. Configuration for Drill will be saved in ZooKeeper. Make sure that ZooKeeper is persistent if you want to keep changes in the Web UI.
+Persistence is used for logging and for JDBC drivers. These can be configured separately.
 
-| Name                        | Description                                                            | Value   |
-| --------------------------- | ---------------------------------------------------------------------- | ------- |
-| `persistence.enabled`       | Enable persistence using Persistent Volume Claims                      | `false` |
-| `persistence.storageClass`  | Persistent Volume storage class                                        | `""`    |
-| `persistence.accessModes`   | Persistent Volume access modes                                         | `[]`    |
-| `persistence.size`          | Persistent Volume size                                                 | `2Gi`   |
-| `persistence.dataSource`    | Custom PVC data source                                                 | `{}`    |
-| `persistence.existingClaim` | The name of an existing PVC to use for persistence                     | `""`    |
-| `persistence.selector`      | Selector to match an existing Persistent Volume for WordPress data PVC | `{}`    |
-| `persistence.annotations`   | Persistent Volume Claim annotations                                    | `{}`    |
+Configuration for Drill will be saved in ZooKeeper.
+Make sure that ZooKeeper is persistent if you want to keep changes in the Web UI.
+
+| Name                                   | Description                                                              | Value   |
+| -------------------------------------- | ------------------------------------------------------------------------ | ------- |
+| `persistence.enabled`                  | Enable persistence using Persistent Volume Claims                        | `false` |
+| `persistence.storageClass`             | Persistent Volume storage class                                          | `""`    |
+| `persistence.accessModes`              | Persistent Volume access modes                                           | `[]`    |
+| `persistence.size`                     | Persistent Volume size                                                   | `2Gi`   |
+| `persistence.dataSource`               | Custom PVC data source                                                   | `{}`    |
+| `persistence.existingClaim`            | The name of an existing PVC to use for persistence                       | `""`    |
+| `persistence.selector`                 | Selector to match an existing Persistent Volume for Drill's data PVC     | `{}`    |
+| `persistence.annotations`              | Persistent Volume Claim annotations                                      | `{}`    |
+| `persistence.dataLogDir.size`          | PVC Storage Request for Drill's dedicated data log directory             | `2Gi`   |
+| `persistence.dataLogDir.existingClaim` | The name of an existing PVC to use for persistence                       | `""`    |
+| `persistence.dataLogDir.selector`      | Selector to match an existing Persistent Volume for Drill's data log PVC | `{}`    |
+
+## Notable changes
+
+### 1.2.6
+
+`.Values.replicaCount` has been changed from `3` to `1`. This is to default to a less complex install. 
+Having three replicas introduces some complexity regarding, authentication, logging and how queries will be executed. 
+Until features have been added to simple this, the user needs to take these things into account. 
+
+The notation for `.Values.persistence` has changed so storage for logs and data can be configured secretly. 
+The values for persistent logging are now located at `.Values.persistence.dataLogDir`.

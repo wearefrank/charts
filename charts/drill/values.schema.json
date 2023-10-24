@@ -46,7 +46,7 @@
         "replicaCount": {
             "type": "number",
             "description": "Number of Drill replicas to deploy",
-            "default": 3
+            "default": 1
         },
         "startupProbe": {
             "type": "object",
@@ -313,6 +313,12 @@
         "drill": {
             "type": "object",
             "properties": {
+                "drivers": {
+                    "type": "array",
+                    "description": "JDBC Drivers can be configured to download here. This can be used if the Docker image doesn't contain the correct drivers",
+                    "default": [],
+                    "items": {}
+                },
                 "overrideConfiguration": {
                     "type": "object",
                     "properties": {
@@ -406,13 +412,33 @@
                 },
                 "selector": {
                     "type": "object",
-                    "description": "Selector to match an existing Persistent Volume for WordPress data PVC",
+                    "description": "Selector to match an existing Persistent Volume for Drill's data PVC",
                     "default": {}
                 },
                 "annotations": {
                     "type": "object",
                     "description": "Persistent Volume Claim annotations",
                     "default": {}
+                },
+                "dataLogDir": {
+                    "type": "object",
+                    "properties": {
+                        "size": {
+                            "type": "string",
+                            "description": "PVC Storage Request for Drill's dedicated data log directory",
+                            "default": "2Gi"
+                        },
+                        "existingClaim": {
+                            "type": "string",
+                            "description": "The name of an existing PVC to use for persistence",
+                            "default": ""
+                        },
+                        "selector": {
+                            "type": "object",
+                            "description": "Selector to match an existing Persistent Volume for Drill's data log PVC",
+                            "default": {}
+                        }
+                    }
                 }
             }
         }

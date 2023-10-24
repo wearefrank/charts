@@ -35,7 +35,7 @@ image:
   ## pullSecrets:
   ##   - myRegistryKeySecretName
   ##
-  pullSecrets: []
+  pullSecrets: [ ]
 
 ## @section Drill deployment parameters
 ##
@@ -43,7 +43,7 @@ image:
 ## @param replicaCount Number of Drill replicas to deploy
 ## NOTE: ReadWriteMany PVC(s) are required if replicaCount > 1
 ##
-replicaCount: 3
+replicaCount: 1
 
 ## Configure extra options for Drill containers' startup probe
 ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/#configure-probes
@@ -101,7 +101,7 @@ livenessProbe:
 ##     cpu: 2000m
 ##     memory: 4200M
 ##
-resources: {}
+resources: { }
 
 ## @skip autoscaling
 ##
@@ -119,18 +119,18 @@ terminationGracePeriodSeconds: 25
 ## @param nodeSelector Node labels for pod assignment
 ## ref: https://kubernetes.io/docs/user-guide/node-selection/
 ##
-nodeSelector: {}
+nodeSelector: { }
 
 ## @param tolerations Set tolerations for pod assignment
 ## ref: https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/
 ##
-tolerations: []
+tolerations: [ ]
 
 ## @param affinity Set affinity for pod assignment
 ## Ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity
 ## NOTE: podAffinityPreset, podAntiAffinityPreset, and nodeAffinityPreset will be ignored when it's set
 ##
-affinity: {}
+affinity: { }
 
 ## @param timeZone used for database connection and log timestamps
 ##
@@ -180,7 +180,7 @@ ingress:
   ##   kubernetes.io/ingress.class: nginx
   ##   kubernetes.io/tls-acme: 'true'
   ##
-  annotations: {}
+  annotations: { }
   ## @param ingress.hosts [array] Set hosts for ingress
   ## @param ingress.hosts.host [string] Set hostname
   ## @param ingress.hosts.paths [array] Set multiple paths
@@ -199,7 +199,7 @@ ingress:
   ##     hosts:
   ##       - chart-example.local
   ##
-  tls: []
+  tls: [ ]
 
 ## @section Other Parameters
 ##
@@ -213,7 +213,7 @@ serviceAccount:
   create: true
   ## @param serviceAccount.annotations Additional custom annotations for the ServiceAccount
   ##
-  annotations: {}
+  annotations: { }
   ## @param serviceAccount.name The name of the ServiceAccount to use.
   ## If not set and create is true, a name is generated using the ff-common.fullname template
   ##
@@ -222,18 +222,18 @@ serviceAccount:
 ## @param podAnnotations Annotations for Drill pods
 ## ref: https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/
 ##
-podAnnotations: {}
+podAnnotations: { }
 
 ## @param podLabels Extra labels for Drill pods
 ## ref: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/
 ##
-podLabels: {}
+podLabels: { }
 
 ## Configure Pods Security Context
 ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod
 ## @param podSecurityContext [object] Set Drill pod's Security Context
 ##
-podSecurityContext: {}
+podSecurityContext: { }
 
 ## Configure Container Security Context (only main container)
 ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container
@@ -247,7 +247,7 @@ podSecurityContext: {}
 ##  runAsNonRoot: true
 ##  runAsUser: 1000
 ##
-securityContext: {}
+securityContext: { }
 
 ## @section Drill configuration
 ## @descriptionStart
@@ -279,6 +279,12 @@ securityContext: {}
 ## @descriptionEnd
 ##
 drill:
+  ## @param drill.drivers [array] JDBC Drivers can be configured to download here. This can be used if the Docker image doesn't contain the correct drivers
+  ## @param drill.drivers.name [string] The name of the driver, will be used as filename (with `.jar` appended) and as name for initContainer
+  ## @param drill.drivers.url [string] The URL to download the driver from
+  ## @param drill.drivers.noCheckCertificate [nullable, string] Skip certificate check
+  ##
+  drivers: [ ]
   overrideConfiguration:
     ## @param drill.overrideConfiguration.existingConfigMap The name of the configmap, containing configuration files to override
     ##
@@ -319,11 +325,14 @@ drill:
     ##     admin: true
     ##     password: changeit
     ##
-    users: []
+    users: [ ]
 
 ## @section Persistence
 ## @descriptionStart
-## Persistence is currently only for login. Configuration for Drill will be saved in ZooKeeper. Make sure that ZooKeeper is persistent if you want to keep changes in the Web UI.
+## Persistence is used for logging and for JDBC drivers. These can be configured separately.
+##
+## Configuration for Drill will be saved in ZooKeeper.
+## Make sure that ZooKeeper is persistent if you want to keep changes in the Web UI.
 ## @descriptionEnd
 ##
 persistence:
@@ -345,21 +354,38 @@ persistence:
   size: 2Gi
   ## @param persistence.dataSource Custom PVC data source
   ##
-  dataSource: {}
+  dataSource: { }
   ## @param persistence.existingClaim The name of an existing PVC to use for persistence
   ##
   existingClaim: ""
-  ## @param persistence.selector Selector to match an existing Persistent Volume for WordPress data PVC
+  ## @param persistence.selector Selector to match an existing Persistent Volume for Drill's data PVC
   ## If set, the PVC can't have a PV dynamically provisioned for it
   ## E.g.
   ## selector:
   ##   matchLabels:
   ##     app: my-app
   ##
-  selector: {}
+  selector: { }
   ## @param persistence.annotations Persistent Volume Claim annotations
   ## You might need to add an annotation for selected node:
   ## E.g: volume.kubernetes.io/selected-node: nodeName
   ## Ref: https://kubernetes.io/docs/reference/labels-annotations-taints/#volume-kubernetes-io-selected-node
   ##
-  annotations: {}
+  annotations: { }
+  ## Persistence for a dedicated data log directory
+  ##
+  dataLogDir:
+    ## @param persistence.dataLogDir.size PVC Storage Request for Drill's dedicated data log directory
+    ##
+    size: 2Gi
+    ## @param persistence.dataLogDir.existingClaim The name of an existing PVC to use for persistence
+    ##
+    existingClaim: ""
+    ## @param persistence.dataLogDir.selector Selector to match an existing Persistent Volume for Drill's data log PVC
+    ## If set, the PVC can't have a PV dynamically provisioned for it
+    ## E.g.
+    ## selector:
+    ##   matchLabels:
+    ##     app: my-app
+    ##
+    selector: { }
