@@ -142,27 +142,26 @@ timeZone: Etc/UTC
 ## Drill service parameters
 ##
 service:
-  ## @param service.type Drill service type
+  ## Drill Web UI
+  ## @param service.web.type Drill Web service type
+  ## @param service.web.port Drill Web service port
   ##
-  type: ClusterIP
-  ## @param service.webPort Needed for the Drill Web UI.
+  web:
+    type: ClusterIP
+    port: 80
+  ## Drill User Api for external client, such as Tableau, to connect into the cluster nodes.
+  ## @param service.user.type Drill User Api service type
+  ## @param service.user.port Drill User Api service port
   ##
-  webPort: 80
-  ## @param service.userPort User port address. Used between nodes in a Drill cluster. Needed for an external client, such as Tableau, to connect into the cluster nodes. Also needed for the Drill Web UI.
-  ##
-  userPort: 31010
-  ## @param service.controlPort Control port address. Used between nodes in a Drill cluster. Needed for multi-node installation of Apache Drill.
-  ##
-  controlPort: 31011
-  ## @param service.dataPort Data port address. Used between nodes in a Drill cluster. Needed for multi-node installation of Apache Drill.
-  ##
-  dataPort: 31012
+  user:
+    type: ClusterIP
+    port: 31010
 
-## Configure the ingress resource that allows you to access the Drill installation
+## Configure the ingress resource that allows you to access the Drill Web UI
 ## ref: https://kubernetes.io/docs/concepts/services-networking/ingress/
 ##
 ingress:
-  ## @param ingress.enabled Enable ingress record generation for Frank!
+  ## @param ingress.enabled Enable ingress record generation for Drill
   ##
   enabled: false
   ## @param ingress.className IngressClass that will be used to implement the Ingress (Kubernetes 1.18+)
@@ -170,7 +169,7 @@ ingress:
   ## ref: https://kubernetes.io/blog/2020/04/02/improvements-to-the-ingress-api-in-kubernetes-1.18/
   ##
   className: ""
-  ## @param ingress.annotations Additional annotations for the Ingress resource. To enable certificate autogeneration, place here your cert-manager annotations.
+  ## @param ingress.annotations Additional annotations for the Ingress resource. To enable certificate auto-generation, place here your cert-manager annotations.
   ## For a full list of possible ingress annotations, please see
   ## ref: https://github.com/kubernetes/ingress-nginx/blob/master/docs/user-guide/nginx-configuration/annotations.md
   ## Use this parameter to set the required annotations for cert-manager, see

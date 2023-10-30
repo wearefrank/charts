@@ -153,22 +153,21 @@ Enable autoscaling by editing the autoscale section in `drill/values.yaml` file.
 
 ### Traffic Exposure Parameters
 
-| Name                           | Description                                                                                                                                                                    | Value       |
-| ------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ----------- |
-| `service.type`                 | Drill service type                                                                                                                                                             | `ClusterIP` |
-| `service.webPort`              | Needed for the Drill Web UI.                                                                                                                                                   | `80`        |
-| `service.userPort`             | User port address. Used between nodes in a Drill cluster. Needed for an external client, such as Tableau, to connect into the cluster nodes. Also needed for the Drill Web UI. | `31010`     |
-| `service.controlPort`          | Control port address. Used between nodes in a Drill cluster. Needed for multi-node installation of Apache Drill.                                                               | `31011`     |
-| `service.dataPort`             | Data port address. Used between nodes in a Drill cluster. Needed for multi-node installation of Apache Drill.                                                                  | `31012`     |
-| `ingress.enabled`              | Enable ingress record generation for Frank!                                                                                                                                    | `false`     |
-| `ingress.className`            | IngressClass that will be used to implement the Ingress (Kubernetes 1.18+)                                                                                                     | `""`        |
-| `ingress.annotations`          | Additional annotations for the Ingress resource. To enable certificate autogeneration, place here your cert-manager annotations.                                               | `{}`        |
-| `ingress.hosts`                | Set hosts for ingress                                                                                                                                                          | `[]`        |
-| `ingress.hosts.host`           | Set hostname                                                                                                                                                                   | `""`        |
-| `ingress.hosts.paths`          | Set multiple paths                                                                                                                                                             | `[]`        |
-| `ingress.hosts.paths.path`     | Set path (context url)                                                                                                                                                         | `""`        |
-| `ingress.hosts.paths.pathType` | Set type of path                                                                                                                                                               | `""`        |
-| `ingress.tls`                  | Define tls secrets for hosts (implementation not done yet)                                                                                                                     | `[]`        |
+| Name                           | Description                                                                                                                       | Value       |
+| ------------------------------ | --------------------------------------------------------------------------------------------------------------------------------- | ----------- |
+| `service.web.type`             | Drill Web service type                                                                                                            | `ClusterIP` |
+| `service.web.port`             | Drill Web service port                                                                                                            | `80`        |
+| `service.user.type`            | Drill User Api service type                                                                                                       | `ClusterIP` |
+| `service.user.port`            | Drill User Api service port                                                                                                       | `31010`     |
+| `ingress.enabled`              | Enable ingress record generation for Drill                                                                                        | `false`     |
+| `ingress.className`            | IngressClass that will be used to implement the Ingress (Kubernetes 1.18+)                                                        | `""`        |
+| `ingress.annotations`          | Additional annotations for the Ingress resource. To enable certificate auto-generation, place here your cert-manager annotations. | `{}`        |
+| `ingress.hosts`                | Set hosts for ingress                                                                                                             | `[]`        |
+| `ingress.hosts.host`           | Set hostname                                                                                                                      | `""`        |
+| `ingress.hosts.paths`          | Set multiple paths                                                                                                                | `[]`        |
+| `ingress.hosts.paths.path`     | Set path (context url)                                                                                                            | `""`        |
+| `ingress.hosts.paths.pathType` | Set type of path                                                                                                                  | `""`        |
+| `ingress.tls`                  | Define tls secrets for hosts (implementation not done yet)                                                                        | `[]`        |
 
 ### Other Parameters
 
@@ -250,6 +249,10 @@ Make sure that ZooKeeper is persistent if you want to keep changes in the Web UI
 | `persistence.dataLogDir.selector`      | Selector to match an existing Persistent Volume for Drill's data log PVC | `{}`    |
 
 ## Notable changes
+
+### 1.2.7
+
+The notation for `.Values.service` has been changed. This makes it possible to configure `web` and `user` services separately.
 
 ### 1.2.6
 

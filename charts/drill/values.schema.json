@@ -197,30 +197,35 @@
         "service": {
             "type": "object",
             "properties": {
-                "type": {
-                    "type": "string",
-                    "description": "Drill service type",
-                    "default": "ClusterIP"
+                "web": {
+                    "type": "object",
+                    "properties": {
+                        "type": {
+                            "type": "string",
+                            "description": "Drill Web service type",
+                            "default": "ClusterIP"
+                        },
+                        "port": {
+                            "type": "number",
+                            "description": "Drill Web service port",
+                            "default": 80
+                        }
+                    }
                 },
-                "webPort": {
-                    "type": "number",
-                    "description": "Needed for the Drill Web UI.",
-                    "default": 80
-                },
-                "userPort": {
-                    "type": "number",
-                    "description": "User port address. Used between nodes in a Drill cluster. Needed for an external client, such as Tableau, to connect into the cluster nodes. Also needed for the Drill Web UI.",
-                    "default": 31010
-                },
-                "controlPort": {
-                    "type": "number",
-                    "description": "Control port address. Used between nodes in a Drill cluster. Needed for multi-node installation of Apache Drill.",
-                    "default": 31011
-                },
-                "dataPort": {
-                    "type": "number",
-                    "description": "Data port address. Used between nodes in a Drill cluster. Needed for multi-node installation of Apache Drill.",
-                    "default": 31012
+                "user": {
+                    "type": "object",
+                    "properties": {
+                        "type": {
+                            "type": "string",
+                            "description": "Drill User Api service type",
+                            "default": "ClusterIP"
+                        },
+                        "port": {
+                            "type": "number",
+                            "description": "Drill User Api service port",
+                            "default": 31010
+                        }
+                    }
                 }
             }
         },
@@ -259,7 +264,7 @@
                 },
                 "enabled": {
                     "type": "boolean",
-                    "description": "Enable ingress record generation for Frank!",
+                    "description": "Enable ingress record generation for Drill",
                     "default": false
                 },
                 "className": {
@@ -269,7 +274,7 @@
                 },
                 "annotations": {
                     "type": "object",
-                    "description": "Additional annotations for the Ingress resource. To enable certificate autogeneration, place here your cert-manager annotations.",
+                    "description": "Additional annotations for the Ingress resource. To enable certificate auto-generation, place here your cert-manager annotations.",
                     "default": {}
                 },
                 "tls": {

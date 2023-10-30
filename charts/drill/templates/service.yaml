@@ -1,21 +1,31 @@
 apiVersion: v1
 kind: Service
-{{ template "drill.metadata" . }}
+metadata:
+  name: {{ include "drill.fullname" . }}-web
+  labels:
+    {{- include "drill.labels" . | nindent 4 }}
 spec:
   sessionAffinity: ClientIP
   ports:
   - name: http
-    port: {{ .Values.service.webPort }}
+    port: {{ .Values.service.web.port }}
     targetPort: 8047
-  - name: user
-    port: {{ .Values.service.userPort }}
-    targetPort: 31010
-  - name: control
-    port: {{ .Values.service.controlPort }}
-    targetPort: 31011
-  - name: data
-    port: {{ add .Values.service.dataPort 2 }}
-    targetPort: 31012
-  type: {{ .Values.service.type }}
+  type: {{ .Values.service.web.type }}
+  selector:
+    {{- include "drill.selectorLabels" . | nindent 4 }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "drill.fullname" . }}-user
+  labels:
+    {{- include "drill.labels" . | nindent 4 }}
+spec:
+  sessionAffinity: ClientIP
+  ports:
+    - name: user
+      port: {{ .Values.service.user.port }}
+      targetPort: 31010
+  type: {{ .Values.service.user.type }}
   selector:
     {{- include "drill.selectorLabels" . | nindent 4 }}
