@@ -3,6 +3,29 @@ entries:
   drill:
   - apiVersion: v2
     appVersion: 1.21.1
+    created: "2023-10-30T10:22:15.657235931Z"
+    dependencies:
+    - name: zookeeper
+      repository: https://charts.bitnami.com/bitnami
+      version: 12.1.2
+    description: Helm Charts for deploying Apache Drill Clusters on Kubernetes
+    digest: 7a3b019a32f43cf6115538c717e91d3f677acb51d2e549d0c2800c744d9fd4f6
+    home: https://drill.apache.org/
+    icon: https://raw.githubusercontent.com/wearefrank/charts/master/charts/drill/icon.svg
+    keywords:
+    - apache
+    - drill
+    - data
+    - query
+    name: drill
+    sources:
+    - https://github.com/wearefrank/charts
+    type: application
+    urls:
+    - https://github.com/wearefrank/charts/releases/download/drill-1.2.7/drill-1.2.7.tgz
+    version: 1.2.7
+  - apiVersion: v2
+    appVersion: 1.21.1
     created: "2023-10-24T12:26:16.118946434Z"
     dependencies:
     - name: zookeeper
@@ -426,4 +449,4 @@ entries:
     urls:
     - https://github.com/wearefrank/charts/releases/download/zaakbrug-2.0.0/zaakbrug-2.0.0.tgz
     version: 2.0.0
-generated: "2023-10-24T12:26:16.119211938Z"
+generated: "2023-10-30T10:22:15.657297931Z"
