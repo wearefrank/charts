@@ -97,9 +97,11 @@ spec:
               subPath: passwd
             - name: {{ template "drill.fullname" . }}-log
               mountPath: /var/lib/drill/log
-            - name: {{ template "drill.fullname" . }}-data
-              mountPath: /opt/drill/jars/3rdparty
-              subPath: 3rdparty
+            {{- range .Values.drill.drivers }}
+            - name: {{ template "drill.fullname" $ }}-data
+              mountPath: "/opt/drill/jars/3rdparty/{{ .name }}.jar"
+              subPath: "3rdparty/{{ .name }}"
+            {{- end }}
       terminationGracePeriodSeconds: {{ .Values.terminationGracePeriodSeconds }}
       securityContext:
         {{- toYaml .Values.securityContext | nindent 8 }}
@@ -138,11 +140,11 @@ spec:
         {{- range .Values.drill.drivers }}
         - name: download-{{ .name }}-driver
           image: busybox
-          command: [ 'sh', '-c', 'if [ -f /downloads/{{ .name }}.jar ]; then echo The driver {{ .name }} already exists; else wget -O /downloads/{{ .name }}.jar {{ .url | quote }} {{ if .noCheckCertificate -}} --no-check-certificate {{- end }}; fi' ]
+          command: [ 'sh', '-c', 'if [ -f /downloads/{{ .name }} ]; then echo The driver {{ .name }} already exists; else wget -O /downloads/{{ .name }} {{ .url | quote }} {{ if .noCheckCertificate -}} --no-check-certificate {{- end }}; fi' ]
           volumeMounts:
             - name: {{ template "drill.fullname" $ }}-data
               mountPath: /downloads
-              subPath: 3rdparty
+              subPath: drivers
         {{- end }}
         - name: zookeeper-available
           image: busybox
