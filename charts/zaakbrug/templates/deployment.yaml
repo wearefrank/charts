@@ -2,6 +2,11 @@
 {{- define "zaakbrug.deployment" -}}
 spec:
   template:
+    metadata:
+      annotations:
+        checksum/configmap.api-proxy: {{ include (print $.Template.BasePath "/configmap.api-proxy.yaml") . | sha256sum }}
+        checksum/configmap.env: {{ include (print $.Template.BasePath "/configmap.zaakbrug.env.yaml") . | sha256sum }}
+        checksum/configmap.specifics: {{ include (print $.Template.BasePath "/configmap.zaakbrug.specifics.yaml") . | sha256sum }}
     spec:
       containers:
         -

@@ -59,7 +59,7 @@ frank:
   ## @param frank.dtap.side Set the `DTAP` side of where the instance is running
   ##
   dtap:
-    stage: ""
+    stage: "LOC"
     side: ""
   ## @skip frank.credentials [object]
   ## @param frank.credentials.secret Set the secret name of the existing secret
@@ -488,6 +488,10 @@ staging:
   ## @param staging.enabled Enable the staging environment
   ##
   enabled: false
+  ## @param staging.image.tag Version of OpenZaak
+  ##
+  image:
+    tag: "1.9.0"
   ## @param staging.zakenApi.rootUrl Endpoint of the zaken API of the staging zaaksysteem
   ## @param staging.documentenApi.rootUrl Endpoint of the documenten API of the staging zaaksysteem
   ## @param staging.catalogiApi.rootUrl Endpoint of the catalogi API of the staging zaaksysteem

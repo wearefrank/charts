@@ -1,9 +1,9 @@
 dependencies:
 - name: ff-common
   repository: https://ibissource.github.io/charts/
-  version: 0.1.15
+  version: 0.1.16
 - name: openzaak
   repository: https://maykinmedia.github.io/charts/
-  version: 1.1.0
-digest: sha256:0bb3c64a3532bc2434bce6614b0f9457b858410ae47208de4ab6e5954dd04a49
-generated: "2023-10-03T02:34:00.982031261+02:00"
+  version: 1.1.1
+digest: sha256:9106c765c9a1d90a4b0fc8d9330915098da31f6b5d736d240245793b124705b1
+generated: "2023-11-16T16:52:36.649862925+01:00"

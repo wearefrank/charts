@@ -72,7 +72,7 @@
                         "stage": {
                             "type": "string",
                             "description": "(Required) Set the `DTAP` stage. Options: `LOC`, `DEV`, `TST`, `ACC`, `PRD`",
-                            "default": ""
+                            "default": "LOC"
                         },
                         "side": {
                             "type": "string",
@@ -937,6 +937,16 @@
                     "type": "boolean",
                     "description": "Enable the staging environment",
                     "default": false
+                },
+                "image": {
+                    "type": "object",
+                    "properties": {
+                        "tag": {
+                            "type": "string",
+                            "description": "Version of OpenZaak",
+                            "default": "1.9.0"
+                        }
+                    }
                 },
                 "zakenApi": {
                     "type": "object",
