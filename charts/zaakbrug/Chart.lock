@@ -1,9 +1,9 @@
 dependencies:
 - name: ff-common
-  repository: https://ibissource.github.io/charts/
-  version: 0.1.16
+  repository: https://frankframework.github.io/charts/
+  version: 0.1.17
 - name: openzaak
   repository: https://maykinmedia.github.io/charts/
   version: 1.1.1
-digest: sha256:9106c765c9a1d90a4b0fc8d9330915098da31f6b5d736d240245793b124705b1
-generated: "2023-11-16T16:52:36.649862925+01:00"
+digest: sha256:931975ea280e5b49d842c393932e0b8e294a8e1027a385a1da89c1d105f9905a
+generated: "2023-11-23T21:13:57.277740004+01:00"

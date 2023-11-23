@@ -2,7 +2,7 @@
 
 An app for Dutch municipalities that supports the transition from "zaak- en documentatieservices" (zds) to "zaakgericht werken" (zgw).
 
-[ZaakBrug source on GitHub](https://github.com/ibissource/zaakbrug)
+[ZaakBrug source on GitHub](https://github.com/frankframework/zaakbrug)
 
 ## Usage
 
