@@ -164,7 +164,13 @@ spec:
         selector:
           {{- toYaml . | nindent 10 }}
         {{- end }}
+        {{- if .Values.persistence.storageClass }}
+        {{- if eq "-" .Values.persistence.storageClass}}
+        storageClassName: ""
+        {{- else }}
         storageClassName: {{ .Values.persistence.storageClass | quote }}
+        {{- end }}
+        {{- end }}
         resources:
           requests:
             storage: {{ .Values.persistence.dataLogDir.size | quote }}
