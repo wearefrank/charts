@@ -48,6 +48,11 @@ spec:
           configMap:
             name: {{ template "ff-common.fullname" . }}-profiles
         {{- end -}}
+        {{- if .Values.persistence.enabled }}
+        - name: {{ template "ff-common.fullname" . }}-data
+          persistentVolumeClaim:
+            claimName: {{ template "ff-common.fullname" . }}-data
+        {{- end }}
 {{- end -}}
 {{- define "zaakbrug.deployment.container" -}}
 envFrom:
@@ -94,11 +99,16 @@ volumeMounts:
     mountPath: /opt/frank/configurations/Translate/Globals.json
     subPath: Globals.json
     readOnly: true
-          {{- end }}
-          {{- if .Values.zaakbrug.profiles }}
+  {{- end }}
+  {{- if .Values.zaakbrug.profiles }}
   - name: {{ template "ff-common.fullname" . }}-profiles
     mountPath: /opt/frank/configurations/Translate/Profiles.json
     subPath: Profiles.json
     readOnly: true
+  {{- end }}
+  {{- if .Values.persistence.enabled }}
+  - name: {{ template "ff-common.fullname" . }}-data
+    subPath: heap-dumps
+    mountPath: /heap-dumps
   {{- end }}
 {{- end -}}

@@ -57,7 +57,7 @@ helm delete zaakbrug
 | `frank.memory.percentage`                                    | Set if the values for the memory are in percentages                                                              | `false` |
 | `frank.memory.minimum`                                       | Sets the initial size of the heap that will be used by the Frank!Framework                                       | `4G`    |
 | `frank.memory.maximum`                                       | Sets the maximum size of the heap that will be used by the Frank!Framework                                       | `4G`    |
-| `frank.dtap.stage`                                           | (Required) Set the `DTAP` stage. Options: `LOC`, `DEV`, `TST`, `ACC`, `PRD`                                      | `LOC`   |
+| `frank.dtap.stage`                                           | (Required) Set the `DTAP` stage. Options: `LOC`, `DEV`, `TST`, `ACC`, `PRD`                                      | `""`    |
 | `frank.dtap.side`                                            | Set the `DTAP` side of where the instance is running                                                             | `""`    |
 | `frank.credentials.secret`                                   | Set the secret name of the existing secret                                                                       | `""`    |
 | `frank.credentials.key`                                      | Set the key inside the secret that contains the data (e.g. `credentials.properties`)                             | `""`    |
@@ -78,6 +78,7 @@ helm delete zaakbrug
 | `frank.security.http.activeDirectory.roleMapping.observer`   | Map the rol for Observer                                                                                         | `""`    |
 | `frank.server.transactionManager`                            | Set the transaction manager for Tomcat. Options: `NARAYANA`, `BTM`, ``                                           | `""`    |
 | `frank.environmentVariables`                                 | Set extra environment variables for the Frank!                                                                   | `{}`    |
+| `frank.javaOpts`                                             | Append custom options to the `JAVA_OPTS` environment variable for the Frank!                                     | `""`    |
 
 ### Frank!Framework Connection parameters
 
@@ -101,22 +102,38 @@ helm delete zaakbrug
 
 ### Frank!Framework deployment parameters
 
-| Name                                | Description                                             | Value     |
-| ----------------------------------- | ------------------------------------------------------- | --------- |
-| `replicaCount`                      | Number of Frank!Framework replicas to deploy            | `1`       |
-| `livenessProbe.initialDelaySeconds` | Initial delay seconds for livenessProbe                 | `40`      |
-| `livenessProbe.periodSeconds`       | Period seconds for livenessProbe                        | `10`      |
-| `livenessProbe.timeoutSeconds`      | Timeout seconds for livenessProbe                       | `1`       |
-| `livenessProbe.failureThreshold`    | Failure threshold for livenessProbe                     | `6`       |
-| `livenessProbe.successThreshold`    | Success threshold for livenessProbe                     | `1`       |
-| `resources`                         | Set the resources for the Frank!Framework containers    | `{}`      |
-| `resources.limits`                  | The resources limits for the Frank!Framework containers | `""`      |
-| `resources.requests.memory`         | The requested memory for the Frank!Framework containers | `""`      |
-| `resources.requests.cpu`            | The requested cpu for the Frank!Framework containers    | `""`      |
-| `nodeSelector`                      | Node labels for pod assignment                          | `{}`      |
-| `tolerations`                       | Set tolerations for pod assignment                      | `[]`      |
-| `affinity`                          | Set affinity for pod assignment                         | `{}`      |
-| `timeZone`                          | used for database connection and log timestamps         | `Etc/UTC` |
+The startup probe will enable blue-green deployment, which are great for uptime during upgrades and such.
+It (and the liveness probe) will check if the console is accessible, until a better health endpoint is available.
+The readiness probe will check if all adapters are running using the server health endpoint
+
+| Name                                 | Description                                              | Value     |
+| ------------------------------------ | -------------------------------------------------------- | --------- |
+| `replicaCount`                       | Number of Frank!Framework replicas to deploy             | `1`       |
+| `startupProbe.initialDelaySeconds`   | Initial delay seconds for startupProbe                   | `40`      |
+| `startupProbe.periodSeconds`         | Period seconds for startupProbe                          | `20`      |
+| `startupProbe.timeoutSeconds`        | Timeout seconds for startupProbe                         | `1`       |
+| `startupProbe.failureThreshold`      | Failure threshold for startupProbe                       | `6`       |
+| `startupProbe.successThreshold`      | Success threshold for startupProbe                       | `1`       |
+| `livenessProbe.initialDelaySeconds`  | Initial delay seconds for livenessProbe                  | `10`      |
+| `livenessProbe.periodSeconds`        | Period seconds for livenessProbe                         | `10`      |
+| `livenessProbe.timeoutSeconds`       | Timeout seconds for livenessProbe                        | `10`      |
+| `livenessProbe.failureThreshold`     | Failure threshold for livenessProbe                      | `3`       |
+| `livenessProbe.successThreshold`     | Success threshold for livenessProbe                      | `1`       |
+| `readinessProbe.initialDelaySeconds` | Initial delay seconds for readinessProbe                 | `60`      |
+| `readinessProbe.periodSeconds`       | Period seconds for readinessProbe                        | `5`       |
+| `readinessProbe.timeoutSeconds`      | Timeout seconds for readinessProbe                       | `3`       |
+| `readinessProbe.failureThreshold`    | Failure threshold for readinessProbe                     | `3`       |
+| `readinessProbe.successThreshold`    | Success threshold for readinessProbe                     | `1`       |
+| `resources`                          | Set the resources for the Frank!Framework containers     | `{}`      |
+| `resources.limits`                   | The resources limits for the Frank!Framework containers  | `""`      |
+| `resources.requests.memory`          | The requested memory for the Frank!Framework containers  | `""`      |
+| `resources.requests.cpu`             | The requested cpu for the Frank!Framework containers     | `""`      |
+| `terminationGracePeriodSeconds`      | Number of seconds after which pods are forcefully killed | `60`      |
+| `terminationGracePeriodSeconds`      | Note: Lower values may cause running adapters to fail    |           |
+| `nodeSelector`                       | Node labels for pod assignment                           | `{}`      |
+| `tolerations`                        | Set tolerations for pod assignment                       | `[]`      |
+| `affinity`                           | Set affinity for pod assignment                          | `{}`      |
+| `timeZone`                           | used for database connection and log timestamps          | `Etc/UTC` |
 
 ### Traffic Exposure Parameters
 
@@ -145,6 +162,22 @@ helm delete zaakbrug
 | `podLabels`                  | Extra labels for Frank!Framework pods                     | `{}`   |
 | `podSecurityContext`         | Set Frank!Framework pod's Security Context                | `{}`   |
 | `securityContext`            | Set Frank!Framework container's Security Context          | `{}`   |
+
+### Persistence
+
+Persistence is used for keeping heap dumps. They can be found at `/heap-dumps` with persistence enabled.
+Otherwise, they can be found at `/usr/local/tomcat/logs`
+
+| Name                        | Description                                                                        | Value   |
+| --------------------------- | ---------------------------------------------------------------------------------- | ------- |
+| `persistence.enabled`       | Enable persistence using Persistent Volume Claims                                  | `false` |
+| `persistence.storageClass`  | Persistent Volume storage class                                                    | `""`    |
+| `persistence.accessModes`   | Persistent Volume access modes                                                     | `[]`    |
+| `persistence.size`          | Persistent Volume size                                                             | `5Gi`   |
+| `persistence.dataSource`    | Custom PVC data source                                                             | `{}`    |
+| `persistence.existingClaim` | The name of an existing PVC to use for persistence                                 | `""`    |
+| `persistence.selector`      | Selector to match an existing Persistent Volume for the Frank!Framework's data PVC | `{}`    |
+| `persistence.annotations`   | Persistent Volume Claim annotations                                                | `{}`    |
 
 ### ZaakBrug
 

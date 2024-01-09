@@ -72,7 +72,7 @@
                         "stage": {
                             "type": "string",
                             "description": "(Required) Set the `DTAP` stage. Options: `LOC`, `DEV`, `TST`, `ACC`, `PRD`",
-                            "default": "LOC"
+                            "default": ""
                         },
                         "side": {
                             "type": "string",
@@ -197,6 +197,33 @@
                             "default": "NARAYANA"
                         }
                     }
+                },
+                "javaOpts": {
+                    "type": "string",
+                    "description": "Append custom options to the `JAVA_OPTS` environment variable for the Frank!",
+                    "default": ""
+                }
+            }
+        },
+        "connections": {
+            "type": "object",
+            "properties": {
+                "create": {
+                    "type": "boolean",
+                    "description": "Create a `context.xml` and possibly overwrite the existing one, to configure the connections/resources.",
+                    "default": true
+                },
+                "jdbc": {
+                    "type": "array",
+                    "description": "Set multiple database connections. One connection should have an empty name, so it'll get picked up by default (unless `jdbc.required=false` is set)",
+                    "default": [],
+                    "items": {}
+                },
+                "jms": {
+                    "type": "array",
+                    "description": "Set multiple massage services",
+                    "default": [],
+                    "items": {}
                 }
             }
         },
@@ -230,25 +257,38 @@
                 }
             }
         },
-        "connections": {
+        "replicaCount": {
+            "type": "number",
+            "description": "Number of Frank!Framework replicas to deploy",
+            "default": 1
+        },
+        "startupProbe": {
             "type": "object",
             "properties": {
-                "create": {
-                    "type": "boolean",
-                    "description": "Create a `context.xml` and possibly overwrite the existing one, to configure the connections/resources.",
-                    "default": true
+                "initialDelaySeconds": {
+                    "type": "number",
+                    "description": "Initial delay seconds for startupProbe",
+                    "default": 40
                 },
-                "jdbc": {
-                    "type": "array",
-                    "description": "Set multiple database connections. One connection should have an empty name, so it'll get picked up by default (unless `jdbc.required=false` is set)",
-                    "default": [],
-                    "items": {}
+                "periodSeconds": {
+                    "type": "number",
+                    "description": "Period seconds for startupProbe",
+                    "default": 20
                 },
-                "jms": {
-                    "type": "array",
-                    "description": "Set multiple massage services",
-                    "default": [],
-                    "items": {}
+                "timeoutSeconds": {
+                    "type": "number",
+                    "description": "Timeout seconds for startupProbe",
+                    "default": 1
+                },
+                "failureThreshold": {
+                    "type": "number",
+                    "description": "Failure threshold for startupProbe",
+                    "default": 6
+                },
+                "successThreshold": {
+                    "type": "number",
+                    "description": "Success threshold for startupProbe",
+                    "default": 1
                 }
             }
         },
@@ -308,18 +348,13 @@
                 }
             }
         },
-        "replicaCount": {
-            "type": "number",
-            "description": "Number of Frank!Framework replicas to deploy",
-            "default": 1
-        },
         "livenessProbe": {
             "type": "object",
             "properties": {
                 "initialDelaySeconds": {
                     "type": "number",
                     "description": "Initial delay seconds for livenessProbe",
-                    "default": 40
+                    "default": 10
                 },
                 "periodSeconds": {
                     "type": "number",
@@ -329,12 +364,12 @@
                 "timeoutSeconds": {
                     "type": "number",
                     "description": "Timeout seconds for livenessProbe",
-                    "default": 1
+                    "default": 10
                 },
                 "failureThreshold": {
                     "type": "number",
                     "description": "Failure threshold for livenessProbe",
-                    "default": 6
+                    "default": 3
                 },
                 "successThreshold": {
                     "type": "number",
@@ -342,6 +377,41 @@
                     "default": 1
                 }
             }
+        },
+        "readinessProbe": {
+            "type": "object",
+            "properties": {
+                "initialDelaySeconds": {
+                    "type": "number",
+                    "description": "Initial delay seconds for readinessProbe",
+                    "default": 60
+                },
+                "periodSeconds": {
+                    "type": "number",
+                    "description": "Period seconds for readinessProbe",
+                    "default": 5
+                },
+                "timeoutSeconds": {
+                    "type": "number",
+                    "description": "Timeout seconds for readinessProbe",
+                    "default": 3
+                },
+                "failureThreshold": {
+                    "type": "number",
+                    "description": "Failure threshold for readinessProbe",
+                    "default": 3
+                },
+                "successThreshold": {
+                    "type": "number",
+                    "description": "Success threshold for readinessProbe",
+                    "default": 1
+                }
+            }
+        },
+        "terminationGracePeriodSeconds": {
+            "type": "number",
+            "description": "Number of seconds after which pods are forcefully killed",
+            "default": 60
         },
         "nodeSelector": {
             "type": "object",
@@ -396,6 +466,66 @@
                     "type": "string",
                     "description": "The name of the ServiceAccount to use.",
                     "default": ""
+                }
+            }
+        },
+        "podAnnotations": {
+            "type": "object",
+            "description": "Annotations for Frank!Framework pods",
+            "default": {}
+        },
+        "podLabels": {
+            "type": "object",
+            "description": "Extra labels for Frank!Framework pods",
+            "default": {}
+        },
+        "persistence": {
+            "type": "object",
+            "properties": {
+                "enabled": {
+                    "type": "boolean",
+                    "description": "Enable persistence using Persistent Volume Claims",
+                    "default": false
+                },
+                "storageClass": {
+                    "type": "string",
+                    "description": "Persistent Volume storage class",
+                    "default": ""
+                },
+                "accessModes": {
+                    "type": "array",
+                    "description": "Persistent Volume access modes",
+                    "default": [
+                        "ReadWriteOnce"
+                    ],
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "size": {
+                    "type": "string",
+                    "description": "Persistent Volume size",
+                    "default": "5Gi"
+                },
+                "dataSource": {
+                    "type": "object",
+                    "description": "Custom PVC data source",
+                    "default": {}
+                },
+                "existingClaim": {
+                    "type": "string",
+                    "description": "The name of an existing PVC to use for persistence",
+                    "default": ""
+                },
+                "selector": {
+                    "type": "object",
+                    "description": "Selector to match an existing Persistent Volume for the Frank!Framework's data PVC",
+                    "default": {}
+                },
+                "annotations": {
+                    "type": "object",
+                    "description": "Persistent Volume Claim annotations",
+                    "default": {}
                 }
             }
         },
@@ -725,16 +855,6 @@
                     }
                 }
             }
-        },
-        "podAnnotations": {
-            "type": "object",
-            "description": "Annotations for Frank!Framework pods",
-            "default": {}
-        },
-        "podLabels": {
-            "type": "object",
-            "description": "Extra labels for Frank!Framework pods",
-            "default": {}
         },
         "staging": {
             "type": "object",

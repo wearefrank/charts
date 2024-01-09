@@ -33,9 +33,9 @@ image:
   ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
   ## e.g:
   ## pullSecrets:
-  ##   - myRegistryKeySecretName
+  ##   - name: myRegistryKeySecretName
   ##
-  pullSecrets: [ ]
+  pullSecrets: []
 
 ## @section Frank! Configuration parameters
 ##
@@ -59,7 +59,7 @@ frank:
   ## @param frank.dtap.side Set the `DTAP` side of where the instance is running
   ##
   dtap:
-    stage: "LOC"
+    stage: ""
     side: ""
   ## @skip frank.credentials [object]
   ## @param frank.credentials.secret Set the secret name of the existing secret
@@ -80,7 +80,7 @@ frank:
   ##   - main
   ##
   configurations:
-    names: [ ]
+    names: []
   ## @skip frank.security [object]
   ## @skip frank.security.http [object]
   ##
@@ -100,7 +100,7 @@ frank:
       ##     roles:
       ##        - IbisTester
       ##
-      localUsers: [ ]
+      localUsers: []
       ## @skip frank.security.http.activeDirectory [object]
       ## @param frank.security.http.activeDirectory.enabled Enable Active Directory for authentication
       ## @param frank.security.http.activeDirectory.url Set url for Active Directory
@@ -130,7 +130,10 @@ frank:
     transactionManager: NARAYANA
   ## @param frank.environmentVariables [object] Set extra environment variables for the Frank!
   ##
-  environmentVariables: { }
+  environmentVariables: {}
+  ## @param frank.javaOpts [string] Append custom options to the `JAVA_OPTS` environment variable for the Frank!
+  ##
+  javaOpts: ""
 
 ## @section Frank!Framework Connection parameters
 ##
@@ -151,16 +154,21 @@ connections:
   ## @param connections.jdbc.password [string] Password to connect to the database (or use string template for use with credentials e.g. `${database/password}`)
   ## @param connections.jdbc.ssl [nullable,string] Set to `true` is the connection uses SSL, default is `false`
   ##
-  jdbc: [ ]
+  jdbc: []
   ## @param connections.jms [array] Set multiple massage services
   ## @param connections.jms.name [nullable,string] Name of the connection (leave empty to use default: `jms/${.Values.instance.name}` in lowercase)
   ## @param connections.jms.type [string] MQ type. Options: `artemis`, `activemq`
   ## @param connections.jms.host [string] Host of where the MQ can be reached (like in the same cluster e.g. `<service>.<namespace>.svc.cluster.local`)
   ## @param connections.jms.post [nullable,string] Port for the MQ (leave empty for default)
   ##
-  jms: [ ]
+  jms: []
 
 ## @section Frank!Framework deployment parameters
+## @descriptionStart
+## The startup probe will enable blue-green deployment, which are great for uptime during upgrades and such.
+## It (and the liveness probe) will check if the console is accessible, until a better health endpoint is available.
+## The readiness probe will check if all adapters are running using the server health endpoint
+## @descriptionEnd
 ##
 
 ## @param replicaCount Number of Frank!Framework replicas to deploy
@@ -168,7 +176,22 @@ connections:
 ##
 replicaCount: 1
 
-## Configure extra options for Frank!Framework containers' liveness, readiness and startup probes
+## Configure extra options for Frank!Framework containers' startup probe
+## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/#configure-probes
+## @param startupProbe.initialDelaySeconds Initial delay seconds for startupProbe
+## @param startupProbe.periodSeconds Period seconds for startupProbe
+## @param startupProbe.timeoutSeconds Timeout seconds for startupProbe
+## @param startupProbe.failureThreshold Failure threshold for startupProbe
+## @param startupProbe.successThreshold Success threshold for startupProbe
+##
+startupProbe:
+  initialDelaySeconds: 40
+  periodSeconds: 20
+  timeoutSeconds: 1
+  failureThreshold: 6
+  successThreshold: 1
+
+## Configure extra options for Frank!Framework containers' liveness probe
 ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/#configure-probes
 ## @param livenessProbe.initialDelaySeconds Initial delay seconds for livenessProbe
 ## @param livenessProbe.periodSeconds Period seconds for livenessProbe
@@ -177,11 +200,27 @@ replicaCount: 1
 ## @param livenessProbe.successThreshold Success threshold for livenessProbe
 ##
 livenessProbe:
-  initialDelaySeconds: 40
+  initialDelaySeconds: 10
   periodSeconds: 10
-  timeoutSeconds: 1
-  failureThreshold: 6
+  timeoutSeconds: 10
+  failureThreshold: 3
   successThreshold: 1
+
+## Configure extra options for Frank!Framework containers' readiness probe
+## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/#configure-probes
+## @param readinessProbe.initialDelaySeconds Initial delay seconds for readinessProbe
+## @param readinessProbe.periodSeconds Period seconds for readinessProbe
+## @param readinessProbe.timeoutSeconds Timeout seconds for readinessProbe
+## @param readinessProbe.failureThreshold Failure threshold for readinessProbe
+## @param readinessProbe.successThreshold Success threshold for readinessProbe
+##
+readinessProbe:
+  initialDelaySeconds: 60
+  periodSeconds: 5
+  timeoutSeconds: 3
+  failureThreshold: 3
+  successThreshold: 1
+
 ## Frank!Framework container's resource requests and limits
 ## ref: https://kubernetes.io/docs/user-guide/compute-resources/
 ## @param resources [object] Set the resources for the Frank!Framework containers
@@ -197,7 +236,7 @@ livenessProbe:
 ##     cpu: 2000m
 ##     memory: 4200M
 ##
-resources: { }
+resources: {}
 
 ## @skip autoscaling
 ##
@@ -208,21 +247,25 @@ autoscaling:
   targetCPUUtilizationPercentage: 80
   targetMemoryUtilizationPercentage: 80
 
+## @param terminationGracePeriodSeconds Number of seconds after which pods are forcefully killed
+## @extra terminationGracePeriodSeconds Note: Lower values may cause running adapters to fail
+terminationGracePeriodSeconds: 60
+
 ## @param nodeSelector Node labels for pod assignment
 ## ref: https://kubernetes.io/docs/user-guide/node-selection/
 ##
-nodeSelector: { }
+nodeSelector: {}
 
 ## @param tolerations Set tolerations for pod assignment
 ## ref: https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/
 ##
-tolerations: [ ]
+tolerations: []
 
 ## @param affinity Set affinity for pod assignment
 ## Ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity
 ## NOTE: podAffinityPreset, podAntiAffinityPreset, and nodeAffinityPreset will be ignored when it's set
 ##
-affinity: { }
+affinity: {}
 
 ## @param timeZone used for database connection and log timestamps
 ##
@@ -262,7 +305,7 @@ ingress:
   ##   kubernetes.io/ingress.class: nginx
   ##   kubernetes.io/tls-acme: 'true'
   ##
-  annotations: { }
+  annotations: {}
   ## @param ingress.hosts [array] Set hosts for ingress
   ## @param ingress.hosts.host [string] Set hostname
   ## @param ingress.hosts.paths [array] Set multiple paths
@@ -281,7 +324,7 @@ ingress:
   ##     hosts:
   ##       - chart-example.local
   ##
-  tls: [ ]
+  tls: []
 
 ## @section Other Parameters
 ##
@@ -295,7 +338,7 @@ serviceAccount:
   create: true
   ## @param serviceAccount.annotations Additional custom annotations for the ServiceAccount
   ##
-  annotations: { }
+  annotations: {}
   ## @param serviceAccount.name The name of the ServiceAccount to use.
   ## If not set and create is true, a name is generated using the ff-common.fullname template
   ##
@@ -304,18 +347,18 @@ serviceAccount:
 ## @param podAnnotations Annotations for Frank!Framework pods
 ## ref: https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/
 ##
-podAnnotations: { }
+podAnnotations: {}
 
 ## @param podLabels Extra labels for Frank!Framework pods
 ## ref: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/
 ##
-podLabels: { }
+podLabels: {}
 
 ## Configure Pods Security Context
 ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod
 ## @param podSecurityContext [object] Set Frank!Framework pod's Security Context
 ##
-podSecurityContext: { }
+podSecurityContext: {}
 
 ## Configure Container Security Context (only main container)
 ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container
@@ -329,7 +372,51 @@ podSecurityContext: { }
 ##  runAsNonRoot: true
 ##  runAsUser: 1000
 ##
-securityContext: { }
+securityContext: {}
+
+## @section Persistence
+## @descriptionStart
+## Persistence is used for keeping heap dumps. They can be found at `/heap-dumps` with persistence enabled.
+## Otherwise, they can be found at `/usr/local/tomcat/logs`
+## @descriptionEnd
+##
+persistence:
+  ## @param persistence.enabled Enable persistence using Persistent Volume Claims
+  ##
+  enabled: false
+  ## @param persistence.storageClass Persistent Volume storage class
+  ## If defined, storageClassName: <storageClass>
+  ## If set to "-", storageClassName: "", which disables dynamic provisioning
+  ## If undefined (the default) or set to null, no storageClassName spec is set, choosing the default provisioner
+  ##
+  storageClass: ""
+  ## @param persistence.accessModes [array] Persistent Volume access modes
+  ##
+  accessModes:
+    - ReadWriteOnce
+  ## @param persistence.size Persistent Volume size
+  ##
+  size: 5Gi
+  ## @param persistence.dataSource Custom PVC data source
+  ##
+  dataSource: {}
+  ## @param persistence.existingClaim The name of an existing PVC to use for persistence
+  ##
+  existingClaim: ""
+  ## @param persistence.selector Selector to match an existing Persistent Volume for the Frank!Framework's data PVC
+  ## If set, the PVC can't have a PV dynamically provisioned for it
+  ## E.g.
+  ## selector:
+  ##   matchLabels:
+  ##     app: my-app
+  ##
+  selector: {}
+  ## @param persistence.annotations Persistent Volume Claim annotations
+  ## You might need to add an annotation for selected node:
+  ## E.g: volume.kubernetes.io/selected-node: nodeName
+  ## Ref: https://kubernetes.io/docs/reference/labels-annotations-taints/#volume-kubernetes-io-selected-node
+  ##
+  annotations: {}
 
 ## @section ZaakBrug
 ## @descriptionStart
@@ -571,7 +658,7 @@ staging:
     ## @param staging.apiProxy.podLabels Extra labels for API proxy pods
     ## ref: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/
     ##
-    podLabels: { }
+    podLabels: {}
     ## Configure Pods Security Context
     ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container
     ## @param staging.apiProxy.securityContext [object] Set API proxy container's Security Context
@@ -613,7 +700,7 @@ staging:
       ## pullSecrets:
       ##   - myRegistryKeySecretName
       ##
-      pullSecrets: [ ]
+      pullSecrets: []
     ## API proxy container's resource requests and limits
     ## ref: https://kubernetes.io/docs/user-guide/compute-resources/
     ## @param staging.apiProxy.resources [object] Set the resources for the API proxy containers
@@ -629,7 +716,7 @@ staging:
     ##     cpu: 2000m
     ##     memory: 4200M
     ##
-    resources: { }
+    resources: {}
     ## @param staging.apiProxy.existingConfigmap Set the name of an existing config-map to use as configuration for the API proxy
     ##
     existingConfigmap: ''
@@ -667,7 +754,7 @@ staging:
       ##   kubernetes.io/ingress.class: nginx
       ##   kubernetes.io/tls-acme: 'true'
       ##
-      annotations: { }
+      annotations: {}
       ## @param staging.apiProxy.ingress.hosts [array] Set hosts for ingress
       ## @param staging.apiProxy.ingress.hosts.host [string] Set hostname
       ## @param staging.apiProxy.ingress.hosts.paths [array] Set multiple paths
@@ -686,4 +773,4 @@ staging:
       ##     hosts:
       ##       - chart-example.local
       ##
-      tls: [ ]
+      tls: []
