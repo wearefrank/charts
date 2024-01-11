@@ -106,34 +106,38 @@ The startup probe will enable blue-green deployment, which are great for uptime 
 It (and the liveness probe) will check if the console is accessible, until a better health endpoint is available.
 The readiness probe will check if all adapters are running using the server health endpoint
 
-| Name                                 | Description                                              | Value     |
-| ------------------------------------ | -------------------------------------------------------- | --------- |
-| `replicaCount`                       | Number of Frank!Framework replicas to deploy             | `1`       |
-| `startupProbe.initialDelaySeconds`   | Initial delay seconds for startupProbe                   | `40`      |
-| `startupProbe.periodSeconds`         | Period seconds for startupProbe                          | `20`      |
-| `startupProbe.timeoutSeconds`        | Timeout seconds for startupProbe                         | `1`       |
-| `startupProbe.failureThreshold`      | Failure threshold for startupProbe                       | `6`       |
-| `startupProbe.successThreshold`      | Success threshold for startupProbe                       | `1`       |
-| `livenessProbe.initialDelaySeconds`  | Initial delay seconds for livenessProbe                  | `10`      |
-| `livenessProbe.periodSeconds`        | Period seconds for livenessProbe                         | `10`      |
-| `livenessProbe.timeoutSeconds`       | Timeout seconds for livenessProbe                        | `10`      |
-| `livenessProbe.failureThreshold`     | Failure threshold for livenessProbe                      | `3`       |
-| `livenessProbe.successThreshold`     | Success threshold for livenessProbe                      | `1`       |
-| `readinessProbe.initialDelaySeconds` | Initial delay seconds for readinessProbe                 | `60`      |
-| `readinessProbe.periodSeconds`       | Period seconds for readinessProbe                        | `5`       |
-| `readinessProbe.timeoutSeconds`      | Timeout seconds for readinessProbe                       | `3`       |
-| `readinessProbe.failureThreshold`    | Failure threshold for readinessProbe                     | `3`       |
-| `readinessProbe.successThreshold`    | Success threshold for readinessProbe                     | `1`       |
-| `resources`                          | Set the resources for the Frank!Framework containers     | `{}`      |
-| `resources.limits`                   | The resources limits for the Frank!Framework containers  | `""`      |
-| `resources.requests.memory`          | The requested memory for the Frank!Framework containers  | `""`      |
-| `resources.requests.cpu`             | The requested cpu for the Frank!Framework containers     | `""`      |
-| `terminationGracePeriodSeconds`      | Number of seconds after which pods are forcefully killed | `60`      |
-| `terminationGracePeriodSeconds`      | Note: Lower values may cause running adapters to fail    |           |
-| `nodeSelector`                       | Node labels for pod assignment                           | `{}`      |
-| `tolerations`                        | Set tolerations for pod assignment                       | `[]`      |
-| `affinity`                           | Set affinity for pod assignment                          | `{}`      |
-| `timeZone`                           | used for database connection and log timestamps          | `Etc/UTC` |
+| Name                                 | Description                                                                                                        | Value     |
+| ------------------------------------ | ------------------------------------------------------------------------------------------------------------------ | --------- |
+| `replicaCount`                       | Number of Frank!Framework replicas to deploy                                                                       | `1`       |
+| `startupProbe.initialDelaySeconds`   | Initial delay seconds for startupProbe                                                                             | `40`      |
+| `startupProbe.periodSeconds`         | Period seconds for startupProbe                                                                                    | `10`      |
+| `startupProbe.timeoutSeconds`        | Timeout seconds for startupProbe                                                                                   | `1`       |
+| `startupProbe.failureThreshold`      | Failure threshold for startupProbe                                                                                 | `12`      |
+| `startupProbe.successThreshold`      | Success threshold for startupProbe                                                                                 | `1`       |
+| `livenessProbe.initialDelaySeconds`  | Initial delay seconds for livenessProbe                                                                            | `0`       |
+| `livenessProbe.periodSeconds`        | Period seconds for livenessProbe                                                                                   | `10`      |
+| `livenessProbe.timeoutSeconds`       | Timeout seconds for livenessProbe                                                                                  | `1`       |
+| `livenessProbe.failureThreshold`     | Failure threshold for livenessProbe                                                                                | `12`      |
+| `livenessProbe.successThreshold`     | Success threshold for livenessProbe                                                                                | `1`       |
+| `readinessProbe.initialDelaySeconds` | Initial delay seconds for readinessProbe                                                                           | `0`       |
+| `readinessProbe.periodSeconds`       | Period seconds for readinessProbe                                                                                  | `5`       |
+| `readinessProbe.timeoutSeconds`      | Timeout seconds for readinessProbe                                                                                 | `1`       |
+| `readinessProbe.failureThreshold`    | Failure threshold for readinessProbe                                                                               | `3`       |
+| `readinessProbe.successThreshold`    | Success threshold for readinessProbe                                                                               | `1`       |
+| `probesEnabled`                      | Toggle probes. This should only be used if a Frank! needs to be kept while in a bad state (for debugging purposes) | `{}`      |
+| `probesEnabled.startupProbe`         | Toggle startupProbe                                                                                                | `{}`      |
+| `probesEnabled.livenessProbe`        | Toggle livenessProbe                                                                                               | `{}`      |
+| `probesEnabled.readinessProbe`       | Toggle readinessProbe                                                                                              | `{}`      |
+| `resources`                          | Set the resources for the Frank!Framework containers                                                               | `{}`      |
+| `resources.limits`                   | The resources limits for the Frank!Framework containers                                                            | `""`      |
+| `resources.requests.memory`          | The requested memory for the Frank!Framework containers                                                            | `""`      |
+| `resources.requests.cpu`             | The requested cpu for the Frank!Framework containers                                                               | `""`      |
+| `terminationGracePeriodSeconds`      | Number of seconds after which pods are forcefully killed                                                           | `60`      |
+| `terminationGracePeriodSeconds`      | Note: Lower values may cause running adapters to fail                                                              |           |
+| `nodeSelector`                       | Node labels for pod assignment                                                                                     | `{}`      |
+| `tolerations`                        | Set tolerations for pod assignment                                                                                 | `[]`      |
+| `affinity`                           | Set affinity for pod assignment                                                                                    | `{}`      |
+| `timeZone`                           | used for database connection and log timestamps                                                                    | `Etc/UTC` |
 
 ### Traffic Exposure Parameters
 

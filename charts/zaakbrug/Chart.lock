@@ -1,9 +1,9 @@
 dependencies:
 - name: ff-common
   repository: https://frankframework.github.io/charts/
-  version: 0.1.19
+  version: 0.1.20
 - name: openzaak
   repository: https://maykinmedia.github.io/charts/
   version: 1.1.1
-digest: sha256:ce82dd11b56869744cfbb73f3d36132e419adbe76c7775ebf8b0001bced8f44a
-generated: "2024-01-09T18:11:20.827858559+01:00"
+digest: sha256:1404c380e936034aef4da7350c8a3e1fceb46081dc36ce6a3819232c703843af
+generated: "2024-01-11T14:07:13.859541915+01:00"

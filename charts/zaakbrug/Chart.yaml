@@ -4,11 +4,11 @@ description: A Helm chart for running ZaakBrug on Kubernetes
 name: zaakbrug
 icon: https://raw.githubusercontent.com/wearefrank/charts/master/charts/zaakbrug/icon.png
 type: application
-version: 2.0.19
+version: 2.0.20
 
 dependencies:
 - name: ff-common
-  version: ~0.1.19
+  version: ~0.1.20
   repository: https://frankframework.github.io/charts/
 - name: openzaak
   alias: staging
