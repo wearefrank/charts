@@ -120,6 +120,12 @@
                 "security": {
                     "type": "object",
                     "properties": {
+                        "certificateStores": {
+                            "type": "array",
+                            "description": "Define certificate (key/trust) stores to mount in the resources folder of the Frank!",
+                            "default": [],
+                            "items": {}
+                        },
                         "http": {
                             "type": "object",
                             "properties": {
@@ -789,6 +795,11 @@
                                     "type": "string",
                                     "description": "Reference to an auth alias configured in credentials.properties",
                                     "default": "zaken-api.jwt"
+                                },
+                                "timeout": {
+                                    "type": "number",
+                                    "description": "Set timeout for the zaken API",
+                                    "default": 20000
                                 }
                             }
                         },
@@ -809,6 +820,11 @@
                                     "type": "string",
                                     "description": "Reference to an auth alias configured in credentials.properties",
                                     "default": "zaken-api.jwt"
+                                },
+                                "timeout": {
+                                    "type": "number",
+                                    "description": "Set timeout for the catalogi API",
+                                    "default": 20000
                                 }
                             }
                         },
@@ -829,6 +845,11 @@
                                     "type": "string",
                                     "description": "Reference to an auth alias configured in credentials.properties",
                                     "default": "zaken-api.jwt"
+                                },
+                                "timeout": {
+                                    "type": "number",
+                                    "description": "Set timeout for the documenten API",
+                                    "default": 20000
                                 }
                             }
                         },
@@ -849,6 +870,11 @@
                                     "type": "string",
                                     "description": "Reference to an auth alias configured in credentials.properties",
                                     "default": "zaken-api.jwt"
+                                },
+                                "timeout": {
+                                    "type": "number",
+                                    "description": "Set timeout for the besluiten API",
+                                    "default": 20000
                                 }
                             }
                         }

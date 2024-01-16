@@ -85,6 +85,12 @@ frank:
   ## @skip frank.security.http [object]
   ##
   security:
+    ## @param frank.security.certificateStores [array] Define certificate (key/trust) stores to mount in the resources folder of the Frank!
+    ## @param frank.security.certificateStores.secretName [string] Name of the secret where the certificate store is located in
+    ## @param frank.security.certificateStores.key [string] The key in the secret where the certificate store is located in
+    ## @param frank.security.certificateStores.resourceUrl [string, nullable] The path to the certificate store in the Resource folder, the key will be used as default value
+    ##
+    certificateStores: []
     http:
       ## @param frank.security.http.authentication Set http authentication for the Frank!
       ##
@@ -504,32 +510,40 @@ zaakbrug:
     ## @param zaakbrug.zgw.zakenApi.rootUrl Endpoint for the zaken API
     ## @param zaakbrug.zgw.zakenApi.authType Options: 'jwt', 'basic', 'value'. 'value' uses the password field of the given authAlias as Authorization header
     ## @param zaakbrug.zgw.zakenApi.authAlias Reference to an auth alias configured in credentials.properties
+    ## @param zaakbrug.zgw.zakenApi.timeout Set timeout for the zaken API
     ## @param zaakbrug.zgw.catalogiApi.rootUrl Endpoint for the catalogi API
     ## @param zaakbrug.zgw.catalogiApi.authType Options: 'jwt', 'basic', 'value'. 'value' uses the password field of the given authAlias as Authorization header
     ## @param zaakbrug.zgw.catalogiApi.authAlias Reference to an auth alias configured in credentials.properties
+    ## @param zaakbrug.zgw.catalogiApi.timeout Set timeout for the catalogi API
     ## @param zaakbrug.zgw.documentenApi.rootUrl Endpoint for the documenten API
     ## @param zaakbrug.zgw.documentenApi.authType Options: 'jwt', 'basic', 'value'. 'value' uses the password field of the given authAlias as Authorization header
     ## @param zaakbrug.zgw.documentenApi.authAlias Reference to an auth alias configured in credentials.properties
+    ## @param zaakbrug.zgw.documentenApi.timeout Set timeout for the documenten API
     ## @param zaakbrug.zgw.besluitenApi.rootUrl Endpoint for the besluiten API
     ## @param zaakbrug.zgw.besluitenApi.authType Options: 'jwt', 'basic', 'value'. 'value' uses the password field of the given authAlias as Authorization header
     ## @param zaakbrug.zgw.besluitenApi.authAlias Reference to an auth alias configured in credentials.properties
+    ## @param zaakbrug.zgw.besluitenApi.timeout Set timeout for the besluiten API
     ##
     zakenApi:
       rootUrl: "http://open-zaak/zaken/api/v1/"
       authType: jwt
       authAlias: zaken-api.jwt
+      timeout: 20000
     catalogiApi:
       rootUrl: "http://open-zaak/catalogi/api/v1/"
       authType: jwt
       authAlias: zaken-api.jwt
+      timeout: 20000
     documentenApi:
       rootUrl: "http://open-zaak/documenten/api/v1/"
       authType: jwt
       authAlias: zaken-api.jwt
+      timeout: 20000
     besluitenApi:
       rootUrl: "http://open-zaak/besluiten/api/v1/"
       authType: jwt
       authAlias: zaken-api.jwt
+      timeout: 20000
   ## @section Globals
   ## @param zaakbrug.globals.organizations [array] Map gemeentecode and RSIN
   ## @param zaakbrug.globals.organizations.gemeenteNaam [string] Name for organisation

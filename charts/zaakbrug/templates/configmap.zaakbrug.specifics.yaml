@@ -40,25 +40,25 @@ data:
   zaakbrug.zgw.document-identificatie-template: "{{ .documentIdentificatieTemplate }}"
   {{- with .zakenApi }}
   zaakbrug.zgw.zaken-api.root-url: "{{ .rootUrl }}"
-  zaakbrug.zgw.zaken-api.timeout: "{{ toString (.timeout | default 20000) }}"
+  zaakbrug.zgw.zaken-api.timeout: "{{ toString .timeout }}"
   zaakbrug.zgw.zaken-api.auth-type: "{{ .authType }}"
   zaakbrug.zgw.zaken-api.auth-alias: "{{ .authAlias }}"
   {{- end }}
   {{- with .documentenApi }}
   zaakbrug.zgw.documenten-api.root-url: "{{ .rootUrl }}"
-  zaakbrug.zgw.documenten-api.timeout: "{{ toString (.timeout | default 20000) }}"
+  zaakbrug.zgw.documenten-api.timeout: "{{ toString .timeout }}"
   zaakbrug.zgw.documenten-api.auth-type: "{{ .authType }}"
   zaakbrug.zgw.documenten-api.auth-alias: "{{ .authAlias }}"
   {{- end }}
   {{- with .catalogiApi }}
   zaakbrug.zgw.catalogi-api.root-url: "{{ .rootUrl }}"
-  zaakbrug.zgw.catalogi-api.timeout: "{{ toString (.timeout | default 20000) }}"
+  zaakbrug.zgw.catalogi-api.timeout: "{{ toString .timeout }}"
   zaakbrug.zgw.catalogi-api.auth-type: "{{ .authType }}"
   zaakbrug.zgw.catalogi-api.auth-alias: "{{ .authAlias }}"
   {{- end }}
   {{- with .besluitenApi }}
   zaakbrug.zgw.besluiten-api.root-url: "{{ .rootUrl }}"
-  zaakbrug.zgw.besluiten-api.timeout: "{{ toString (.timeout | default 20000) }}"
+  zaakbrug.zgw.besluiten-api.timeout: "{{ toString .timeout }}"
   zaakbrug.zgw.besluiten-api.auth-type: "{{ .authType }}"
   zaakbrug.zgw.besluiten-api.auth-alias: "{{ .authAlias }}"
   {{- end }}
