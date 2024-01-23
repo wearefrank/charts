@@ -226,6 +226,8 @@ For more options refer to the [Apache Drill documentation](https://drill.apache.
 | `drill.authentication.users.name`               | Username for the user                                                                                                     | `""`  |
 | `drill.authentication.users.password`           | Password for the user                                                                                                     | `""`  |
 | `drill.authentication.users.admin`              | Configures if the user should be admin                                                                                    | `""`  |
+| `extraVolumes`                                  | Optionally specify extra list of additional volumes for Drill pods                                                        | `[]`  |
+| `extraVolumeMounts`                             | Optionally specify extra list of additional volumeMounts for Drill container(s)                                           | `[]`  |
 
 ### Persistence
 

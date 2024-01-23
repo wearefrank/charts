@@ -326,6 +326,13 @@ drill:
     ##
     users: [ ]
 
+## @param extraVolumes Optionally specify extra list of additional volumes for Drill pods
+##
+extraVolumes: []
+## @param extraVolumeMounts Optionally specify extra list of additional volumeMounts for Drill container(s)
+##
+extraVolumeMounts: []
+
 ## @section Persistence
 ## @descriptionStart
 ## Persistence is used for logging and for JDBC drivers. These can be configured separately.

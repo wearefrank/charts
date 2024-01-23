@@ -98,6 +98,9 @@ spec:
               mountPath: "/opt/drill/jars/3rdparty/{{ .name }}.jar"
               subPath: "3rdparty/{{ .name }}"
             {{- end }}
+            {{- if .Values.extraVolumeMounts }}
+            {{- include "common.tplvalues.render" (dict "value" .Values.extraVolumeMounts "context" $) | nindent 12 }}
+            {{- end }}
       terminationGracePeriodSeconds: {{ .Values.terminationGracePeriodSeconds }}
       securityContext:
         {{- toYaml .Values.securityContext | nindent 8 }}
@@ -131,6 +134,9 @@ spec:
         {{- else if (not .Values.persistence.enabled) }}
         - name: {{ template "drill.fullname" . }}-log
           emptyDir: { }
+        {{- end }}
+        {{- if .Values.extraVolumes }}
+        {{- include "common.tplvalues.render" (dict "value" .Values.extraVolumes "context" $) | nindent 8 }}
         {{- end }}
       initContainers:
         {{- range .Values.drill.drivers }}
