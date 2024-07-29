@@ -32,7 +32,7 @@ data:
   storage-plugins-override.conf: |-
     {{- toString . | nindent 4 }}
   {{- end }}
-  logback.xml: |
+  logback.xml: |-
     <configuration>
       <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <file>/var/lib/drill/log/drill.log</file>
