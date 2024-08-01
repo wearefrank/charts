@@ -275,6 +275,11 @@ securityContext: { }
 ## ```
 ##
 ## For more options refer to the [Apache Drill documentation](https://drill.apache.org/docs/configuration-options-introduction/).
+##
+## Additionally, this section allows you to override the default logging configuration for Apache Drill.
+## By default, Apache Drill uses a built-in logging configuration, but you can customize it by enabling drill.overrideLogging.
+## You can specify custom logging settings such as file paths, log rotation policies, logging levels, and more.
+##
 ## @descriptionEnd
 ##
 drill:
@@ -325,6 +330,58 @@ drill:
     ##     password: changeit
     ##
     users: [ ]
+  overrideLogging:
+    ## @param drill.overrideLogging.enabled [boolean] Set to true to override the default logging configuration
+    ## This will create a custom logback.xml file for Drill.
+    ##
+    enabled: false
+
+    ## @param drill.overrideLogging.filePath [string] The file path where logs will be written.
+    ## Default is `/var/lib/drill/log/drill.log`.
+    ##
+    filePath: "/var/lib/drill/log/drill.log"
+
+    ## @param drill.overrideLogging.fileNamePattern [string] The pattern for log file rotation.
+    ## Default is `/var/lib/drill/log/drill.%i.log`.
+    ##
+    fileNamePattern: "/var/lib/drill/log/drill.%i.log"
+
+    ## @param drill.overrideLogging.minIndex [integer] The minimum index for log file rotation.
+    ## Default is `1`.
+    ##
+    minIndex: 1
+
+    ## @param drill.overrideLogging.maxIndex [integer] The maximum index for log file rotation.
+    ## Default is `9`.
+    ##
+    maxIndex: 9
+
+    ## @param drill.overrideLogging.maxFileSize [string] The maximum size for each log file before rotation.
+    ## Default is `10MB`.
+    ##
+    maxFileSize: "10MB"
+
+    ## @param drill.overrideLogging.pattern [string] The logging pattern used in log messages.
+    ## Default is `%date [%thread] %-5level %logger{35} - %msg%n`.
+    ##
+    pattern: "%date [%thread] %-5level %logger{35} - %msg%n"
+
+    ## @param drill.overrideLogging.rootLevel [string] The logging level for the root logger.
+    ## Default is `debug`.
+    ##
+    rootLevel: "debug"
+
+    ## @param drill.overrideLogging.loggers [array] Additional loggers to configure with specific levels.
+    ## Each logger should have a `name` and `level`.
+    ## e.g.
+    ## loggers:
+    ##   - name: org.apache.drill
+    ##     level: trace
+    ##   - name: org.apache.calcite
+    ##     level: trace
+    ##
+    loggers: []
+
 
 ## @param extraVolumes Optionally specify extra list of additional volumes for Drill pods
 ##
