@@ -57,12 +57,12 @@
                         "minimum": {
                             "type": "string",
                             "description": "Sets the initial size of the heap that will be used by the Frank!Framework",
-                            "default": "4G"
+                            "default": "1G"
                         },
                         "maximum": {
                             "type": "string",
                             "description": "Sets the maximum size of the heap that will be used by the Frank!Framework",
-                            "default": "4G"
+                            "default": "1G"
                         }
                     }
                 },
@@ -485,44 +485,59 @@
             "description": "Extra labels for Frank!Framework pods",
             "default": {}
         },
+        "persistence": {
+            "type": "object",
+            "properties": {
+                "enabled": {
+                    "type": "boolean",
+                    "description": "Enable persistence using Persistent Volume Claims",
+                    "default": false
+                },
+                "storageClass": {
+                    "type": "string",
+                    "description": "Persistent Volume storage class",
+                    "default": ""
+                },
+                "accessModes": {
+                    "type": "array",
+                    "description": "Persistent Volume access modes",
+                    "default": [
+                        "ReadWriteOnce"
+                    ],
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "size": {
+                    "type": "string",
+                    "description": "Persistent Volume size",
+                    "default": "5Gi"
+                },
+                "dataSource": {
+                    "type": "object",
+                    "description": "Custom PVC data source",
+                    "default": {}
+                },
+                "existingClaim": {
+                    "type": "string",
+                    "description": "The name of an existing PVC to use for persistence",
+                    "default": ""
+                },
+                "selector": {
+                    "type": "object",
+                    "description": "Selector to match an existing Persistent Volume for the Frank!Framework's data PVC",
+                    "default": {}
+                },
+                "annotations": {
+                    "type": "object",
+                    "description": "Persistent Volume Claim annotations",
+                    "default": {}
+                }
+            }
+        },
         "openforms2xxllnc": {
             "type": "object",
             "properties": {
-                "mailTemplates": {
-                    "type": "object",
-                    "properties": {
-                        "templates": {
-                            "type": "array",
-                            "description": "",
-                            "items": {
-                                "type": "object",
-                                "properties": {
-                                    "name": {
-                                        "type": "string",
-                                        "description": ""
-                                    },
-                                    "subject": {
-                                        "type": "string",
-                                        "description": ""
-                                    },
-                                    "message": {
-                                        "type": "string",
-                                        "description": ""
-                                    },
-                                    "messageType": {
-                                        "type": "string",
-                                        "description": ""
-                                    }
-                                }
-                            }
-                        },
-                        "existingConfigMap": {
-                            "type": "string",
-                            "description": "The name of the configmap containing the mail templates.",
-                            "default": ""
-                        }
-                    }
-                },
                 "connections": {
                     "type": "object",
                     "properties": {
@@ -713,6 +728,22 @@
                         }
                     }
                 },
+                "mailTemplates": {
+                    "type": "object",
+                    "properties": {
+                        "existingConfigMap": {
+                            "type": "string",
+                            "description": "The name of the configmap containing the mail templates.",
+                            "default": ""
+                        },
+                        "templates": {
+                            "type": "array",
+                            "description": "Mail templates that can be referenced by name on a variety of functional error scenario's.",
+                            "default": [],
+                            "items": {}
+                        }
+                    }
+                },
                 "workflows": {
                     "type": "object",
                     "properties": {
@@ -872,56 +903,6 @@
                             }
                         }
                     }
-                }
-            }
-        },
-        "persistence": {
-            "type": "object",
-            "properties": {
-                "enabled": {
-                    "type": "boolean",
-                    "description": "Enable persistence using Persistent Volume Claims",
-                    "default": false
-                },
-                "storageClass": {
-                    "type": "string",
-                    "description": "Persistent Volume storage class",
-                    "default": ""
-                },
-                "accessModes": {
-                    "type": "array",
-                    "description": "Persistent Volume access modes",
-                    "default": [
-                        "ReadWriteOnce"
-                    ],
-                    "items": {
-                        "type": "string"
-                    }
-                },
-                "size": {
-                    "type": "string",
-                    "description": "Persistent Volume size",
-                    "default": "5Gi"
-                },
-                "dataSource": {
-                    "type": "object",
-                    "description": "Custom PVC data source",
-                    "default": {}
-                },
-                "existingClaim": {
-                    "type": "string",
-                    "description": "The name of an existing PVC to use for persistence",
-                    "default": ""
-                },
-                "selector": {
-                    "type": "object",
-                    "description": "Selector to match an existing Persistent Volume for the Frank!Framework's data PVC",
-                    "default": {}
-                },
-                "annotations": {
-                    "type": "object",
-                    "description": "Persistent Volume Claim annotations",
-                    "default": {}
                 }
             }
         }

@@ -55,8 +55,8 @@ helm delete my-ff-template
 | Name                                                         | Description                                                                                                      | Value       |
 | ------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------- | ----------- |
 | `frank.memory.percentage`                                    | Set if the values for the memory are in percentages                                                              | `false`     |
-| `frank.memory.minimum`                                       | Sets the initial size of the heap that will be used by the Frank!Framework                                       | `4G`        |
-| `frank.memory.maximum`                                       | Sets the maximum size of the heap that will be used by the Frank!Framework                                       | `4G`        |
+| `frank.memory.minimum`                                       | Sets the initial size of the heap that will be used by the Frank!Framework                                       | `1G`        |
+| `frank.memory.maximum`                                       | Sets the maximum size of the heap that will be used by the Frank!Framework                                       | `1G`        |
 | `frank.dtap.stage`                                           | (Required) Set the `DTAP` stage. Options: `LOC`, `DEV`, `TST`, `ACC`, `PRD`                                      | `""`        |
 | `frank.dtap.side`                                            | Set the `DTAP` side of where the instance is running                                                             | `""`        |
 | `frank.credentials.secret`                                   | Set the secret name of the existing secret                                                                       | `""`        |
