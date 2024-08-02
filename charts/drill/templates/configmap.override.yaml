@@ -8,7 +8,6 @@ metadata:
   labels:
     {{- include "drill.labels" . | nindent 4 }}
 data:
-  {{- if (not .Values.drill.overrideConfiguration.existingConfigMap) -}}
   drill-override.conf: |-
     drill.exec: {
       cluster-id: "{{ include "drill.fullname" . }}",
@@ -16,7 +15,6 @@ data:
       http.port: 8047
     }
     {{- toString .Values.drill.overrideConfiguration.drill | nindent 4 }}
-  {{- end -}}
   {{- with .Values.drill.overrideConfiguration.drillMetastore }}
   drill-metastore-override.conf: |-
     {{- toString . | nindent 4 }}
@@ -33,7 +31,6 @@ data:
   storage-plugins-override.conf: |-
     {{- toString . | nindent 4 }}
   {{- end }}
-  {{- if .Values.drill.overrideLogging.enabled -}}
   logback.xml: |-
     <configuration>
       <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
@@ -61,4 +58,3 @@ data:
       <logger name="{{ .name }}" level="{{ .level | default "trace" }}"/>
       {{- end }}
     </configuration>
-  {{- end -}}
