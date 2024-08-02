@@ -52,8 +52,8 @@ frank:
   ##
   memory:
     percentage: false
-    minimum: 4G
-    maximum: 4G
+    minimum: 1G
+    maximum: 1G
   ## @skip frank.dtap [object]
   ## @param frank.dtap.stage (Required) Set the `DTAP` stage. Options: `LOC`, `DEV`, `TST`, `ACC`, `PRD`
   ## @param frank.dtap.side Set the `DTAP` side of where the instance is running
@@ -550,21 +550,24 @@ openforms2xxllnc:
     ## ref: todo
     ##
     existingConfigMap: ""
-    templates:
-      - name: "mail-template-name"
-        subject: "Document toevoegen aan zaak niet gelukt"
-        messageType: "text/html"
-        message: >-
-          Beste,<br>
-          <br>
-          U hebt eerder een aanvraag bij ons gedaan. U probeerde hier 1 of meer documenten aan toe te voegen. Dit is helaas niet gelukt omdat het aanvraagnummer (zaaknummer) niet klopte. Het juiste nummer staat in de bevestigingsmail van uw eerste aanvraag.<br>
-          <br>
-          Wilt u uw laatste aanvraag met de bestanden opnieuw naar ons toesturen met het juiste nummer?<br>
-          <br>
-          Bedankt voor uw medewerking.<br>
-          <br>
-          Met vriendelijke groet,<br>
-          ${vars.signature-from-name}<br>
+    templates: []
+    ## Example mail template
+    ## ```yaml
+    ## - name: "mail-template-name"
+    ##   subject: "Document toevoegen aan zaak niet gelukt"
+    ##   messageType: "text/html"
+    ##   message: |-
+    ##     Beste,<br>
+    ##     <br>
+    ##     U hebt eerder een aanvraag bij ons gedaan. U probeerde hier 1 of meer documenten aan toe te voegen. Dit is helaas niet gelukt omdat het aanvraagnummer (zaaknummer) niet klopte. Het juiste nummer staat in de bevestigingsmail van uw eerste aanvraag.<br>
+    ##     <br>
+    ##     Wilt u uw laatste aanvraag met de bestanden opnieuw naar ons toesturen met het juiste nummer?<br>
+    ##     <br>
+    ##     Bedankt voor uw medewerking.<br>
+    ##     <br>
+    ##     Met vriendelijke groet,<br>
+    ##     ${vars.signature-from-name}<br>
+    ## ```
   ## @skip openforms2xxllnc.workflows [object]
   ## @section Workflows
   ##
