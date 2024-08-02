@@ -1,0 +1,539 @@
+{
+    "title": "Chart Values",
+    "type": "object",
+    "properties": {
+        "nameOverride": {
+            "type": "string",
+            "description": "String to partially override common.names.fullname template (will maintain the release name)",
+            "default": ""
+        },
+        "fullnameOverride": {
+            "type": "string",
+            "description": "String to fully override common.names.fullname template",
+            "default": ""
+        },
+        "image": {
+            "type": "object",
+            "properties": {
+                "registry": {
+                    "type": "string",
+                    "description": "Frank!Framework image registry",
+                    "default": "nexus.frankframework.org"
+                },
+                "repository": {
+                    "type": "string",
+                    "description": "Frank!Framework image repository",
+                    "default": "frankframework"
+                },
+                "tag": {
+                    "type": "string",
+                    "description": "Frank!Framework image tag (immutable tags are recommended)",
+                    "default": ""
+                },
+                "pullPolicy": {
+                    "type": "string",
+                    "description": "Frank!Framework image pull policy",
+                    "default": "IfNotPresent"
+                },
+                "pullSecrets": {
+                    "type": "array",
+                    "description": "Frank!Framework image pull secrets",
+                    "default": [],
+                    "items": {}
+                }
+            }
+        },
+        "frank": {
+            "type": "object",
+            "properties": {
+                "memory": {
+                    "type": "object",
+                    "properties": {
+                        "percentage": {
+                            "type": "boolean",
+                            "description": "Set if the values for the memory are in percentages",
+                            "default": false
+                        },
+                        "minimum": {
+                            "type": "string",
+                            "description": "Sets the initial size of the heap that will be used by the Frank!Framework",
+                            "default": "4G"
+                        },
+                        "maximum": {
+                            "type": "string",
+                            "description": "Sets the maximum size of the heap that will be used by the Frank!Framework",
+                            "default": "4G"
+                        }
+                    }
+                },
+                "dtap": {
+                    "type": "object",
+                    "properties": {
+                        "stage": {
+                            "type": "string",
+                            "description": "(Required) Set the `DTAP` stage. Options: `LOC`, `DEV`, `TST`, `ACC`, `PRD`",
+                            "default": ""
+                        },
+                        "side": {
+                            "type": "string",
+                            "description": "Set the `DTAP` side of where the instance is running",
+                            "default": ""
+                        }
+                    }
+                },
+                "credentials": {
+                    "type": "object",
+                    "properties": {
+                        "secret": {
+                            "type": "string",
+                            "description": "Set the secret name of the existing secret",
+                            "default": ""
+                        },
+                        "key": {
+                            "type": "string",
+                            "description": "Set the key inside the secret that contains the data (e.g. `credentials.properties`)",
+                            "default": ""
+                        }
+                    }
+                },
+                "instance": {
+                    "type": "object",
+                    "properties": {
+                        "name": {
+                            "type": "string",
+                            "description": "Set the name of the Frank! instance (default is the `fullname`)",
+                            "default": ""
+                        }
+                    }
+                },
+                "configurations": {
+                    "type": "object",
+                    "properties": {
+                        "names": {
+                            "type": "array",
+                            "description": "Set the configurations to load. Leave empty to use the default",
+                            "default": [],
+                            "items": {}
+                        }
+                    }
+                },
+                "security": {
+                    "type": "object",
+                    "properties": {
+                        "certificateStores": {
+                            "type": "array",
+                            "description": "Define certificate (key/trust) stores to mount in the resources folder of the Frank!",
+                            "default": [],
+                            "items": {}
+                        },
+                        "http": {
+                            "type": "object",
+                            "properties": {
+                                "authentication": {
+                                    "type": "boolean",
+                                    "description": "Set http authentication for the Frank!",
+                                    "default": false
+                                },
+                                "localUsers": {
+                                    "type": "array",
+                                    "description": "Set localUsers who can log in on the Frank!",
+                                    "default": [],
+                                    "items": {}
+                                },
+                                "activeDirectory": {
+                                    "type": "object",
+                                    "properties": {
+                                        "enabled": {
+                                            "type": "boolean",
+                                            "description": "Enable Active Directory for authentication",
+                                            "default": false
+                                        },
+                                        "url": {
+                                            "type": "string",
+                                            "description": "Set url for Active Directory",
+                                            "default": ""
+                                        },
+                                        "baseDn": {
+                                            "type": "string",
+                                            "description": "Set baseDn for Active Directory users",
+                                            "default": ""
+                                        },
+                                        "roleMapping": {
+                                            "type": "object",
+                                            "properties": {
+                                                "tester": {
+                                                    "type": "string",
+                                                    "description": "Map the role for Tester",
+                                                    "default": ""
+                                                },
+                                                "dataAdmin": {
+                                                    "type": "string",
+                                                    "description": "Map the role for DataAdmin",
+                                                    "default": ""
+                                                },
+                                                "admin": {
+                                                    "type": "string",
+                                                    "description": "Map the role for Admin",
+                                                    "default": ""
+                                                },
+                                                "webService": {
+                                                    "type": "string",
+                                                    "description": "Map the role for WebService",
+                                                    "default": ""
+                                                },
+                                                "observer": {
+                                                    "type": "string",
+                                                    "description": "Map the role for Observer",
+                                                    "default": ""
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "server": {
+                    "type": "object",
+                    "properties": {
+                        "transactionManager": {
+                            "type": "string",
+                            "description": "Set the transaction manager for Tomcat. Options: `NARAYANA`, `BTM`, ``",
+                            "default": "NARAYANA"
+                        }
+                    }
+                },
+                "javaOpts": {
+                    "type": "string",
+                    "description": "Append custom options to the `JAVA_OPTS` environment variable for the Frank!",
+                    "default": ""
+                }
+            }
+        },
+        "connections": {
+            "type": "object",
+            "properties": {
+                "create": {
+                    "type": "boolean",
+                    "description": "Create a `context.xml` and possibly overwrite the existing one, to configure the connections/resources.",
+                    "default": true
+                },
+                "jdbc": {
+                    "type": "array",
+                    "description": "Set multiple database connections. One connection should have an empty name, so it'll get picked up by default (unless `jdbc.required=false` is set)",
+                    "default": [],
+                    "items": {}
+                },
+                "jms": {
+                    "type": "array",
+                    "description": "Set multiple message services",
+                    "default": [],
+                    "items": {}
+                }
+            }
+        },
+        "autoscaling": {
+            "type": "object",
+            "properties": {
+                "enabled": {
+                    "type": "boolean",
+                    "description": "",
+                    "default": false
+                },
+                "minReplicas": {
+                    "type": "number",
+                    "description": "",
+                    "default": 1
+                },
+                "maxReplicas": {
+                    "type": "number",
+                    "description": "",
+                    "default": 100
+                },
+                "targetCPUUtilizationPercentage": {
+                    "type": "number",
+                    "description": "",
+                    "default": 80
+                },
+                "targetMemoryUtilizationPercentage": {
+                    "type": "number",
+                    "description": "",
+                    "default": 80
+                }
+            }
+        },
+        "replicaCount": {
+            "type": "number",
+            "description": "Number of Frank!Framework replicas to deploy",
+            "default": 1
+        },
+        "startupProbe": {
+            "type": "object",
+            "properties": {
+                "initialDelaySeconds": {
+                    "type": "number",
+                    "description": "Initial delay seconds for startupProbe",
+                    "default": 40
+                },
+                "periodSeconds": {
+                    "type": "number",
+                    "description": "Period seconds for startupProbe",
+                    "default": 10
+                },
+                "timeoutSeconds": {
+                    "type": "number",
+                    "description": "Timeout seconds for startupProbe",
+                    "default": 1
+                },
+                "failureThreshold": {
+                    "type": "number",
+                    "description": "Failure threshold for startupProbe",
+                    "default": 12
+                },
+                "successThreshold": {
+                    "type": "number",
+                    "description": "Success threshold for startupProbe",
+                    "default": 1
+                }
+            }
+        },
+        "ingress": {
+            "type": "object",
+            "properties": {
+                "hosts": {
+                    "type": "array",
+                    "description": "",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "host": {
+                                "type": "string",
+                                "description": ""
+                            },
+                            "paths": {
+                                "type": "array",
+                                "description": "",
+                                "items": {
+                                    "type": "object",
+                                    "properties": {
+                                        "path": {
+                                            "type": "string",
+                                            "description": ""
+                                        },
+                                        "pathType": {
+                                            "type": "string",
+                                            "description": ""
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "enabled": {
+                    "type": "boolean",
+                    "description": "Enable ingress record generation for Frank!",
+                    "default": false
+                },
+                "className": {
+                    "type": "string",
+                    "description": "IngressClass that will be used to implement the Ingress (Kubernetes 1.18+)",
+                    "default": ""
+                },
+                "annotations": {
+                    "type": "object",
+                    "description": "Additional annotations for the Ingress resource. To enable certificate autogeneration, place here your cert-manager annotations.",
+                    "default": {}
+                },
+                "tls": {
+                    "type": "array",
+                    "description": "Define tls secrets for hosts (implementation not done yet)",
+                    "default": [],
+                    "items": {}
+                }
+            }
+        },
+        "livenessProbe": {
+            "type": "object",
+            "properties": {
+                "initialDelaySeconds": {
+                    "type": "number",
+                    "description": "Initial delay seconds for livenessProbe",
+                    "default": 0
+                },
+                "periodSeconds": {
+                    "type": "number",
+                    "description": "Period seconds for livenessProbe",
+                    "default": 10
+                },
+                "timeoutSeconds": {
+                    "type": "number",
+                    "description": "Timeout seconds for livenessProbe",
+                    "default": 1
+                },
+                "failureThreshold": {
+                    "type": "number",
+                    "description": "Failure threshold for livenessProbe",
+                    "default": 12
+                },
+                "successThreshold": {
+                    "type": "number",
+                    "description": "Success threshold for livenessProbe",
+                    "default": 1
+                }
+            }
+        },
+        "readinessProbe": {
+            "type": "object",
+            "properties": {
+                "initialDelaySeconds": {
+                    "type": "number",
+                    "description": "Initial delay seconds for readinessProbe",
+                    "default": 0
+                },
+                "periodSeconds": {
+                    "type": "number",
+                    "description": "Period seconds for readinessProbe",
+                    "default": 5
+                },
+                "timeoutSeconds": {
+                    "type": "number",
+                    "description": "Timeout seconds for readinessProbe",
+                    "default": 1
+                },
+                "failureThreshold": {
+                    "type": "number",
+                    "description": "Failure threshold for readinessProbe",
+                    "default": 3
+                },
+                "successThreshold": {
+                    "type": "number",
+                    "description": "Success threshold for readinessProbe",
+                    "default": 1
+                }
+            }
+        },
+        "terminationGracePeriodSeconds": {
+            "type": "number",
+            "description": "Number of seconds after which pods are forcefully killed",
+            "default": 60
+        },
+        "nodeSelector": {
+            "type": "object",
+            "description": "Node labels for pod assignment",
+            "default": {}
+        },
+        "tolerations": {
+            "type": "array",
+            "description": "Set tolerations for pod assignment",
+            "default": [],
+            "items": {}
+        },
+        "affinity": {
+            "type": "object",
+            "description": "Set affinity for pod assignment",
+            "default": {}
+        },
+        "timeZone": {
+            "type": "string",
+            "description": "used for database connection and log timestamps",
+            "default": "Etc/UTC"
+        },
+        "service": {
+            "type": "object",
+            "properties": {
+                "type": {
+                    "type": "string",
+                    "description": "Frank!Framework service type",
+                    "default": "ClusterIP"
+                },
+                "port": {
+                    "type": "number",
+                    "description": "Frank!Framework service port",
+                    "default": 80
+                }
+            }
+        },
+        "serviceAccount": {
+            "type": "object",
+            "properties": {
+                "create": {
+                    "type": "boolean",
+                    "description": "Enable creation of ServiceAccount for Frank!Framework pod",
+                    "default": true
+                },
+                "annotations": {
+                    "type": "object",
+                    "description": "Additional custom annotations for the ServiceAccount",
+                    "default": {}
+                },
+                "name": {
+                    "type": "string",
+                    "description": "The name of the ServiceAccount to use.",
+                    "default": ""
+                }
+            }
+        },
+        "podAnnotations": {
+            "type": "object",
+            "description": "Annotations for Frank!Framework pods",
+            "default": {}
+        },
+        "podLabels": {
+            "type": "object",
+            "description": "Extra labels for Frank!Framework pods",
+            "default": {}
+        },
+        "persistence": {
+            "type": "object",
+            "properties": {
+                "enabled": {
+                    "type": "boolean",
+                    "description": "Enable persistence using Persistent Volume Claims",
+                    "default": false
+                },
+                "storageClass": {
+                    "type": "string",
+                    "description": "Persistent Volume storage class",
+                    "default": ""
+                },
+                "accessModes": {
+                    "type": "array",
+                    "description": "Persistent Volume access modes",
+                    "default": [
+                        "ReadWriteOnce"
+                    ],
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "size": {
+                    "type": "string",
+                    "description": "Persistent Volume size",
+                    "default": "5Gi"
+                },
+                "dataSource": {
+                    "type": "object",
+                    "description": "Custom PVC data source",
+                    "default": {}
+                },
+                "existingClaim": {
+                    "type": "string",
+                    "description": "The name of an existing PVC to use for persistence",
+                    "default": ""
+                },
+                "selector": {
+                    "type": "object",
+                    "description": "Selector to match an existing Persistent Volume for the Frank!Framework's data PVC",
+                    "default": {}
+                },
+                "annotations": {
+                    "type": "object",
+                    "description": "Persistent Volume Claim annotations",
+                    "default": {}
+                }
+            }
+        }
+    }
+}

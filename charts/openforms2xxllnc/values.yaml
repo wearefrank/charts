@@ -1,0 +1,649 @@
+## @section Common parameters
+##
+
+## @param nameOverride String to partially override common.names.fullname template (will maintain the release name)
+##
+nameOverride: ""
+## @param fullnameOverride String to fully override common.names.fullname template
+##
+fullnameOverride: ""
+
+## @section Frank!Framework image parameters
+##
+
+## Frank!Framework image
+## ref: https://nexus.frankframework.org/#browse/browse:frankframework-docker:v2%2Ffrankframework%2Ftags/
+## @param image.registry Frank!Framework image registry
+## @param image.repository Frank!Framework image repository
+## @param image.tag Frank!Framework image tag (immutable tags are recommended)
+##
+image:
+  registry: wearefrank
+  repository: openforms2xxllnc
+  tag: ""
+  ## @param image.pullPolicy Frank!Framework image pull policy
+  ## Specify a imagePullPolicy
+  ## Defaults to 'Always' if image tag is 'latest', else set to 'IfNotPresent'
+  ## ref: https://kubernetes.io/docs/user-guide/images/#pre-pulling-images
+  ##
+  pullPolicy: IfNotPresent
+  ## @param image.pullSecrets Frank!Framework image pull secrets
+  ## Optionally specify an array of imagePullSecrets.
+  ## Secrets must be manually created in the namespace.
+  ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
+  ## e.g:
+  ## pullSecrets:
+  ##   - name: myRegistryKeySecretName
+  ##
+  pullSecrets: []
+
+## @section Frank! Configuration parameters
+##
+
+## @skip frank [object]
+##
+frank:
+  ## @param frank.memory.percentage Set if the values for the memory are in percentages
+  ## @param frank.memory.minimum Sets the initial size of the heap that will be used by the Frank!Framework
+  ## @param frank.memory.maximum Sets the maximum size of the heap that will be used by the Frank!Framework
+  ## For Java 8 it is best suited to use the same amount of memory for both the minimum and maximum.
+  ## For Java 11 and above, it is possible to use percentages. E.g. minimum: 20.0, maximum: 80.0.
+  ## ref: https://docs.oracle.com/javase/8/docs/technotes/tools/unix/java.html#BABDJJFI
+  ##
+  memory:
+    percentage: false
+    minimum: 4G
+    maximum: 4G
+  ## @skip frank.dtap [object]
+  ## @param frank.dtap.stage (Required) Set the `DTAP` stage. Options: `LOC`, `DEV`, `TST`, `ACC`, `PRD`
+  ## @param frank.dtap.side Set the `DTAP` side of where the instance is running
+  ##
+  dtap:
+    stage: ""
+    side: ""
+  ## @skip frank.credentials [object]
+  ## @param frank.credentials.secret Set the secret name of the existing secret
+  ## @param frank.credentials.key Set the key inside the secret that contains the data (e.g. `credentials.properties`)
+  ##
+  credentials:
+    secret: ""
+    key: ""
+  ## @skip frank.instance [string]
+  ## @param frank.instance.name Set the name of the Frank! instance (default is the `fullname`)
+  ##
+  instance:
+    name: ""
+  ## @skip frank.configurations [object]
+  ## @param frank.configurations.names [array] Set the configurations to load. Leave empty to use the default
+  ## e.g.
+  ## configurations.names:
+  ##   - main
+  ##
+  configurations:
+    names: []
+  ## @skip frank.security [object]
+  ## @skip frank.security.http [object]
+  ##
+  security:
+    ## @param frank.security.certificateStores [array] Define certificate (key/trust) stores to mount in the resources folder of the Frank!
+    ## @param frank.security.certificateStores.secretName [string] Name of the secret where the certificate store is located in
+    ## @param frank.security.certificateStores.key [string] The key in the secret where the certificate store is located in
+    ## @param frank.security.certificateStores.resourceUrl [string, nullable] The path to the certificate store in the Resource folder, the key will be used as default value
+    ##
+    certificateStores: []
+    http:
+      ## @param frank.security.http.authentication Set http authentication for the Frank!
+      ##
+      authentication: false
+      ## @param frank.security.http.localUsers [array] Set localUsers who can log in on the Frank!
+      ## @param frank.security.http.localUsers.username [string] Set the username of the user
+      ## @param frank.security.http.localUsers.password [string] Set the password of the user
+      ## @param frank.security.http.localUsers.roles [array] Set the roles of the user. Options: `IbisTester`, `IbisDataAdmin`, `IbisAdmin`, `IbisWebService`, `IbisObserver`
+      ## e.g.
+      ## localUsers:
+      ##   - username: Tester
+      ##     password: ChangeMe!
+      ##     roles:
+      ##        - IbisTester
+      ##
+      localUsers: []
+      ## @skip frank.security.http.activeDirectory [object]
+      ## @param frank.security.http.activeDirectory.enabled Enable Active Directory for authentication
+      ## @param frank.security.http.activeDirectory.url Set url for Active Directory
+      ## @param frank.security.http.activeDirectory.baseDn Set baseDn for Active Directory users
+      ## @skip frank.security.http.activeDirectory.roleMapping [object]
+      ## @param frank.security.http.activeDirectory.roleMapping.tester Map the role for Tester
+      ## @param frank.security.http.activeDirectory.roleMapping.dataAdmin Map the role for DataAdmin
+      ## @param frank.security.http.activeDirectory.roleMapping.admin Map the role for Admin
+      ## @param frank.security.http.activeDirectory.roleMapping.webService Map the role for WebService
+      ## @param frank.security.http.activeDirectory.roleMapping.observer Map the role for Observer
+      ##
+      activeDirectory:
+        enabled: false
+        url: ""
+        baseDn: ""
+        roleMapping:
+          tester: ""
+          dataAdmin: ""
+          admin: ""
+          webService: ""
+          observer: ""
+  ## @skip frank.server [object]
+  ##
+  server:
+    ## @param frank.server.transactionManager [string] Set the transaction manager for Tomcat. Options: `NARAYANA`, `BTM`, ``
+    ##
+    transactionManager: NARAYANA
+  ## @param frank.properties [object] Set Yaml properties for configuring the Frank!Framework or configurations
+  ## properties ref: https://github.com/frankframework/frankframework/blob/master/core/src/main/resources/AppConstants.properties
+  ## implementation ref: https://github.com/frankframework/frankframework/blob/master/commons/src/main/java/org/frankframework/util/YamlParser.java
+  ##
+  properties: {}
+  ## @param frank.environmentVariables [object] Set extra environment variables for the Frank!
+  ##
+  environmentVariables: {}
+  ## @param frank.javaOpts [string] Append custom options to the `JAVA_OPTS` environment variable for the Frank!
+  ##
+  javaOpts: ""
+
+## @section Frank!Framework Connection parameters
+##
+
+## @skip connections [object]
+##
+connections:
+  ## @param connections.create Create a `context.xml` and possibly overwrite the existing one, to configure the connections/resources.
+  ##
+  create: true
+  ## @param connections.jdbc [array] Set multiple database connections. One connection should have an empty name, so it'll get picked up by default (unless `jdbc.required=false` is set)
+  ## @param connections.jdbc.name [nullable,string] Name of the connection (leave empty to use default: `jdbc/${.Values.instance.name}` in lowercase)
+  ## @param connections.jdbc.type [string] DBMS type. Options: `oracle`, `mssql`, `mysql`, `mariadb`, `postgresql`, `db2`, `mongodb`
+  ## @param connections.jdbc.host [string] Host of where the database can be reached (like in the same cluster e.g. `<service>.<namespace>.svc.cluster.local`)
+  ## @param connections.jdbc.post [nullable,string] Port for the database (leave empty for default)
+  ## @param connections.jdbc.database [nullable,string] Name of the database to use (default is `.Values.instance.name`)
+  ## @param connections.jdbc.username [string] Username to connect to the database (or use string template for use with credentials e.g. `${database/username}`)
+  ## @param connections.jdbc.password [string] Password to connect to the database (or use string template for use with credentials e.g. `${database/password}`)
+  ## @param connections.jdbc.ssl [nullable,string] Set to `true` is the connection uses SSL, default is `false`
+  ##
+  jdbc: []
+  ## @param connections.jms [array] Set multiple message services
+  ## @param connections.jms.name [nullable,string] Name of the connection (leave empty to use default: `jms/${.Values.instance.name}` in lowercase)
+  ## @param connections.jms.type [string] MQ type. Options: `artemis`, `activemq`
+  ## @param connections.jms.host [string] Host of where the MQ can be reached (like in the same cluster e.g. `<service>.<namespace>.svc.cluster.local`)
+  ## @param connections.jms.post [nullable,string] Port for the MQ (leave empty for default)
+  ##
+  jms: []
+
+## @section Frank!Framework deployment parameters
+## @descriptionStart
+## The startup probe will enable blue-green deployment, which are great for uptime during upgrades and such.
+## It (and the liveness probe) will check if the console is accessible, until a better health endpoint is available.
+## The readiness probe will check if all adapters are running using the server health endpoint
+## @descriptionEnd
+##
+
+## @param replicaCount Number of Frank!Framework replicas to deploy
+## NOTE: ReadWriteMany PVC(s) are required if replicaCount > 1
+##
+replicaCount: 1
+
+## Configure extra options for Frank!Framework containers' startup probe
+## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/#configure-probes
+## @param startupProbe.initialDelaySeconds Initial delay seconds for startupProbe
+## @param startupProbe.periodSeconds Period seconds for startupProbe
+## @param startupProbe.timeoutSeconds Timeout seconds for startupProbe
+## @param startupProbe.failureThreshold Failure threshold for startupProbe
+## @param startupProbe.successThreshold Success threshold for startupProbe
+##
+startupProbe:
+  initialDelaySeconds: 40
+  periodSeconds: 10
+  timeoutSeconds: 1
+  failureThreshold: 12
+  successThreshold: 1
+
+## Configure extra options for Frank!Framework containers' liveness probe
+## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/#configure-probes
+## @param livenessProbe.initialDelaySeconds Initial delay seconds for livenessProbe
+## @param livenessProbe.periodSeconds Period seconds for livenessProbe
+## @param livenessProbe.timeoutSeconds Timeout seconds for livenessProbe
+## @param livenessProbe.failureThreshold Failure threshold for livenessProbe
+## @param livenessProbe.successThreshold Success threshold for livenessProbe
+##
+livenessProbe:
+  initialDelaySeconds: 0
+  periodSeconds: 10
+  timeoutSeconds: 1
+  failureThreshold: 12
+  successThreshold: 1
+
+## Configure extra options for Frank!Framework containers' readiness probe
+## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/#configure-probes
+## @param readinessProbe.initialDelaySeconds Initial delay seconds for readinessProbe
+## @param readinessProbe.periodSeconds Period seconds for readinessProbe
+## @param readinessProbe.timeoutSeconds Timeout seconds for readinessProbe
+## @param readinessProbe.failureThreshold Failure threshold for readinessProbe
+## @param readinessProbe.successThreshold Success threshold for readinessProbe
+##
+readinessProbe:
+  initialDelaySeconds: 0
+  periodSeconds: 5
+  timeoutSeconds: 1
+  failureThreshold: 3
+  successThreshold: 1
+
+## @param probesEnabled [object] Toggle probes. This should only be used if a Frank! needs to be kept while in a bad state (for debugging purposes)
+## @param probesEnabled.startupProbe [object] Toggle startupProbe
+## @param probesEnabled.livenessProbe [object] Toggle livenessProbe
+## @param probesEnabled.readinessProbe [object] Toggle readinessProbe
+probesEnabled:
+  startupProbe: true
+  livenessProbe: true
+  readinessProbe: true
+
+## Frank!Framework container's resource requests and limits
+## ref: https://kubernetes.io/docs/user-guide/compute-resources/
+## @param resources [object] Set the resources for the Frank!Framework containers
+## @param resources.limits [string] The resources limits for the Frank!Framework containers
+## @param resources.requests.memory [string] The requested memory for the Frank!Framework containers
+## @param resources.requests.cpu [string] The requested cpu for the Frank!Framework containers
+## e.g.:
+## resources
+##   limits:
+##     cpu: 2000m
+##     memory: 4200M
+##   requests:
+##     cpu: 2000m
+##     memory: 4200M
+##
+resources: {}
+
+## @skip autoscaling
+##
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 100
+  targetCPUUtilizationPercentage: 80
+  targetMemoryUtilizationPercentage: 80
+
+## @param terminationGracePeriodSeconds Number of seconds after which pods are forcefully killed
+## @extra terminationGracePeriodSeconds Note: Lower values may cause running adapters to fail
+terminationGracePeriodSeconds: 60
+
+## @param nodeSelector Node labels for pod assignment
+## ref: https://kubernetes.io/docs/user-guide/node-selection/
+##
+nodeSelector: {}
+
+## @param tolerations Set tolerations for pod assignment
+## ref: https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/
+##
+tolerations: []
+
+## @param affinity Set affinity for pod assignment
+## Ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity
+## NOTE: podAffinityPreset, podAntiAffinityPreset, and nodeAffinityPreset will be ignored when it's set
+##
+affinity: {}
+
+## @param timeZone used for database connection and log timestamps
+##
+timeZone: Etc/UTC
+
+## @section Traffic Exposure Parameters
+##
+
+## Frank!Framework service parameters
+##
+service:
+  ## @param service.type Frank!Framework service type
+  ##
+  type: ClusterIP
+  ## @param service.port Frank!Framework service port
+  port: 80
+
+## Configure the ingress resource that allows you to access the Frank!Framework installation
+## ref: https://kubernetes.io/docs/concepts/services-networking/ingress/
+##
+ingress:
+  ## @param ingress.enabled Enable ingress record generation for Frank!
+  ##
+  enabled: false
+  ## @param ingress.className IngressClass that will be used to implement the Ingress (Kubernetes 1.18+)
+  ## This is supported in Kubernetes 1.18+ and required if you have more than one IngressClass marked as the default for your cluster .
+  ## ref: https://kubernetes.io/blog/2020/04/02/improvements-to-the-ingress-api-in-kubernetes-1.18/
+  ##
+  className: ""
+  ## @param ingress.annotations Additional annotations for the Ingress resource. To enable certificate autogeneration, place here your cert-manager annotations.
+  ## For a full list of possible ingress annotations, please see
+  ## ref: https://github.com/kubernetes/ingress-nginx/blob/master/docs/user-guide/nginx-configuration/annotations.md
+  ## Use this parameter to set the required annotations for cert-manager, see
+  ## ref: https://cert-manager.io/docs/usage/ingress/#supported-annotations
+  ## e.g:
+  ## annotations:
+  ##   kubernetes.io/ingress.class: nginx
+  ##   kubernetes.io/tls-acme: 'true'
+  ##
+  annotations: {}
+  ## @param ingress.hosts [array] Set hosts for ingress
+  ## @param ingress.hosts.host [string] Set hostname
+  ## @param ingress.hosts.paths [array] Set multiple paths
+  ## @param ingress.hosts.paths.path [string] Set path (context url)
+  ## @param ingress.hosts.paths.pathType [string] Set type of path
+  ##
+  hosts:
+    - host: chart-example.local
+      paths:
+        - path: /
+          pathType: ImplementationSpecific
+  ## @param ingress.tls [array] Define tls secrets for hosts (implementation not done yet)
+  ## e.g.
+  ## tls:
+  ##   - secretName: chart-example-tls
+  ##     hosts:
+  ##       - chart-example.local
+  ##
+  tls: []
+
+## @section Other Parameters
+##
+
+## Frank!Framework Service Account
+## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/
+##
+serviceAccount:
+  ## @param serviceAccount.create Enable creation of ServiceAccount for Frank!Framework pod
+  ##
+  create: true
+  ## @param serviceAccount.annotations Additional custom annotations for the ServiceAccount
+  ##
+  annotations: {}
+  ## @param serviceAccount.name The name of the ServiceAccount to use.
+  ## If not set and create is true, a name is generated using the ff-common.fullname template
+  ##
+  name: ""
+
+## @param podAnnotations Annotations for Frank!Framework pods
+## ref: https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/
+##
+podAnnotations: {}
+
+## @param podLabels Extra labels for Frank!Framework pods
+## ref: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/
+##
+podLabels: {}
+
+## Configure Pods Security Context
+## ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod
+## @param podSecurityContext [object] Set Frank!Framework pod's Security Context
+##
+podSecurityContext: {}
+
+## Configure Container Security Context (only main container)
+## ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container
+## @param securityContext [object] Set Frank!Framework container's Security Context
+## e.g.
+## securityContext: {}
+##  capabilities:
+##    drop:
+##      - ALL
+##  readOnlyRootFilesystem: true
+##  runAsNonRoot: true
+##  runAsUser: 1000
+##
+securityContext: {}
+
+## @section Persistence
+## @descriptionStart
+## Persistence is used for keeping heap dumps. They can be found at `/heap-dumps` with persistence enabled.
+## Otherwise, they can be found at `/usr/local/tomcat/logs`
+## @descriptionEnd
+##
+persistence:
+  ## @param persistence.enabled Enable persistence using Persistent Volume Claims
+  ##
+  enabled: false
+  ## @param persistence.storageClass Persistent Volume storage class
+  ## If defined, storageClassName: <storageClass>
+  ## If set to "-", storageClassName: "", which disables dynamic provisioning
+  ## If undefined (the default) or set to null, no storageClassName spec is set, choosing the default provisioner
+  ##
+  storageClass: ""
+  ## @param persistence.accessModes [array] Persistent Volume access modes
+  ##
+  accessModes:
+    - ReadWriteOnce
+  ## @param persistence.size Persistent Volume size
+  ##
+  size: 5Gi
+  ## @param persistence.dataSource Custom PVC data source
+  ##
+  dataSource: {}
+  ## @param persistence.existingClaim The name of an existing PVC to use for persistence
+  ##
+  existingClaim: ""
+  ## @param persistence.selector Selector to match an existing Persistent Volume for the Frank!Framework's data PVC
+  ## If set, the PVC can't have a PV dynamically provisioned for it
+  ## E.g.
+  ## selector:
+  ##   matchLabels:
+  ##     app: my-app
+  ##
+  selector: {}
+  ## @param persistence.annotations Persistent Volume Claim annotations
+  ## You might need to add an annotation for selected node:
+  ## E.g: volume.kubernetes.io/selected-node: nodeName
+  ## Ref: https://kubernetes.io/docs/reference/labels-annotations-taints/#volume-kubernetes-io-selected-node
+  ##
+  annotations: {}
+
+## @skip openforms2xxllnc [object]
+## @section Openforms2xxllnc
+##
+openforms2xxllnc:
+  ## @skip openforms2xxllnc.connections [object]
+  ## @section Connections
+  ##
+  connections:
+    ## @skip openforms2xxllnc.connections.beantwoordVraag [object]
+    ## @param openforms2xxllnc.connections.beantwoordVraag.endpoint [string] Endpoint at which the zs-dms BeantwoordVraag binding is served.
+    ## @param openforms2xxllnc.connections.beantwoordVraag.timeout Timeout used zs-dms BeantwoordVraag calls.
+    ##
+    beantwoordVraag:
+      endpoint: "https://zs-dms/generic/zds/BeantwoordVraag"
+      timeout: 60000
+    ## @skip openforms2xxllnc.connections.ontvangAsynchroon [object]
+    ## @param openforms2xxllnc.connections.ontvangAsynchroon.endpoint [string] Endpoint at which the zs-dms OntvangAsynchroon binding is served.
+    ## @param openforms2xxllnc.connections.ontvangAsynchroon.timeout Timeout used zs-dms OntvangAsynchroon calls.
+    ##
+    ontvangAsynchroon:
+      endpoint: "https://zs-dms/generic/zds/OntvangAsynchroon"
+      timeout: 60000
+    ## @skip openforms2xxllnc.connections.vrijeBerichten [object]
+    ## @param openforms2xxllnc.connections.vrijeBerichten.endpoint [string] Endpoint at which the zs-dms VrijBericht binding is served.
+    ## @param openforms2xxllnc.connections.vrijeBerichten.timeout Timeout used zs-dms VrijBericht calls.
+    ##
+    vrijeBerichten:
+      endpoint: "https://zs-dms/generic/zds/VrijBericht"
+      timeout: 60000
+    ## @skip openforms2xxllnc.connections.notificatiesApi [object]
+    ## @param openforms2xxllnc.connections.notificatiesApi.rootUrl [string] Root url of the 'Notificaties API' that is used to subscribe at.
+    ## @param openforms2xxllnc.connections.notificatiesApi.timeout Timeout used in 'Notificaties API' calls.
+    ## @param openforms2xxllnc.connections.notificatiesApi.authType [string] Options: 'jwt', 'basic', 'value'. 'value' uses the password field of the given authAlias as Authorization header.
+    ## @param openforms2xxllnc.connections.notificatiesApi.authAlias [string] Reference to an auth alias to be used as credentials for this api.
+    ## Can be configured in credentials.properties.
+    ##
+    notificatiesApi:
+      rootUrl: "https://notificaties-api/api/v1/"
+      timeout: 60000
+      authType: "jwt"
+      authAlias: "notificaties-api"
+      ## @skip openforms2xxllnc.connections.notificatiesApi.subscription [object]
+      ## @param openforms2xxllnc.connections.notificatiesApi.subscription.callback [string] Fully qualified url to the notification callback of openforms2xxllnc.
+      ## This url needs to be reachable from the 'Notificaties API'.
+      ## @param openforms2xxllnc.connections.notificatiesApi.subscription.authAlias [string] Reference to an auth alias to be used as authorization key for calling the callback endpoint.
+      ## Can be configured in credentials.properties.
+      ##
+      subscription:
+        callback: "https://openforms2xxllnc/api/v1/form-object-callback"
+        authAlias: "forms-object-callback"
+        ## @skip openforms2xxllnc.connections.notificatiesApi.subscription.filters [object]
+        ## @param openforms2xxllnc.connections.notificatiesApi.subscription.filters.objectType [string] Url of the objecttype to filter the notifications on.
+        ##
+        filters:
+          objectType: "https://objecttypes-api/api/v2/objecttypes/uuid"
+    ## @skip openforms2xxllnc.connections.documentenApi [object]
+    ## @param openforms2xxllnc.connections.documentenApi.timeout Timeout used in 'Documenten API' calls.
+    ## @param openforms2xxllnc.connections.documentenApi.authType [string] Options: 'jwt', 'basic', 'value'. 'value' uses the password field of the given authAlias as Authorization header.
+    ## @param openforms2xxllnc.connections.documentenApi.authAlias [string] Reference to an auth alias to be used as credentials for this api.
+    ## Can be configured in credentials.properties.
+    ##
+    documentenApi:
+      authType: "jwt"
+      authAlias: "documenten-api"
+      timeout: 60000
+    ## @skip openforms2xxllnc.connections.objectsApi [object]
+    ## @param openforms2xxllnc.connections.objectsApi.timeout Timeout used in 'Objects API' calls.
+    ## @param openforms2xxllnc.connections.objectsApi.authType [string] Options: 'jwt', 'basic', 'value'. 'value' uses the password field of the given authAlias as Authorization header.
+    ## @param openforms2xxllnc.connections.objectsApi.authAlias [string] Reference to an auth alias to be used as credentials for this api.
+    ## Can be configured in credentials.properties.
+    ##
+    objectsApi:
+      authType: "value"
+      authAlias: "objects-api"
+      timeout: 60000
+    ## @skip openforms2xxllnc.connections.noReplySmtp [object]
+    ## @param openforms2xxllnc.connections.noReplySmtp.enabled Enable connecting to the configured SMTP server/replay.
+    ## @param openforms2xxllnc.connections.noReplySmtp.host [string] Host of the SMTP server/relay.
+    ## @param openforms2xxllnc.connections.noReplySmtp.port Port of the SMTP server/relay.
+    ## @param openforms2xxllnc.connections.noReplySmtp.useSsl Connect securely to the SMTP server/relay with SSL.
+    ## @param openforms2xxllnc.connections.noReplySmtp.authAlias [string] Reference to an auth alias to be used as credentials for authorizing with the SMTP server/relay.
+    ## @param openforms2xxllnc.connections.noReplySmtp.defaultFromName [string] The default no-reply sender's name that is shown with the no-reply sender's e-mail address.
+    ## @param openforms2xxllnc.connections.noReplySmtp.defaultFromAddress [string] The default no-reply sender's e-mail address that used when sending e-mails.
+    ## @param openforms2xxllnc.connections.noReplySmtp.signatureFromName [string] The no-reply sender's name used in the signature of the e-mail body.
+    ## Defaults to the value configured in defaultFromName
+    ## @param openforms2xxllnc.connections.noReplySmtp.timeout Timeout used when sending emails.
+    ## @param openforms2xxllnc.connections.noReplySmtp.authType [string] Options: 'jwt', 'basic', 'value'. 'value' uses the password field of the given authAlias as Authorization header.
+    ## Can be configured in credentials.properties.
+    ##
+    noReplySmtp:
+      enabled: false
+      host: "https://smtp-relay/"
+      port: 587
+      useSsl: true
+      timeout: 60000
+      authAlias: "noreply-smtp"
+      defaultFromName: "Gemeente X"
+      defaultFromAddress: "no-reply@gemeente-x.local"
+      signatureFromName: ""
+  ## @skip openforms2xxllnc.mailTemplates [object]
+  ## @section Mail Templates
+  ##
+  mailTemplates:
+    ## @param openforms2xxllnc.mailTemplates.existingConfigMap [string] The name of the configmap containing the mail templates.
+    ## @param openforms2xxllnc.mailTemplates.templates [array] Mail templates that can be referenced by name on a variety of functional error scenario's.
+    ## @param openforms2xxllnc.mailTemplates.templates.name [string] Name of the mail template that can be referenced.
+    ## @param openforms2xxllnc.mailTemplates.templates.subject [string] Mail subject text.
+    ## @param openforms2xxllnc.mailTemplates.templates.messageType [string] ContentType of the message. Options: 'text/plain', 'text/html'.
+    ## @param openforms2xxllnc.mailTemplates.templates.message [string] Mail message body. A limit degree of variable substitution is available.
+    ## ref: todo
+    ##
+    existingConfigMap: ""
+    templates:
+      - name: "mail-template-name"
+        subject: "Document toevoegen aan zaak niet gelukt"
+        messageType: "text/html"
+        message: >-
+          Beste,<br>
+          <br>
+          U hebt eerder een aanvraag bij ons gedaan. U probeerde hier 1 of meer documenten aan toe te voegen. Dit is helaas niet gelukt omdat het aanvraagnummer (zaaknummer) niet klopte. Het juiste nummer staat in de bevestigingsmail van uw eerste aanvraag.<br>
+          <br>
+          Wilt u uw laatste aanvraag met de bestanden opnieuw naar ons toesturen met het juiste nummer?<br>
+          <br>
+          Bedankt voor uw medewerking.<br>
+          <br>
+          Met vriendelijke groet,<br>
+          ${vars.signature-from-name}<br>
+  ## @skip openforms2xxllnc.workflows [object]
+  ## @section Workflows
+  ##
+  workflows:
+    ## @skip openforms2xxllnc.workflows.autoRetries [object]
+    ## @param openforms2xxllnc.workflows.autoRetries.enabled Enable automatic retries. For all workflows(unless overriden).
+    ## @param openforms2xxllnc.workflows.autoRetries.cronExpression [string] Cron expression used for retry interval/schedule. For all workflows(unless overriden).
+    ## @param openforms2xxllnc.workflows.autoRetries.maxRetries Maximum amount an errorstore item is retried. For all workflows(unless overriden).
+    ##
+    autoRetries:
+      enabled: true
+      cronExpression: "0 0/30 * * * ?"
+      maxRetries: 5
+      ## @skip openforms2xxllnc.workflows.autoRetries.workflowSelector [object]
+      ## @param openforms2xxllnc.workflows.autoRetries.workflowSelector.enabled Enable automatic retries. Override for this specific workflow.
+      ## @param openforms2xxllnc.workflows.autoRetries.workflowSelector.cronExpression [string] Cron expression used for retry interval/schedule. Override for this specific workflow.
+      ## @param openforms2xxllnc.workflows.autoRetries.workflowSelector.maxRetries Maximum amount an errorstore item is retried. Override for this specific workflow.
+      ##
+      workflowSelector:
+        enabled: true
+        cronExpression: "0 0/30 * * * ?"
+        maxRetries: 5
+      ## @skip openforms2xxllnc.workflows.autoRetries.addDocumentsToCase [object]
+      ## @param openforms2xxllnc.workflows.autoRetries.addDocumentsToCase.enabled Enable automatic retries. Override for this specific workflow.
+      ## @param openforms2xxllnc.workflows.autoRetries.addDocumentsToCase.cronExpression [string] Cron expression used for retry interval/schedule. Override for this specific workflow.
+      ## @param openforms2xxllnc.workflows.autoRetries.addDocumentsToCase.maxRetries Maximum amount an errorstore item is retried. Override for this specific workflow.
+      ##
+      addDocumentsToCase:
+        enabled: true
+        cronExpression: "0 0/30 * * * ?"
+        maxRetries: 5
+      ## @skip openforms2xxllnc.workflows.autoRetries.sendNoReplyUserEmail [object]
+      ## @param openforms2xxllnc.workflows.autoRetries.sendNoReplyUserEmail.enabled Enable automatic retries. Override for this specific workflow.
+      ## @param openforms2xxllnc.workflows.autoRetries.sendNoReplyUserEmail.cronExpression [string] Cron expression used for retry interval/schedule. Override for this specific workflow.
+      ## @param openforms2xxllnc.workflows.autoRetries.sendNoReplyUserEmail.maxRetries Maximum amount an errorstore item is retried. Override for this specific workflow.
+      ##
+      sendNoReplyUserEmail:
+        enabled: true
+        cronExpression: "0 0/30 * * * ?"
+        maxRetries: 5
+    ## @skip openforms2xxllnc.workflows.scheduledStartReceiver [object]
+    scheduledStartReceiver:
+      ## @skip openforms2xxllnc.workflows.scheduledStartReceiver.workflowSelector [object]
+      ## @param openforms2xxllnc.workflows.scheduledStartReceiver.workflowSelector.enabled Enable scheduled start the receiver of this specific workflow.
+      ## Incoming form-objects are always accepted, but only processed when the receiver is active.
+      ## @param openforms2xxllnc.workflows.scheduledStartReceiver.workflowSelector.cronExpression [string] Cron expression used to schedule starting the receiver of this specific workflow.
+      ##
+      workflowSelector:
+        enabled: false
+        cronExpression: "0 * 5 * * ?"
+    ## @skip openforms2xxllnc.workflows.scheduledStopReceiver [object]
+    scheduledStopReceiver:
+      ## @skip openforms2xxllnc.workflows.scheduledStopReceiver.workflowSelector [object]
+      ## @param openforms2xxllnc.workflows.scheduledStopReceiver.workflowSelector.enabled Enable scheduled stop the receiver of this specific workflow.
+      ## Incoming form-objects are always accepted, but only processed when the receiver is active.
+      ## @param openforms2xxllnc.workflows.scheduledStopReceiver.workflowSelector.cronExpression [string] Cron expression used to schedule stopping the receiver of this specific workflow.
+      ##
+      workflowSelector:
+        enabled: false
+        cronExpression: "0 * 0 * * ?"
+    ## @skip openforms2xxllnc.workflows.onErrorActions [object]
+    onErrorActions:
+      ## @skip openforms2xxllnc.workflows.onErrorActions.onCaseNotFound [object]
+      ## @param openforms2xxllnc.workflows.onErrorActions.onCaseNotFound.sendEmail Enable sending a mail to the form initiator when this specific error occurs.
+      ## Otherwise an exception is throw, which requires manual intervention. Enabling the sending of a mail requires 'openforms2xxllnc.connections.noReplySmtp' to be configured.
+      ## @param openforms2xxllnc.workflows.onErrorActions.onCaseNotFound.templateName [string] Name of the mail template to be used when this specific error occurs.
+      ## Mail templates can be configured in the 'openforms2xxllnc.mailTemplates' section.
+      ##
+      onCaseNotFound:
+        sendEmail: false
+        templateName: ""
+      ## @skip openforms2xxllnc.workflows.onErrorActions.onSubjectNotEqualsCaseSubject [object]
+      ## @param openforms2xxllnc.workflows.onErrorActions.onSubjectNotEqualsCaseSubject.sendEmail Enable sending a mail to the form initiator when this specific error occurs.
+      ## Otherwise an exception is throw, which requires manual intervention. Enabling the sending of a mail requires 'openforms2xxllnc.connections.noReplySmtp' to be configured.
+      ## @param openforms2xxllnc.workflows.onErrorActions.onSubjectNotEqualsCaseSubject.templateName [string] Name of the mail template to be used when this specific error occurs.
+      ## Mail templates can be configured in the 'openforms2xxllnc.mailTemplates' section.
+      ##
+      onSubjectNotEqualsCaseSubject:
+        sendEmail: false
+        templateName: ""
+
+
