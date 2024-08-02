@@ -18,12 +18,12 @@
                 "registry": {
                     "type": "string",
                     "description": "Frank!Framework image registry",
-                    "default": "nexus.frankframework.org"
+                    "default": "wearefrank"
                 },
                 "repository": {
                     "type": "string",
                     "description": "Frank!Framework image repository",
-                    "default": "frankframework"
+                    "default": "openforms2xxllnc"
                 },
                 "tag": {
                     "type": "string",
@@ -484,6 +484,396 @@
             "type": "object",
             "description": "Extra labels for Frank!Framework pods",
             "default": {}
+        },
+        "openforms2xxllnc": {
+            "type": "object",
+            "properties": {
+                "mailTemplates": {
+                    "type": "object",
+                    "properties": {
+                        "templates": {
+                            "type": "array",
+                            "description": "",
+                            "items": {
+                                "type": "object",
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "description": ""
+                                    },
+                                    "subject": {
+                                        "type": "string",
+                                        "description": ""
+                                    },
+                                    "message": {
+                                        "type": "string",
+                                        "description": ""
+                                    },
+                                    "messageType": {
+                                        "type": "string",
+                                        "description": ""
+                                    }
+                                }
+                            }
+                        },
+                        "existingConfigMap": {
+                            "type": "string",
+                            "description": "The name of the configmap containing the mail templates.",
+                            "default": ""
+                        }
+                    }
+                },
+                "connections": {
+                    "type": "object",
+                    "properties": {
+                        "beantwoordVraag": {
+                            "type": "object",
+                            "properties": {
+                                "endpoint": {
+                                    "type": "string",
+                                    "description": "Endpoint at which the zs-dms BeantwoordVraag binding is served.",
+                                    "default": "https://zs-dms/generic/zds/BeantwoordVraag"
+                                },
+                                "timeout": {
+                                    "type": "number",
+                                    "description": "Timeout used zs-dms BeantwoordVraag calls.",
+                                    "default": 60000
+                                }
+                            }
+                        },
+                        "ontvangAsynchroon": {
+                            "type": "object",
+                            "properties": {
+                                "endpoint": {
+                                    "type": "string",
+                                    "description": "Endpoint at which the zs-dms OntvangAsynchroon binding is served.",
+                                    "default": "https://zs-dms/generic/zds/OntvangAsynchroon"
+                                },
+                                "timeout": {
+                                    "type": "number",
+                                    "description": "Timeout used zs-dms OntvangAsynchroon calls.",
+                                    "default": 60000
+                                }
+                            }
+                        },
+                        "vrijeBerichten": {
+                            "type": "object",
+                            "properties": {
+                                "endpoint": {
+                                    "type": "string",
+                                    "description": "Endpoint at which the zs-dms VrijBericht binding is served.",
+                                    "default": "https://zs-dms/generic/zds/VrijBericht"
+                                },
+                                "timeout": {
+                                    "type": "number",
+                                    "description": "Timeout used zs-dms VrijBericht calls.",
+                                    "default": 60000
+                                }
+                            }
+                        },
+                        "notificatiesApi": {
+                            "type": "object",
+                            "properties": {
+                                "rootUrl": {
+                                    "type": "string",
+                                    "description": "Root url of the 'Notificaties API' that is used to subscribe at.",
+                                    "default": "https://notificaties-api/api/v1/"
+                                },
+                                "timeout": {
+                                    "type": "number",
+                                    "description": "Timeout used in 'Notificaties API' calls.",
+                                    "default": 60000
+                                },
+                                "authType": {
+                                    "type": "string",
+                                    "description": "Options: 'jwt', 'basic', 'value'. 'value' uses the password field of the given authAlias as Authorization header.",
+                                    "default": "jwt"
+                                },
+                                "authAlias": {
+                                    "type": "string",
+                                    "description": "Reference to an auth alias to be used as credentials for this api.",
+                                    "default": "notificaties-api"
+                                },
+                                "subscription": {
+                                    "type": "object",
+                                    "properties": {
+                                        "callback": {
+                                            "type": "string",
+                                            "description": "Fully qualified url to the notification callback of openforms2xxllnc.",
+                                            "default": "https://openforms2xxllnc/api/v1/form-object-callback"
+                                        },
+                                        "authAlias": {
+                                            "type": "string",
+                                            "description": "Reference to an auth alias to be used as authorization key for calling the callback endpoint.",
+                                            "default": "forms-object-callback"
+                                        },
+                                        "filters": {
+                                            "type": "object",
+                                            "properties": {
+                                                "objectType": {
+                                                    "type": "string",
+                                                    "description": "Url of the objecttype to filter the notifications on.",
+                                                    "default": "https://objecttypes-api/api/v2/objecttypes/uuid"
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        },
+                        "documentenApi": {
+                            "type": "object",
+                            "properties": {
+                                "timeout": {
+                                    "type": "number",
+                                    "description": "Timeout used in 'Documenten API' calls.",
+                                    "default": 60000
+                                },
+                                "authType": {
+                                    "type": "string",
+                                    "description": "Options: 'jwt', 'basic', 'value'. 'value' uses the password field of the given authAlias as Authorization header.",
+                                    "default": "jwt"
+                                },
+                                "authAlias": {
+                                    "type": "string",
+                                    "description": "Reference to an auth alias to be used as credentials for this api.",
+                                    "default": "documenten-api"
+                                }
+                            }
+                        },
+                        "objectsApi": {
+                            "type": "object",
+                            "properties": {
+                                "timeout": {
+                                    "type": "number",
+                                    "description": "Timeout used in 'Objects API' calls.",
+                                    "default": 60000
+                                },
+                                "authType": {
+                                    "type": "string",
+                                    "description": "Options: 'jwt', 'basic', 'value'. 'value' uses the password field of the given authAlias as Authorization header.",
+                                    "default": "value"
+                                },
+                                "authAlias": {
+                                    "type": "string",
+                                    "description": "Reference to an auth alias to be used as credentials for this api.",
+                                    "default": "objects-api"
+                                }
+                            }
+                        },
+                        "noReplySmtp": {
+                            "type": "object",
+                            "properties": {
+                                "enabled": {
+                                    "type": "boolean",
+                                    "description": "Enable connecting to the configured SMTP server/replay.",
+                                    "default": false
+                                },
+                                "host": {
+                                    "type": "string",
+                                    "description": "Host of the SMTP server/relay.",
+                                    "default": "https://smtp-relay/"
+                                },
+                                "port": {
+                                    "type": "number",
+                                    "description": "Port of the SMTP server/relay.",
+                                    "default": 587
+                                },
+                                "useSsl": {
+                                    "type": "boolean",
+                                    "description": "Connect securely to the SMTP server/relay with SSL.",
+                                    "default": true
+                                },
+                                "authAlias": {
+                                    "type": "string",
+                                    "description": "Reference to an auth alias to be used as credentials for authorizing with the SMTP server/relay.",
+                                    "default": "noreply-smtp"
+                                },
+                                "defaultFromName": {
+                                    "type": "string",
+                                    "description": "The default no-reply sender's name that is shown with the no-reply sender's e-mail address.",
+                                    "default": "Gemeente X"
+                                },
+                                "defaultFromAddress": {
+                                    "type": "string",
+                                    "description": "The default no-reply sender's e-mail address that used when sending e-mails.",
+                                    "default": "no-reply@gemeente-x.local"
+                                },
+                                "signatureFromName": {
+                                    "type": "string",
+                                    "description": "The no-reply sender's name used in the signature of the e-mail body.",
+                                    "default": ""
+                                },
+                                "timeout": {
+                                    "type": "number",
+                                    "description": "Timeout used when sending emails.",
+                                    "default": 60000
+                                }
+                            }
+                        }
+                    }
+                },
+                "workflows": {
+                    "type": "object",
+                    "properties": {
+                        "autoRetries": {
+                            "type": "object",
+                            "properties": {
+                                "enabled": {
+                                    "type": "boolean",
+                                    "description": "Enable automatic retries. For all workflows(unless overriden).",
+                                    "default": true
+                                },
+                                "cronExpression": {
+                                    "type": "string",
+                                    "description": "Cron expression used for retry interval/schedule. For all workflows(unless overriden).",
+                                    "default": "0 0/30 * * * ?"
+                                },
+                                "maxRetries": {
+                                    "type": "number",
+                                    "description": "Maximum amount an errorstore item is retried. For all workflows(unless overriden).",
+                                    "default": 5
+                                },
+                                "workflowSelector": {
+                                    "type": "object",
+                                    "properties": {
+                                        "enabled": {
+                                            "type": "boolean",
+                                            "description": "Enable automatic retries. Override for this specific workflow.",
+                                            "default": true
+                                        },
+                                        "cronExpression": {
+                                            "type": "string",
+                                            "description": "Cron expression used for retry interval/schedule. Override for this specific workflow.",
+                                            "default": "0 0/30 * * * ?"
+                                        },
+                                        "maxRetries": {
+                                            "type": "number",
+                                            "description": "Maximum amount an errorstore item is retried. Override for this specific workflow.",
+                                            "default": 5
+                                        }
+                                    }
+                                },
+                                "addDocumentsToCase": {
+                                    "type": "object",
+                                    "properties": {
+                                        "enabled": {
+                                            "type": "boolean",
+                                            "description": "Enable automatic retries. Override for this specific workflow.",
+                                            "default": true
+                                        },
+                                        "cronExpression": {
+                                            "type": "string",
+                                            "description": "Cron expression used for retry interval/schedule. Override for this specific workflow.",
+                                            "default": "0 0/30 * * * ?"
+                                        },
+                                        "maxRetries": {
+                                            "type": "number",
+                                            "description": "Maximum amount an errorstore item is retried. Override for this specific workflow.",
+                                            "default": 5
+                                        }
+                                    }
+                                },
+                                "sendNoReplyUserEmail": {
+                                    "type": "object",
+                                    "properties": {
+                                        "enabled": {
+                                            "type": "boolean",
+                                            "description": "Enable automatic retries. Override for this specific workflow.",
+                                            "default": true
+                                        },
+                                        "cronExpression": {
+                                            "type": "string",
+                                            "description": "Cron expression used for retry interval/schedule. Override for this specific workflow.",
+                                            "default": "0 0/30 * * * ?"
+                                        },
+                                        "maxRetries": {
+                                            "type": "number",
+                                            "description": "Maximum amount an errorstore item is retried. Override for this specific workflow.",
+                                            "default": 5
+                                        }
+                                    }
+                                }
+                            }
+                        },
+                        "scheduledStartReceiver": {
+                            "type": "object",
+                            "properties": {
+                                "workflowSelector": {
+                                    "type": "object",
+                                    "properties": {
+                                        "enabled": {
+                                            "type": "boolean",
+                                            "description": "Enable scheduled start the receiver of this specific workflow.",
+                                            "default": false
+                                        },
+                                        "cronExpression": {
+                                            "type": "string",
+                                            "description": "Cron expression used to schedule starting the receiver of this specific workflow.",
+                                            "default": "0 * 5 * * ?"
+                                        }
+                                    }
+                                }
+                            }
+                        },
+                        "scheduledStopReceiver": {
+                            "type": "object",
+                            "properties": {
+                                "workflowSelector": {
+                                    "type": "object",
+                                    "properties": {
+                                        "enabled": {
+                                            "type": "boolean",
+                                            "description": "Enable scheduled stop the receiver of this specific workflow.",
+                                            "default": false
+                                        },
+                                        "cronExpression": {
+                                            "type": "string",
+                                            "description": "Cron expression used to schedule stopping the receiver of this specific workflow.",
+                                            "default": "0 * 0 * * ?"
+                                        }
+                                    }
+                                }
+                            }
+                        },
+                        "onErrorActions": {
+                            "type": "object",
+                            "properties": {
+                                "onCaseNotFound": {
+                                    "type": "object",
+                                    "properties": {
+                                        "sendEmail": {
+                                            "type": "boolean",
+                                            "description": "Enable sending a mail to the form initiator when this specific error occurs.",
+                                            "default": false
+                                        },
+                                        "templateName": {
+                                            "type": "string",
+                                            "description": "Name of the mail template to be used when this specific error occurs.",
+                                            "default": ""
+                                        }
+                                    }
+                                },
+                                "onSubjectNotEqualsCaseSubject": {
+                                    "type": "object",
+                                    "properties": {
+                                        "sendEmail": {
+                                            "type": "boolean",
+                                            "description": "Enable sending a mail to the form initiator when this specific error occurs.",
+                                            "default": false
+                                        },
+                                        "templateName": {
+                                            "type": "string",
+                                            "description": "Name of the mail template to be used when this specific error occurs.",
+                                            "default": ""
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         },
         "persistence": {
             "type": "object",

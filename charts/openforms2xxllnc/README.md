@@ -42,13 +42,13 @@ helm delete my-ff-template
 
 ### Frank!Framework image parameters
 
-| Name                | Description                                                | Value                      |
-| ------------------- | ---------------------------------------------------------- | -------------------------- |
-| `image.registry`    | Frank!Framework image registry                             | `nexus.frankframework.org` |
-| `image.repository`  | Frank!Framework image repository                           | `frankframework`           |
-| `image.tag`         | Frank!Framework image tag (immutable tags are recommended) | `""`                       |
-| `image.pullPolicy`  | Frank!Framework image pull policy                          | `IfNotPresent`             |
-| `image.pullSecrets` | Frank!Framework image pull secrets                         | `[]`                       |
+| Name                | Description                                                | Value              |
+| ------------------- | ---------------------------------------------------------- | ------------------ |
+| `image.registry`    | Frank!Framework image registry                             | `wearefrank`       |
+| `image.repository`  | Frank!Framework image repository                           | `openforms2xxllnc` |
+| `image.tag`         | Frank!Framework image tag (immutable tags are recommended) | `""`               |
+| `image.pullPolicy`  | Frank!Framework image pull policy                          | `IfNotPresent`     |
+| `image.pullSecrets` | Frank!Framework image pull secrets                         | `[]`               |
 
 ### Frank! Configuration parameters
 
@@ -75,11 +75,11 @@ helm delete my-ff-template
 | `frank.security.http.activeDirectory.enabled`                | Enable Active Directory for authentication                                                                       | `false`     |
 | `frank.security.http.activeDirectory.url`                    | Set url for Active Directory                                                                                     | `""`        |
 | `frank.security.http.activeDirectory.baseDn`                 | Set baseDn for Active Directory users                                                                            | `""`        |
-| `frank.security.http.activeDirectory.roleMapping.tester`     | Map the role for Tester                                                                                           | `""`        |
-| `frank.security.http.activeDirectory.roleMapping.dataAdmin`  | Map the role for DataAdmin                                                                                        | `""`        |
-| `frank.security.http.activeDirectory.roleMapping.admin`      | Map the role for Admin                                                                                            | `""`        |
-| `frank.security.http.activeDirectory.roleMapping.webService` | Map the role for WebService                                                                                       | `""`        |
-| `frank.security.http.activeDirectory.roleMapping.observer`   | Map the role for Observer                                                                                         | `""`        |
+| `frank.security.http.activeDirectory.roleMapping.tester`     | Map the role for Tester                                                                                          | `""`        |
+| `frank.security.http.activeDirectory.roleMapping.dataAdmin`  | Map the role for DataAdmin                                                                                       | `""`        |
+| `frank.security.http.activeDirectory.roleMapping.admin`      | Map the role for Admin                                                                                           | `""`        |
+| `frank.security.http.activeDirectory.roleMapping.webService` | Map the role for WebService                                                                                      | `""`        |
+| `frank.security.http.activeDirectory.roleMapping.observer`   | Map the role for Observer                                                                                        | `""`        |
 | `frank.server.transactionManager`                            | Set the transaction manager for Tomcat. Options: `NARAYANA`, `BTM`, ``                                           | `""`        |
 | `frank.properties`                                           | Set Yaml properties for configuring the Frank!Framework or configurations                                        | `{}`        |
 | `frank.environmentVariables`                                 | Set extra environment variables for the Frank!                                                                   | `{}`        |
@@ -187,6 +187,79 @@ Otherwise, they can be found at `/usr/local/tomcat/logs`
 | `persistence.existingClaim` | The name of an existing PVC to use for persistence                                 | `""`    |
 | `persistence.selector`      | Selector to match an existing Persistent Volume for the Frank!Framework's data PVC | `{}`    |
 | `persistence.annotations`   | Persistent Volume Claim annotations                                                | `{}`    |
+
+### Openforms2xxllnc
+
+
+### Connections
+
+| Name                                                                           | Description                                                                                                       | Value   |
+| ------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------- | ------- |
+| `openforms2xxllnc.connections.beantwoordVraag.endpoint`                        | Endpoint at which the zs-dms BeantwoordVraag binding is served.                                                   | `""`    |
+| `openforms2xxllnc.connections.beantwoordVraag.timeout`                         | Timeout used zs-dms BeantwoordVraag calls.                                                                        | `60000` |
+| `openforms2xxllnc.connections.ontvangAsynchroon.endpoint`                      | Endpoint at which the zs-dms OntvangAsynchroon binding is served.                                                 | `""`    |
+| `openforms2xxllnc.connections.ontvangAsynchroon.timeout`                       | Timeout used zs-dms OntvangAsynchroon calls.                                                                      | `60000` |
+| `openforms2xxllnc.connections.vrijeBerichten.endpoint`                         | Endpoint at which the zs-dms VrijBericht binding is served.                                                       | `""`    |
+| `openforms2xxllnc.connections.vrijeBerichten.timeout`                          | Timeout used zs-dms VrijBericht calls.                                                                            | `60000` |
+| `openforms2xxllnc.connections.notificatiesApi.rootUrl`                         | Root url of the 'Notificaties API' that is used to subscribe at.                                                  | `""`    |
+| `openforms2xxllnc.connections.notificatiesApi.timeout`                         | Timeout used in 'Notificaties API' calls.                                                                         | `60000` |
+| `openforms2xxllnc.connections.notificatiesApi.authType`                        | Options: 'jwt', 'basic', 'value'. 'value' uses the password field of the given authAlias as Authorization header. | `""`    |
+| `openforms2xxllnc.connections.notificatiesApi.authAlias`                       | Reference to an auth alias to be used as credentials for this api.                                                | `""`    |
+| `openforms2xxllnc.connections.notificatiesApi.subscription.callback`           | Fully qualified url to the notification callback of openforms2xxllnc.                                             | `""`    |
+| `openforms2xxllnc.connections.notificatiesApi.subscription.authAlias`          | Reference to an auth alias to be used as authorization key for calling the callback endpoint.                     | `""`    |
+| `openforms2xxllnc.connections.notificatiesApi.subscription.filters.objectType` | Url of the objecttype to filter the notifications on.                                                             | `""`    |
+| `openforms2xxllnc.connections.documentenApi.timeout`                           | Timeout used in 'Documenten API' calls.                                                                           | `60000` |
+| `openforms2xxllnc.connections.documentenApi.authType`                          | Options: 'jwt', 'basic', 'value'. 'value' uses the password field of the given authAlias as Authorization header. | `""`    |
+| `openforms2xxllnc.connections.documentenApi.authAlias`                         | Reference to an auth alias to be used as credentials for this api.                                                | `""`    |
+| `openforms2xxllnc.connections.objectsApi.timeout`                              | Timeout used in 'Objects API' calls.                                                                              | `60000` |
+| `openforms2xxllnc.connections.objectsApi.authType`                             | Options: 'jwt', 'basic', 'value'. 'value' uses the password field of the given authAlias as Authorization header. | `""`    |
+| `openforms2xxllnc.connections.objectsApi.authAlias`                            | Reference to an auth alias to be used as credentials for this api.                                                | `""`    |
+| `openforms2xxllnc.connections.noReplySmtp.enabled`                             | Enable connecting to the configured SMTP server/replay.                                                           | `false` |
+| `openforms2xxllnc.connections.noReplySmtp.host`                                | Host of the SMTP server/relay.                                                                                    | `""`    |
+| `openforms2xxllnc.connections.noReplySmtp.port`                                | Port of the SMTP server/relay.                                                                                    | `587`   |
+| `openforms2xxllnc.connections.noReplySmtp.useSsl`                              | Connect securely to the SMTP server/relay with SSL.                                                               | `true`  |
+| `openforms2xxllnc.connections.noReplySmtp.authAlias`                           | Reference to an auth alias to be used as credentials for authorizing with the SMTP server/relay.                  | `""`    |
+| `openforms2xxllnc.connections.noReplySmtp.defaultFromName`                     | The default no-reply sender's name that is shown with the no-reply sender's e-mail address.                       | `""`    |
+| `openforms2xxllnc.connections.noReplySmtp.defaultFromAddress`                  | The default no-reply sender's e-mail address that used when sending e-mails.                                      | `""`    |
+| `openforms2xxllnc.connections.noReplySmtp.signatureFromName`                   | The no-reply sender's name used in the signature of the e-mail body.                                              | `""`    |
+| `openforms2xxllnc.connections.noReplySmtp.timeout`                             | Timeout used when sending emails.                                                                                 | `60000` |
+| `openforms2xxllnc.connections.noReplySmtp.authType`                            | Options: 'jwt', 'basic', 'value'. 'value' uses the password field of the given authAlias as Authorization header. | `""`    |
+
+### Mail Templates
+
+| Name                                                   | Description                                                                                | Value |
+| ------------------------------------------------------ | ------------------------------------------------------------------------------------------ | ----- |
+| `openforms2xxllnc.mailTemplates.existingConfigMap`     | The name of the configmap containing the mail templates.                                   | `""`  |
+| `openforms2xxllnc.mailTemplates.templates`             | Mail templates that can be referenced by name on a variety of functional error scenario's. | `[]`  |
+| `openforms2xxllnc.mailTemplates.templates.name`        | Name of the mail template that can be referenced.                                          | `""`  |
+| `openforms2xxllnc.mailTemplates.templates.subject`     | Mail subject text.                                                                         | `""`  |
+| `openforms2xxllnc.mailTemplates.templates.messageType` | ContentType of the message. Options: 'text/plain', 'text/html'.                            | `""`  |
+| `openforms2xxllnc.mailTemplates.templates.message`     | Mail message body. A limit degree of variable substitution is available.                   | `""`  |
+
+### Workflows
+
+| Name                                                                                   | Description                                                                            | Value   |
+| -------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------- | ------- |
+| `openforms2xxllnc.workflows.autoRetries.enabled`                                       | Enable automatic retries. For all workflows(unless overriden).                         | `true`  |
+| `openforms2xxllnc.workflows.autoRetries.cronExpression`                                | Cron expression used for retry interval/schedule. For all workflows(unless overriden). | `""`    |
+| `openforms2xxllnc.workflows.autoRetries.maxRetries`                                    | Maximum amount an errorstore item is retried. For all workflows(unless overriden).     | `5`     |
+| `openforms2xxllnc.workflows.autoRetries.workflowSelector.enabled`                      | Enable automatic retries. Override for this specific workflow.                         | `true`  |
+| `openforms2xxllnc.workflows.autoRetries.workflowSelector.cronExpression`               | Cron expression used for retry interval/schedule. Override for this specific workflow. | `""`    |
+| `openforms2xxllnc.workflows.autoRetries.workflowSelector.maxRetries`                   | Maximum amount an errorstore item is retried. Override for this specific workflow.     | `5`     |
+| `openforms2xxllnc.workflows.autoRetries.addDocumentsToCase.enabled`                    | Enable automatic retries. Override for this specific workflow.                         | `true`  |
+| `openforms2xxllnc.workflows.autoRetries.addDocumentsToCase.cronExpression`             | Cron expression used for retry interval/schedule. Override for this specific workflow. | `""`    |
+| `openforms2xxllnc.workflows.autoRetries.addDocumentsToCase.maxRetries`                 | Maximum amount an errorstore item is retried. Override for this specific workflow.     | `5`     |
+| `openforms2xxllnc.workflows.autoRetries.sendNoReplyUserEmail.enabled`                  | Enable automatic retries. Override for this specific workflow.                         | `true`  |
+| `openforms2xxllnc.workflows.autoRetries.sendNoReplyUserEmail.cronExpression`           | Cron expression used for retry interval/schedule. Override for this specific workflow. | `""`    |
+| `openforms2xxllnc.workflows.autoRetries.sendNoReplyUserEmail.maxRetries`               | Maximum amount an errorstore item is retried. Override for this specific workflow.     | `5`     |
+| `openforms2xxllnc.workflows.scheduledStartReceiver.workflowSelector.enabled`           | Enable scheduled start the receiver of this specific workflow.                         | `false` |
+| `openforms2xxllnc.workflows.scheduledStartReceiver.workflowSelector.cronExpression`    | Cron expression used to schedule starting the receiver of this specific workflow.      | `""`    |
+| `openforms2xxllnc.workflows.scheduledStopReceiver.workflowSelector.enabled`            | Enable scheduled stop the receiver of this specific workflow.                          | `false` |
+| `openforms2xxllnc.workflows.scheduledStopReceiver.workflowSelector.cronExpression`     | Cron expression used to schedule stopping the receiver of this specific workflow.      | `""`    |
+| `openforms2xxllnc.workflows.onErrorActions.onCaseNotFound.sendEmail`                   | Enable sending a mail to the form initiator when this specific error occurs.           | `false` |
+| `openforms2xxllnc.workflows.onErrorActions.onCaseNotFound.templateName`                | Name of the mail template to be used when this specific error occurs.                  | `""`    |
+| `openforms2xxllnc.workflows.onErrorActions.onSubjectNotEqualsCaseSubject.sendEmail`    | Enable sending a mail to the form initiator when this specific error occurs.           | `false` |
+| `openforms2xxllnc.workflows.onErrorActions.onSubjectNotEqualsCaseSubject.templateName` | Name of the mail template to be used when this specific error occurs.                  | `""`    |
 
 ## Configuration and installation details
 
