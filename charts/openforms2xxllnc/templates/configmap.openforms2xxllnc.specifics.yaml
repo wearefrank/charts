@@ -1,0 +1,110 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ template "ff-common.fullname" . }}-specifics
+  labels:
+    {{- include "ff-common.labels" . | nindent 4 }}
+data:
+  {{- with .Values.openforms2xxllnc.connections }}
+
+  {{- with .beantwoordVraag }}
+  openforms2xxllnc.connections.beantwoord-vraag.endpoint: "{{ .endpoint }}"
+  openforms2xxllnc.connections.beantwoord-vraag.timeout: "{{ .timeout }}"
+  {{- end }}
+  {{- with .ontvangAsynchroon }}
+  openforms2xxllnc.connections.ontvang-asynchroon.endpoint: "{{ .endpoint }}"
+  openforms2xxllnc.connections.ontvang-asynchroon.timeout: "{{ .timeout }}"
+  {{- end }}
+  {{- with .vrijeBerichten }}
+  openforms2xxllnc.connections.vrije-berichten.endpoint: "{{ .endpoint }}"
+  openforms2xxllnc.connections.vrije-berichten.timeout: "{{ .timeout }}"
+  {{- end }}
+
+  {{- with .notificatiesApi }}
+  openforms2xxllnc.connections.notificaties-api.root-url: "{{ .rootUrl }}"
+  openforms2xxllnc.connections.notificaties-api.timeout: "{{ .timeout }}"
+  openforms2xxllnc.connections.notificaties-api.auth-type: "{{ .authType }}"
+  openforms2xxllnc.connections.notificaties-api.auth-alias: "{{ .authAlias }}"
+  {{- with .subscription }}
+  openforms2xxllnc.connections.notificaties-api.subscription.callback: "{{ .callback }}"
+  openforms2xxllnc.connections.notificaties-api.subscription.auth-alias: "{{ .authAlias }}"
+  {{- with .filters }}
+  openforms2xxllnc.connections.notificaties-api.subscription.filters.object-type: "{{ .objectType }}"
+  {{- end }}
+  {{- end }}
+  {{- end }}
+
+  {{- with .documentenApi }}
+  openforms2xxllnc.connections.documenten-api.timeout: "{{ .timeout }}"
+  openforms2xxllnc.connections.documenten-api.auth-type: "{{ .authType }}"
+  openforms2xxllnc.connections.documenten-api.auth-alias: "{{ .authAlias }}"
+  {{- end }}
+
+  {{- with .objectsApi }}
+  openforms2xxllnc.connections.objects-api.timeout: "{{ .timeout }}"
+  openforms2xxllnc.connections.objects-api.auth-type: "{{ .authType }}"
+  openforms2xxllnc.connections.objects-api.auth-alias: "{{ .authAlias }}"
+  {{- end }}
+
+  {{- with .noReplySmtp }}
+  openforms2xxllnc.connections.noreply-smtp.enabled: "{{ .enabled }}"
+  openforms2xxllnc.connections.noreply-smtp.host: "{{ .host }}"
+  openforms2xxllnc.connections.noreply-smtp.port: "{{ .port }}"
+  openforms2xxllnc.connections.noreply-smtp.use-ssl: "{{ .useSsl }}"
+  openforms2xxllnc.connections.noreply-smtp.timeout: "{{ .timeout }}"
+  openforms2xxllnc.connections.noreply-smtp.auth-alias: "{{ .authAlias }}"
+  openforms2xxllnc.connections.noreply-smtp.default-from-name: "{{ .defaultFromName }}"
+  openforms2xxllnc.connections.noreply-smtp.default-from-address: "{{ .defaultFromAddress }}"
+  openforms2xxllnc.connections.noreply-smtp.signature-from-name: "{{ .signatureFromName | default .defaultFromName }}"
+  {{- end }}
+
+  {{- end }}
+
+  {{- with .Values.openforms2xxllnc.workflows }}
+
+  {{- with .autoRetries }}
+  openforms2xxllnc.workflows.auto-retries.enabled: "{{ .enabled }}"
+  openforms2xxllnc.workflows.auto-retries.cron-expression: "{{ .cronExpression }}"
+  openforms2xxllnc.workflows.auto-retries.max-retries: "{{ .maxRetries }}"
+
+  {{- with .workflowSelector }}
+  openforms2xxllnc.workflows.auto-retries.workflow-selector.enabled: "{{ .enabled | default "${openforms2xxllnc.workflows.auto-retries.enabled}" }}"
+  openforms2xxllnc.workflows.auto-retries.workflow-selector.cron-expression: "{{ .cronExpression | default "${openforms2xxllnc.workflows.auto-retries.cron-expression}" }}"
+  openforms2xxllnc.workflows.auto-retries.workflow-selector.max-retries: "{{ .maxRetries | default "${openforms2xxllnc.workflows.auto-retries.max-retries}" }}"
+  {{- end }}
+
+  {{- with .addDocumentsToCase }}
+  openforms2xxllnc.workflows.auto-retries.add-documents-to-case.enabled: "{{ .enabled | default "${openforms2xxllnc.workflows.auto-retries.enabled}" }}"
+  openforms2xxllnc.workflows.auto-retries.add-documents-to-case.cron-expression: "{{ .cronExpression | default "${openforms2xxllnc.workflows.auto-retries.cron-expression}" }}"
+  openforms2xxllnc.workflows.auto-retries.add-documents-to-case.max-retries: "{{ .maxRetries | default "${openforms2xxllnc.workflows.auto-retries.max-retries}" }}"
+  {{- end }}
+
+  {{- with .sendNoReplyUserEmail }}
+  openforms2xxllnc.workflows.auto-retries.send-no-reply-user-email.enabled: "{{ .enabled | default "${openforms2xxllnc.workflows.auto-retries.enabled}" }}"
+  openforms2xxllnc.workflows.auto-retries.send-no-reply-user-email.cron-expression: "{{ .cronExpression | default "${openforms2xxllnc.workflows.auto-retries.cron-expression}" }}"
+  openforms2xxllnc.workflows.auto-retries.send-no-reply-user-email.max-retries: "{{ .maxRetries | default "${openforms2xxllnc.workflows.auto-retries.max-retries}" }}"
+  {{- end }}
+
+  {{- end }}
+
+  {{- with .scheduledStartReceiver }}
+  openforms2xxllnc.workflows.scheduled-start-receiver.workflow-selector.enabled: "{{ .enabled }}"
+  openforms2xxllnc.workflows.scheduled-start-receiver.workflow-selector.cron-expression: "{{ .cronExpression }}"
+  {{- end }}
+
+  {{- with .scheduledStopReceiver }}
+  openforms2xxllnc.workflows.scheduled-stop-receiver.workflow-selector.enabled: "{{ .enabled }}"
+  openforms2xxllnc.workflows.scheduled-stop-receiver.workflow-selector.cron-expression: "{{ .cronExpression }}"
+  {{- end }}
+
+  {{- with .onErrorActions.onCaseNotFound }}
+  openforms2xxllnc.workflows.on-error-actions.on-case-not-found.send-mail: "{{ .sendMail }}"
+  openforms2xxllnc.workflows.on-error-actions.on-case-not-found.template-name: "{{ .templateName }}"
+  {{- end }}
+
+  {{- with .onErrorActions.onSubjectNotEqualsCaseSubject }}
+  openforms2xxllnc.workflows.on-error-actions.on-subject-not-equals-case-subject.send-mail: "{{ .sendMail }}"
+  openforms2xxllnc.workflows.on-error-actions.on-subject-not-equals-case-subject.template-name: "{{ .templateName }}"
+  {{- end }}
+
+  {{- end }}
