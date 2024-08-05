@@ -421,6 +421,23 @@ entries:
     urls:
     - https://github.com/wearefrank/charts/releases/download/drill-1.1.0/drill-1.1.0.tgz
     version: 1.1.0
+  openforms2xxllnc:
+  - apiVersion: v2
+    appVersion: 1.0.1
+    created: "2024-08-05T05:43:43.840373224Z"
+    dependencies:
+    - name: ff-common
+      repository: https://frankframework.github.io/charts/
+      version: ~0.1.23
+    description: A Helm chart for running a Frank! on Kubernetes
+    digest: 3107229035733e18b9522d908130e5ce41effa5fc3cac05dd7be84235ca80f4e
+    home: https://wearefrank.github.io/openforms2xxllnc
+    icon: https://raw.githubusercontent.com/wearefrank/charts/master/openforms2xxllnc/icon.svg
+    name: openforms2xxllnc
+    type: application
+    urls:
+    - https://github.com/wearefrank/charts/releases/download/openforms2xxllnc-1.0.0/openforms2xxllnc-1.0.0.tgz
+    version: 1.0.0
   zaakbrug:
   - apiVersion: v2
     appVersion: 1.20.2
@@ -1702,4 +1719,4 @@ entries:
     urls:
     - https://github.com/wearefrank/charts/releases/download/zaakbrug-2.0.0/zaakbrug-2.0.0.tgz
     version: 2.0.0
-generated: "2024-08-02T14:16:22.080934801Z"
+generated: "2024-08-05T05:43:44.016138432Z"
