@@ -1,8 +1,8 @@
 apiVersion: v2
 name: openforms2xxllnc
 description: A Helm chart for running a Frank! on Kubernetes
-version: 1.0.0
-appVersion: 1.0.1
+version: 1.0.1
+appVersion: 1.1.1
 type: application
 home: https://wearefrank.github.io/openforms2xxllnc
 icon: https://raw.githubusercontent.com/wearefrank/charts/master/openforms2xxllnc/icon.svg
