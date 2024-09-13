@@ -61,6 +61,17 @@ data:
   {{- end }}
 
   {{- with .Values.openforms2xxllnc.workflows }}
+  
+  {{- with .stuurgegevens.zender }}
+  openforms2xxllnc.workflows.stuurgegevens.zender.organisatie: "{{ .organisatie }}"
+  openforms2xxllnc.workflows.stuurgegevens.zender.applicatie: "{{ .applicatie }}"
+  {{- end }}
+
+  {{- with .stuurgegevens.ontvanger }}
+  openforms2xxllnc.workflows.stuurgegevens.ontvanger.organisatie: "{{ .organisatie }}"
+  openforms2xxllnc.workflows.stuurgegevens.ontvanger.applicatie: "{{ .applicatie }}"
+  {{- end }}
+
 
   {{- with .autoRetries }}
   openforms2xxllnc.workflows.auto-retries.enabled: "{{ .enabled }}"
@@ -105,6 +116,11 @@ data:
   {{- with .onErrorActions.onSubjectNotEqualsCaseSubject }}
   openforms2xxllnc.workflows.on-error-actions.on-subject-not-equals-case-subject.send-mail: "{{ .sendMail }}"
   openforms2xxllnc.workflows.on-error-actions.on-subject-not-equals-case-subject.template-name: "{{ .templateName }}"
+  {{- end }}
+
+  {{- with .onErrorActions.onCaseClosed }}
+  openforms2xxllnc.workflows.on-error-actions.on-case-closed.send-mail: "{{ .sendMail }}"
+  openforms2xxllnc.workflows.on-error-actions.on-case-closed.template-name: "{{ .templateName }}"
   {{- end }}
 
   {{- end }}
