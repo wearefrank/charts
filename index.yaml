@@ -432,7 +432,7 @@ entries:
     description: A Helm chart for running a Frank! on Kubernetes
     digest: b9f7cc56d574175570f1798eb616447a6ccf24fbb6372b0c71d64fb8a7cd064f
     home: https://wearefrank.github.io/openforms2xxllnc
-    icon: https://raw.githubusercontent.com/wearefrank/charts/master/openforms2xxllnc/icon.svg
+    icon: https://raw.githubusercontent.com/wearefrank/charts/master/charts/openforms2xxllnc/icon.svg
     name: openforms2xxllnc
     type: application
     urls:
@@ -448,7 +448,7 @@ entries:
     description: A Helm chart for running a Frank! on Kubernetes
     digest: 2ac6848f56d21ea0ecced70c0dce567aeb5fc84b76580731f01ab73129513cfb
     home: https://wearefrank.github.io/openforms2xxllnc
-    icon: https://raw.githubusercontent.com/wearefrank/charts/master/openforms2xxllnc/icon.svg
+    icon: https://raw.githubusercontent.com/wearefrank/charts/master/charts/openforms2xxllnc/icon.svg
     name: openforms2xxllnc
     type: application
     urls:
@@ -464,7 +464,7 @@ entries:
     description: A Helm chart for running a Frank! on Kubernetes
     digest: 3107229035733e18b9522d908130e5ce41effa5fc3cac05dd7be84235ca80f4e
     home: https://wearefrank.github.io/openforms2xxllnc
-    icon: https://raw.githubusercontent.com/wearefrank/charts/master/openforms2xxllnc/icon.svg
+    icon: https://raw.githubusercontent.com/wearefrank/charts/master/charts/openforms2xxllnc/icon.svg
     name: openforms2xxllnc
     type: application
     urls:
