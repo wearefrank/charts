@@ -122,7 +122,7 @@ export default <Partial<Config>> {
                 verticalAlign: 'baseline !important'
               },
               table: {
-                wordBreak: 'break-all'
+                wordBreak: 'normal'
               }
             }
           },
