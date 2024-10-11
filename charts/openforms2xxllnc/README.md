@@ -193,37 +193,40 @@ Otherwise, they can be found at `/usr/local/tomcat/logs`
 
 ### Connections
 
-| Name                                                                           | Description                                                                                                       | Value   |
-| ------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------- | ------- |
-| `openforms2xxllnc.connections.beantwoordVraag.endpoint`                        | Endpoint at which the zs-dms BeantwoordVraag binding is served.                                                   | `""`    |
-| `openforms2xxllnc.connections.beantwoordVraag.timeout`                         | Timeout used zs-dms BeantwoordVraag calls.                                                                        | `60000` |
-| `openforms2xxllnc.connections.ontvangAsynchroon.endpoint`                      | Endpoint at which the zs-dms OntvangAsynchroon binding is served.                                                 | `""`    |
-| `openforms2xxllnc.connections.ontvangAsynchroon.timeout`                       | Timeout used zs-dms OntvangAsynchroon calls.                                                                      | `60000` |
-| `openforms2xxllnc.connections.vrijeBerichten.endpoint`                         | Endpoint at which the zs-dms VrijBericht binding is served.                                                       | `""`    |
-| `openforms2xxllnc.connections.vrijeBerichten.timeout`                          | Timeout used zs-dms VrijBericht calls.                                                                            | `60000` |
-| `openforms2xxllnc.connections.notificatiesApi.rootUrl`                         | Root url of the 'Notificaties API' that is used to subscribe at.                                                  | `""`    |
-| `openforms2xxllnc.connections.notificatiesApi.timeout`                         | Timeout used in 'Notificaties API' calls.                                                                         | `60000` |
-| `openforms2xxllnc.connections.notificatiesApi.authType`                        | Options: 'jwt', 'basic', 'value'. 'value' uses the password field of the given authAlias as Authorization header. | `""`    |
-| `openforms2xxllnc.connections.notificatiesApi.authAlias`                       | Reference to an auth alias to be used as credentials for this api.                                                | `""`    |
-| `openforms2xxllnc.connections.notificatiesApi.subscription.callback`           | Fully qualified url to the notification callback of openforms2xxllnc.                                             | `""`    |
-| `openforms2xxllnc.connections.notificatiesApi.subscription.authAlias`          | Reference to an auth alias to be used as authorization key for calling the callback endpoint.                     | `""`    |
-| `openforms2xxllnc.connections.notificatiesApi.subscription.filters.objectType` | Url of the objecttype to filter the notifications on.                                                             | `""`    |
-| `openforms2xxllnc.connections.documentenApi.timeout`                           | Timeout used in 'Documenten API' calls.                                                                           | `60000` |
-| `openforms2xxllnc.connections.documentenApi.authType`                          | Options: 'jwt', 'basic', 'value'. 'value' uses the password field of the given authAlias as Authorization header. | `""`    |
-| `openforms2xxllnc.connections.documentenApi.authAlias`                         | Reference to an auth alias to be used as credentials for this api.                                                | `""`    |
-| `openforms2xxllnc.connections.objectsApi.timeout`                              | Timeout used in 'Objects API' calls.                                                                              | `60000` |
-| `openforms2xxllnc.connections.objectsApi.authType`                             | Options: 'jwt', 'basic', 'value'. 'value' uses the password field of the given authAlias as Authorization header. | `""`    |
-| `openforms2xxllnc.connections.objectsApi.authAlias`                            | Reference to an auth alias to be used as credentials for this api.                                                | `""`    |
-| `openforms2xxllnc.connections.noReplySmtp.enabled`                             | Enable connecting to the configured SMTP server/replay.                                                           | `false` |
-| `openforms2xxllnc.connections.noReplySmtp.host`                                | Host of the SMTP server/relay.                                                                                    | `""`    |
-| `openforms2xxllnc.connections.noReplySmtp.port`                                | Port of the SMTP server/relay.                                                                                    | `587`   |
-| `openforms2xxllnc.connections.noReplySmtp.useSsl`                              | Connect securely to the SMTP server/relay with SSL.                                                               | `true`  |
-| `openforms2xxllnc.connections.noReplySmtp.authAlias`                           | Reference to an auth alias to be used as credentials for authorizing with the SMTP server/relay.                  | `""`    |
-| `openforms2xxllnc.connections.noReplySmtp.defaultFromName`                     | The default no-reply sender's name that is shown with the no-reply sender's e-mail address.                       | `""`    |
-| `openforms2xxllnc.connections.noReplySmtp.defaultFromAddress`                  | The default no-reply sender's e-mail address that used when sending e-mails.                                      | `""`    |
-| `openforms2xxllnc.connections.noReplySmtp.signatureFromName`                   | The no-reply sender's name used in the signature of the e-mail body.                                              | `""`    |
-| `openforms2xxllnc.connections.noReplySmtp.timeout`                             | Timeout used when sending emails.                                                                                 | `60000` |
-| `openforms2xxllnc.connections.noReplySmtp.authType`                            | Options: 'jwt', 'basic', 'value'. 'value' uses the password field of the given authAlias as Authorization header. | `""`    |
+| Name                                                                           | Description                                                                                                       | Value         |
+| ------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------- | ------------- |
+| `openforms2xxllnc.connections.beantwoordVraag.endpoint`                        | Endpoint at which the zs-dms BeantwoordVraag binding is served.                                                   | `""`          |
+| `openforms2xxllnc.connections.beantwoordVraag.timeout`                         | Timeout used zs-dms BeantwoordVraag calls.                                                                        | `60000`       |
+| `openforms2xxllnc.connections.beantwoordVraag.authAlias`                       | AuthAlias used zs-dms BeantwoordVraag calls.                                                                      | `zaakdms-api` |
+| `openforms2xxllnc.connections.ontvangAsynchroon.endpoint`                      | Endpoint at which the zs-dms OntvangAsynchroon binding is served.                                                 | `""`          |
+| `openforms2xxllnc.connections.ontvangAsynchroon.timeout`                       | Timeout used zs-dms OntvangAsynchroon calls.                                                                      | `60000`       |
+| `openforms2xxllnc.connections.ontvangAsynchroon.authAlias`                     | AuthAlias used zs-dms OntvangAsynchroon calls.                                                                    | `zaakdms-api` |
+| `openforms2xxllnc.connections.vrijeBerichten.endpoint`                         | Endpoint at which the zs-dms VrijBericht binding is served.                                                       | `""`          |
+| `openforms2xxllnc.connections.vrijeBerichten.timeout`                          | Timeout used zs-dms VrijBericht calls.                                                                            | `60000`       |
+| `openforms2xxllnc.connections.vrijeBerichten.authAlias`                        | AuthAlias used zs-dms VrijBericht calls.                                                                          | `zaakdms-api` |
+| `openforms2xxllnc.connections.notificatiesApi.rootUrl`                         | Root url of the 'Notificaties API' that is used to subscribe at.                                                  | `""`          |
+| `openforms2xxllnc.connections.notificatiesApi.timeout`                         | Timeout used in 'Notificaties API' calls.                                                                         | `60000`       |
+| `openforms2xxllnc.connections.notificatiesApi.authType`                        | Options: 'jwt', 'basic', 'value'. 'value' uses the password field of the given authAlias as Authorization header. | `""`          |
+| `openforms2xxllnc.connections.notificatiesApi.authAlias`                       | Reference to an auth alias to be used as credentials for this api.                                                | `""`          |
+| `openforms2xxllnc.connections.notificatiesApi.subscription.callback`           | Fully qualified url to the notification callback of openforms2xxllnc.                                             | `""`          |
+| `openforms2xxllnc.connections.notificatiesApi.subscription.authAlias`          | Reference to an auth alias to be used as authorization key for calling the callback endpoint.                     | `""`          |
+| `openforms2xxllnc.connections.notificatiesApi.subscription.filters.objectType` | Url of the objecttype to filter the notifications on.                                                             | `""`          |
+| `openforms2xxllnc.connections.documentenApi.timeout`                           | Timeout used in 'Documenten API' calls.                                                                           | `60000`       |
+| `openforms2xxllnc.connections.documentenApi.authType`                          | Options: 'jwt', 'basic', 'value'. 'value' uses the password field of the given authAlias as Authorization header. | `""`          |
+| `openforms2xxllnc.connections.documentenApi.authAlias`                         | Reference to an auth alias to be used as credentials for this api.                                                | `""`          |
+| `openforms2xxllnc.connections.objectsApi.timeout`                              | Timeout used in 'Objects API' calls.                                                                              | `60000`       |
+| `openforms2xxllnc.connections.objectsApi.authType`                             | Options: 'jwt', 'basic', 'value'. 'value' uses the password field of the given authAlias as Authorization header. | `""`          |
+| `openforms2xxllnc.connections.objectsApi.authAlias`                            | Reference to an auth alias to be used as credentials for this api.                                                | `""`          |
+| `openforms2xxllnc.connections.noReplySmtp.enabled`                             | Enable connecting to the configured SMTP server/replay.                                                           | `false`       |
+| `openforms2xxllnc.connections.noReplySmtp.host`                                | Host of the SMTP server/relay.                                                                                    | `""`          |
+| `openforms2xxllnc.connections.noReplySmtp.port`                                | Port of the SMTP server/relay.                                                                                    | `587`         |
+| `openforms2xxllnc.connections.noReplySmtp.useSsl`                              | Connect securely to the SMTP server/relay with SSL.                                                               | `true`        |
+| `openforms2xxllnc.connections.noReplySmtp.authAlias`                           | Reference to an auth alias to be used as credentials for authorizing with the SMTP server/relay.                  | `""`          |
+| `openforms2xxllnc.connections.noReplySmtp.defaultFromName`                     | The default no-reply sender's name that is shown with the no-reply sender's e-mail address.                       | `""`          |
+| `openforms2xxllnc.connections.noReplySmtp.defaultFromAddress`                  | The default no-reply sender's e-mail address that used when sending e-mails.                                      | `""`          |
+| `openforms2xxllnc.connections.noReplySmtp.signatureFromName`                   | The no-reply sender's name used in the signature of the e-mail body.                                              | `""`          |
+| `openforms2xxllnc.connections.noReplySmtp.timeout`                             | Timeout used when sending emails.                                                                                 | `60000`       |
+| `openforms2xxllnc.connections.noReplySmtp.authType`                            | Options: 'jwt', 'basic', 'value'. 'value' uses the password field of the given authAlias as Authorization header. | `""`          |
 
 ### Mail Templates
 
@@ -240,6 +243,10 @@ Otherwise, they can be found at `/usr/local/tomcat/logs`
 
 | Name                                                                                   | Description                                                                            | Value   |
 | -------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------- | ------- |
+| `openforms2xxllnc.workflows.stuurgegevens.zender.organisatie`                          | Gemeentecode of the gemeente sending the zs-dms requests.                              | `""`    |
+| `openforms2xxllnc.workflows.stuurgegevens.zender.applicatie`                           | Application name used when sending the zs-dms requests.                                | `""`    |
+| `openforms2xxllnc.workflows.stuurgegevens.ontvanger.organisatie`                       | Gemeentecode of the gemeente receiving the zs-dms requests.                            | `""`    |
+| `openforms2xxllnc.workflows.stuurgegevens.ontvanger.applicatie`                        | Application name of the receiving zs-dms application.                                  | `""`    |
 | `openforms2xxllnc.workflows.autoRetries.enabled`                                       | Enable automatic retries. For all workflows(unless overriden).                         | `true`  |
 | `openforms2xxllnc.workflows.autoRetries.cronExpression`                                | Cron expression used for retry interval/schedule. For all workflows(unless overriden). | `""`    |
 | `openforms2xxllnc.workflows.autoRetries.maxRetries`                                    | Maximum amount an errorstore item is retried. For all workflows(unless overriden).     | `5`     |
@@ -260,6 +267,8 @@ Otherwise, they can be found at `/usr/local/tomcat/logs`
 | `openforms2xxllnc.workflows.onErrorActions.onCaseNotFound.templateName`                | Name of the mail template to be used when this specific error occurs.                  | `""`    |
 | `openforms2xxllnc.workflows.onErrorActions.onSubjectNotEqualsCaseSubject.sendEmail`    | Enable sending a mail to the form initiator when this specific error occurs.           | `false` |
 | `openforms2xxllnc.workflows.onErrorActions.onSubjectNotEqualsCaseSubject.templateName` | Name of the mail template to be used when this specific error occurs.                  | `""`    |
+| `openforms2xxllnc.workflows.onErrorActions.onCaseClosed.sendEmail`                     | Enable sending a mail to the form initiator when this specific error occurs.           | `false` |
+| `openforms2xxllnc.workflows.onErrorActions.onCaseClosed.templateName`                  | Name of the mail template to be used when this specific error occurs.                  | `""`    |
 
 ## Configuration and installation details
 
