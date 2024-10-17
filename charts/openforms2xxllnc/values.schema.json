@@ -553,6 +553,11 @@
                                     "type": "number",
                                     "description": "Timeout used zs-dms BeantwoordVraag calls.",
                                     "default": 60000
+                                },
+                                "authAlias": {
+                                    "type": "string",
+                                    "description": "AuthAlias used zs-dms BeantwoordVraag calls.",
+                                    "default": "zaakdms-api"
                                 }
                             }
                         },
@@ -568,6 +573,11 @@
                                     "type": "number",
                                     "description": "Timeout used zs-dms OntvangAsynchroon calls.",
                                     "default": 60000
+                                },
+                                "authAlias": {
+                                    "type": "string",
+                                    "description": "AuthAlias used zs-dms OntvangAsynchroon calls.",
+                                    "default": "zaakdms-api"
                                 }
                             }
                         },
@@ -583,6 +593,11 @@
                                     "type": "number",
                                     "description": "Timeout used zs-dms VrijBericht calls.",
                                     "default": 60000
+                                },
+                                "authAlias": {
+                                    "type": "string",
+                                    "description": "AuthAlias used zs-dms VrijBericht calls.",
+                                    "default": "zaakdms-api"
                                 }
                             }
                         },
@@ -747,6 +762,41 @@
                 "workflows": {
                     "type": "object",
                     "properties": {
+                        "stuurgegevens": {
+                            "type": "object",
+                            "properties": {
+                                "zender": {
+                                    "type": "object",
+                                    "properties": {
+                                        "organisatie": {
+                                            "type": "string",
+                                            "description": "Gemeentecode of the gemeente sending the zs-dms requests.",
+                                            "default": "1111"
+                                        },
+                                        "applicatie": {
+                                            "type": "string",
+                                            "description": "Application name used when sending the zs-dms requests.",
+                                            "default": ""
+                                        }
+                                    }
+                                },
+                                "ontvanger": {
+                                    "type": "object",
+                                    "properties": {
+                                        "organisatie": {
+                                            "type": "string",
+                                            "description": "Gemeentecode of the gemeente receiving the zs-dms requests.",
+                                            "default": "1111"
+                                        },
+                                        "applicatie": {
+                                            "type": "string",
+                                            "description": "Application name of the receiving zs-dms application.",
+                                            "default": "zs-dms"
+                                        }
+                                    }
+                                }
+                            }
+                        },
                         "autoRetries": {
                             "type": "object",
                             "properties": {
@@ -886,6 +936,21 @@
                                     }
                                 },
                                 "onSubjectNotEqualsCaseSubject": {
+                                    "type": "object",
+                                    "properties": {
+                                        "sendEmail": {
+                                            "type": "boolean",
+                                            "description": "Enable sending a mail to the form initiator when this specific error occurs.",
+                                            "default": false
+                                        },
+                                        "templateName": {
+                                            "type": "string",
+                                            "description": "Name of the mail template to be used when this specific error occurs.",
+                                            "default": ""
+                                        }
+                                    }
+                                },
+                                "onCaseClosed": {
                                     "type": "object",
                                     "properties": {
                                         "sendEmail": {

@@ -10,14 +10,17 @@ data:
   {{- with .beantwoordVraag }}
   openforms2xxllnc.connections.beantwoord-vraag.endpoint: "{{ .endpoint }}"
   openforms2xxllnc.connections.beantwoord-vraag.timeout: "{{ .timeout }}"
+  openforms2xxllnc.connections.beantwoord-vraag.auth-alias: "{{ .authAlias }}"
   {{- end }}
   {{- with .ontvangAsynchroon }}
   openforms2xxllnc.connections.ontvang-asynchroon.endpoint: "{{ .endpoint }}"
   openforms2xxllnc.connections.ontvang-asynchroon.timeout: "{{ .timeout }}"
+  openforms2xxllnc.connections.ontvang-asynchroon.auth-alias: "{{ .authAlias }}"
   {{- end }}
   {{- with .vrijeBerichten }}
   openforms2xxllnc.connections.vrije-berichten.endpoint: "{{ .endpoint }}"
   openforms2xxllnc.connections.vrije-berichten.timeout: "{{ .timeout }}"
+  openforms2xxllnc.connections.vrije-berichten.auth-alias: "{{ .authAlias }}"
   {{- end }}
 
   {{- with .notificatiesApi }}
