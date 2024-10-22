@@ -85,6 +85,10 @@ volumeMounts:
     mountPath: /usr/local/tomcat/conf/tomcat-users.xml
     subPath: tomcat-users.xml
     readOnly: true
+  - name: {{ template "ff-common.fullname" . }}-tomcat-users
+    mountPath: /opt/frank/resources/localUsers.yml
+    subPath: localUsers.yml
+    readOnly: true
   {{- end }}
   {{- if .Values.frank.security.http.activeDirectory.enabled }}
   - name: {{ template "ff-common.fullname" . }}-ldap-role-mapping
