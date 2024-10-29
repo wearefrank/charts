@@ -423,6 +423,22 @@ entries:
     version: 1.1.0
   openforms2xxllnc:
   - apiVersion: v2
+    appVersion: 1.2.4
+    created: "2024-10-29T11:37:41.578485545Z"
+    dependencies:
+    - name: ff-common
+      repository: https://frankframework.github.io/charts/
+      version: ~0.1.24
+    description: A Helm chart for running a Frank! on Kubernetes
+    digest: 3e9037668ce31e595297f350b0ca0a3c1b9862aff0c52722f573d08d055b303f
+    home: https://wearefrank.github.io/openforms2xxllnc
+    icon: https://raw.githubusercontent.com/wearefrank/charts/master/charts/openforms2xxllnc/icon.svg
+    name: openforms2xxllnc
+    type: application
+    urls:
+    - https://github.com/wearefrank/charts/releases/download/openforms2xxllnc-1.1.1/openforms2xxllnc-1.1.1.tgz
+    version: 1.1.1
+  - apiVersion: v2
     appVersion: 1.2.0
     created: "2024-09-13T13:42:47.588866871Z"
     dependencies:
@@ -1931,4 +1947,4 @@ entries:
     urls:
     - https://github.com/wearefrank/charts/releases/download/zaakbrug-2.0.0/zaakbrug-2.0.0.tgz
     version: 2.0.0
-generated: "2024-10-23T13:02:15.95301444Z"
+generated: "2024-10-29T11:37:41.578660863Z"
