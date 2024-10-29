@@ -579,7 +579,7 @@ openforms2xxllnc:
     ##     Bedankt voor uw medewerking.<br>
     ##     <br>
     ##     Met vriendelijke groet,<br>
-    ##     ${vars.signature-from-name}<br>
+    ##     ?{vars.signature-from-name}<br>
     ## ```
   ## @skip openforms2xxllnc.workflows [object]
   ## @section Workflows
