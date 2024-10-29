@@ -660,31 +660,31 @@ openforms2xxllnc:
     ## @skip openforms2xxllnc.workflows.onErrorActions [object]
     onErrorActions:
       ## @skip openforms2xxllnc.workflows.onErrorActions.onCaseNotFound [object]
-      ## @param openforms2xxllnc.workflows.onErrorActions.onCaseNotFound.sendEmail Enable sending a mail to the form initiator when this specific error occurs.
+      ## @param openforms2xxllnc.workflows.onErrorActions.onCaseNotFound.sendMail Enable sending a mail to the form initiator when this specific error occurs.
       ## Otherwise an exception is throw, which requires manual intervention. Enabling the sending of a mail requires 'openforms2xxllnc.connections.noReplySmtp' to be configured.
       ## @param openforms2xxllnc.workflows.onErrorActions.onCaseNotFound.templateName [string] Name of the mail template to be used when this specific error occurs.
       ## Mail templates can be configured in the 'openforms2xxllnc.mailTemplates' section.
       ##
       onCaseNotFound:
-        sendEmail: false
+        sendMail: false
         templateName: ""
       ## @skip openforms2xxllnc.workflows.onErrorActions.onSubjectNotEqualsCaseSubject [object]
-      ## @param openforms2xxllnc.workflows.onErrorActions.onSubjectNotEqualsCaseSubject.sendEmail Enable sending a mail to the form initiator when this specific error occurs.
+      ## @param openforms2xxllnc.workflows.onErrorActions.onSubjectNotEqualsCaseSubject.sendMail Enable sending a mail to the form initiator when this specific error occurs.
       ## Otherwise an exception is throw, which requires manual intervention. Enabling the sending of a mail requires 'openforms2xxllnc.connections.noReplySmtp' to be configured.
       ## @param openforms2xxllnc.workflows.onErrorActions.onSubjectNotEqualsCaseSubject.templateName [string] Name of the mail template to be used when this specific error occurs.
       ## Mail templates can be configured in the 'openforms2xxllnc.mailTemplates' section.
       ##
       onSubjectNotEqualsCaseSubject:
-        sendEmail: false
+        sendMail: false
         templateName: ""
       ## @skip openforms2xxllnc.workflows.onErrorActions.onCaseClosed [object]
-      ## @param openforms2xxllnc.workflows.onErrorActions.onCaseClosed.sendEmail Enable sending a mail to the form initiator when this specific error occurs.
+      ## @param openforms2xxllnc.workflows.onErrorActions.onCaseClosed.sendMail Enable sending a mail to the form initiator when this specific error occurs.
       ## Otherwise an exception is throw, which requires manual intervention. Enabling the sending of a mail requires 'openforms2xxllnc.connections.noReplySmtp' to be configured.
       ## @param openforms2xxllnc.workflows.onErrorActions.onCaseClosed.templateName [string] Name of the mail template to be used when this specific error occurs.
       ## Mail templates can be configured in the 'openforms2xxllnc.mailTemplates' section.
       ##
       onCaseClosed:
-        sendEmail: false
+        sendMail: false
         templateName: ""
 
 
