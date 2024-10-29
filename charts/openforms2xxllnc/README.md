@@ -197,13 +197,17 @@ Otherwise, they can be found at `/usr/local/tomcat/logs`
 | ------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------- | ------------- |
 | `openforms2xxllnc.connections.beantwoordVraag.endpoint`                        | Endpoint at which the zs-dms BeantwoordVraag binding is served.                                                   | `""`          |
 | `openforms2xxllnc.connections.beantwoordVraag.timeout`                         | Timeout used zs-dms BeantwoordVraag calls.                                                                        | `60000`       |
-| `openforms2xxllnc.connections.beantwoordVraag.authAlias`                       | AuthAlias used zs-dms BeantwoordVraag calls.                                                                      | `zaakdms-api` |
+| `openforms2xxllnc.connections.beantwoordVraag.authAlias`                       | Reference to an auth alias to be used as credentials for communication with this endpoint.                        | `""`          |
+| `openforms2xxllnc.connections.beantwoordVraag.authHeaderName`                  | Name of the HTTP request header to provide authentication credentials in.                                         | `""`          |
 | `openforms2xxllnc.connections.ontvangAsynchroon.endpoint`                      | Endpoint at which the zs-dms OntvangAsynchroon binding is served.                                                 | `""`          |
 | `openforms2xxllnc.connections.ontvangAsynchroon.timeout`                       | Timeout used zs-dms OntvangAsynchroon calls.                                                                      | `60000`       |
-| `openforms2xxllnc.connections.ontvangAsynchroon.authAlias`                     | AuthAlias used zs-dms OntvangAsynchroon calls.                                                                    | `zaakdms-api` |
+| `openforms2xxllnc.connections.ontvangAsynchroon.authAlias`                     | Reference to an auth alias to be used as credentials for communication with this endpoint.                        | `""`          |
+| `openforms2xxllnc.connections.ontvangAsynchroon.authHeaderName`                | Name of the HTTP request header to provide authentication credentials in.                                         | `""`          |
 | `openforms2xxllnc.connections.vrijeBerichten.endpoint`                         | Endpoint at which the zs-dms VrijBericht binding is served.                                                       | `""`          |
 | `openforms2xxllnc.connections.vrijeBerichten.timeout`                          | Timeout used zs-dms VrijBericht calls.                                                                            | `60000`       |
 | `openforms2xxllnc.connections.vrijeBerichten.authAlias`                        | AuthAlias used zs-dms VrijBericht calls.                                                                          | `zaakdms-api` |
+| `openforms2xxllnc.connections.vrijeBerichten.authAlias`                        | Reference to an auth alias to be used as credentials for communication with this endpoint.                        | `""`          |
+| `openforms2xxllnc.connections.vrijeBerichten.authHeaderName`                   | Name of the HTTP request header to provide authentication credentials in.                                         | `""`          |
 | `openforms2xxllnc.connections.notificatiesApi.rootUrl`                         | Root url of the 'Notificaties API' that is used to subscribe at.                                                  | `""`          |
 | `openforms2xxllnc.connections.notificatiesApi.timeout`                         | Timeout used in 'Notificaties API' calls.                                                                         | `60000`       |
 | `openforms2xxllnc.connections.notificatiesApi.authType`                        | Options: 'jwt', 'basic', 'value'. 'value' uses the password field of the given authAlias as Authorization header. | `""`          |
@@ -263,11 +267,11 @@ Otherwise, they can be found at `/usr/local/tomcat/logs`
 | `openforms2xxllnc.workflows.scheduledStartReceiver.workflowSelector.cronExpression`    | Cron expression used to schedule starting the receiver of this specific workflow.      | `""`    |
 | `openforms2xxllnc.workflows.scheduledStopReceiver.workflowSelector.enabled`            | Enable scheduled stop the receiver of this specific workflow.                          | `false` |
 | `openforms2xxllnc.workflows.scheduledStopReceiver.workflowSelector.cronExpression`     | Cron expression used to schedule stopping the receiver of this specific workflow.      | `""`    |
-| `openforms2xxllnc.workflows.onErrorActions.onCaseNotFound.sendEmail`                   | Enable sending a mail to the form initiator when this specific error occurs.           | `false` |
+| `openforms2xxllnc.workflows.onErrorActions.onCaseNotFound.sendMail`                    | Enable sending a mail to the form initiator when this specific error occurs.           | `false` |
 | `openforms2xxllnc.workflows.onErrorActions.onCaseNotFound.templateName`                | Name of the mail template to be used when this specific error occurs.                  | `""`    |
-| `openforms2xxllnc.workflows.onErrorActions.onSubjectNotEqualsCaseSubject.sendEmail`    | Enable sending a mail to the form initiator when this specific error occurs.           | `false` |
+| `openforms2xxllnc.workflows.onErrorActions.onSubjectNotEqualsCaseSubject.sendMail`     | Enable sending a mail to the form initiator when this specific error occurs.           | `false` |
 | `openforms2xxllnc.workflows.onErrorActions.onSubjectNotEqualsCaseSubject.templateName` | Name of the mail template to be used when this specific error occurs.                  | `""`    |
-| `openforms2xxllnc.workflows.onErrorActions.onCaseClosed.sendEmail`                     | Enable sending a mail to the form initiator when this specific error occurs.           | `false` |
+| `openforms2xxllnc.workflows.onErrorActions.onCaseClosed.sendMail`                      | Enable sending a mail to the form initiator when this specific error occurs.           | `false` |
 | `openforms2xxllnc.workflows.onErrorActions.onCaseClosed.templateName`                  | Name of the mail template to be used when this specific error occurs.                  | `""`    |
 
 ## Configuration and installation details

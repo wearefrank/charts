@@ -11,16 +11,19 @@ data:
   openforms2xxllnc.connections.beantwoord-vraag.endpoint: "{{ .endpoint }}"
   openforms2xxllnc.connections.beantwoord-vraag.timeout: "{{ .timeout }}"
   openforms2xxllnc.connections.beantwoord-vraag.auth-alias: "{{ .authAlias }}"
+  openforms2xxllnc.connections.beantwoord-vraag.auth-header-name: "{{ .authHeaderName }}"
   {{- end }}
   {{- with .ontvangAsynchroon }}
   openforms2xxllnc.connections.ontvang-asynchroon.endpoint: "{{ .endpoint }}"
   openforms2xxllnc.connections.ontvang-asynchroon.timeout: "{{ .timeout }}"
   openforms2xxllnc.connections.ontvang-asynchroon.auth-alias: "{{ .authAlias }}"
+  openforms2xxllnc.connections.ontvang-asynchroon.auth-header-name: "{{ .authHeaderName }}"
   {{- end }}
   {{- with .vrijeBerichten }}
   openforms2xxllnc.connections.vrije-berichten.endpoint: "{{ .endpoint }}"
   openforms2xxllnc.connections.vrije-berichten.timeout: "{{ .timeout }}"
   openforms2xxllnc.connections.vrije-berichten.auth-alias: "{{ .authAlias }}"
+  openforms2xxllnc.connections.vrije-berichten.auth-header-name: "{{ .authHeaderName }}"
   {{- end }}
 
   {{- with .notificatiesApi }}

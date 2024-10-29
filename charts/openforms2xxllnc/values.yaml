@@ -449,30 +449,37 @@ openforms2xxllnc:
     ## @skip openforms2xxllnc.connections.beantwoordVraag [object]
     ## @param openforms2xxllnc.connections.beantwoordVraag.endpoint [string] Endpoint at which the zs-dms BeantwoordVraag binding is served.
     ## @param openforms2xxllnc.connections.beantwoordVraag.timeout Timeout used zs-dms BeantwoordVraag calls.
-    ## @param openforms2xxllnc.connections.beantwoordVraag.authAlias AuthAlias used zs-dms BeantwoordVraag calls.
+    ## @param openforms2xxllnc.connections.beantwoordVraag.authAlias [string] Reference to an auth alias to be used as credentials for communication with this endpoint.
+    ## @param openforms2xxllnc.connections.beantwoordVraag.authHeaderName [string] Name of the HTTP request header to provide authentication credentials in.
     ##
     beantwoordVraag:
       endpoint: "https://zs-dms/generic/zds/BeantwoordVraag"
       timeout: 60000
       authAlias: "zaakdms-api"
+      authHeaderName: "Authorization"
     ## @skip openforms2xxllnc.connections.ontvangAsynchroon [object]
     ## @param openforms2xxllnc.connections.ontvangAsynchroon.endpoint [string] Endpoint at which the zs-dms OntvangAsynchroon binding is served.
     ## @param openforms2xxllnc.connections.ontvangAsynchroon.timeout Timeout used zs-dms OntvangAsynchroon calls.
-    ## @param openforms2xxllnc.connections.ontvangAsynchroon.authAlias AuthAlias used zs-dms OntvangAsynchroon calls.
+    ## @param openforms2xxllnc.connections.ontvangAsynchroon.authAlias [string] Reference to an auth alias to be used as credentials for communication with this endpoint.
+    ## @param openforms2xxllnc.connections.ontvangAsynchroon.authHeaderName [string] Name of the HTTP request header to provide authentication credentials in.
     ##
     ontvangAsynchroon:
       endpoint: "https://zs-dms/generic/zds/OntvangAsynchroon"
       timeout: 60000
       authAlias: "zaakdms-api"
+      authHeaderName: "Authorization"
     ## @skip openforms2xxllnc.connections.vrijeBerichten [object]
     ## @param openforms2xxllnc.connections.vrijeBerichten.endpoint [string] Endpoint at which the zs-dms VrijBericht binding is served.
     ## @param openforms2xxllnc.connections.vrijeBerichten.timeout Timeout used zs-dms VrijBericht calls.
     ## @param openforms2xxllnc.connections.vrijeBerichten.authAlias AuthAlias used zs-dms VrijBericht calls.
+    ## @param openforms2xxllnc.connections.vrijeBerichten.authAlias [string] Reference to an auth alias to be used as credentials for communication with this endpoint.
+    ## @param openforms2xxllnc.connections.vrijeBerichten.authHeaderName [string] Name of the HTTP request header to provide authentication credentials in.
     ##
     vrijeBerichten:
       endpoint: "https://zs-dms/generic/zds/VrijBericht"
       timeout: 60000
       authAlias: "zaakdms-api"
+      authHeaderName: "Authorization"
     ## @skip openforms2xxllnc.connections.notificatiesApi [object]
     ## @param openforms2xxllnc.connections.notificatiesApi.rootUrl [string] Root url of the 'Notificaties API' that is used to subscribe at.
     ## @param openforms2xxllnc.connections.notificatiesApi.timeout Timeout used in 'Notificaties API' calls.
