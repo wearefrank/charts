@@ -556,8 +556,13 @@
                                 },
                                 "authAlias": {
                                     "type": "string",
-                                    "description": "AuthAlias used zs-dms BeantwoordVraag calls.",
+                                    "description": "Reference to an auth alias to be used as credentials for communication with this endpoint.",
                                     "default": "zaakdms-api"
+                                },
+                                "authHeaderName": {
+                                    "type": "string",
+                                    "description": "Name of the HTTP request header to provide authentication credentials in.",
+                                    "default": "Authorization"
                                 }
                             }
                         },
@@ -576,8 +581,13 @@
                                 },
                                 "authAlias": {
                                     "type": "string",
-                                    "description": "AuthAlias used zs-dms OntvangAsynchroon calls.",
+                                    "description": "Reference to an auth alias to be used as credentials for communication with this endpoint.",
                                     "default": "zaakdms-api"
+                                },
+                                "authHeaderName": {
+                                    "type": "string",
+                                    "description": "Name of the HTTP request header to provide authentication credentials in.",
+                                    "default": "Authorization"
                                 }
                             }
                         },
@@ -596,8 +606,13 @@
                                 },
                                 "authAlias": {
                                     "type": "string",
-                                    "description": "AuthAlias used zs-dms VrijBericht calls.",
+                                    "description": "Reference to an auth alias to be used as credentials for communication with this endpoint.",
                                     "default": "zaakdms-api"
+                                },
+                                "authHeaderName": {
+                                    "type": "string",
+                                    "description": "Name of the HTTP request header to provide authentication credentials in.",
+                                    "default": "Authorization"
                                 }
                             }
                         },
@@ -923,7 +938,7 @@
                                 "onCaseNotFound": {
                                     "type": "object",
                                     "properties": {
-                                        "sendEmail": {
+                                        "sendMail": {
                                             "type": "boolean",
                                             "description": "Enable sending a mail to the form initiator when this specific error occurs.",
                                             "default": false
@@ -938,7 +953,7 @@
                                 "onSubjectNotEqualsCaseSubject": {
                                     "type": "object",
                                     "properties": {
-                                        "sendEmail": {
+                                        "sendMail": {
                                             "type": "boolean",
                                             "description": "Enable sending a mail to the form initiator when this specific error occurs.",
                                             "default": false
@@ -953,7 +968,7 @@
                                 "onCaseClosed": {
                                     "type": "object",
                                     "properties": {
-                                        "sendEmail": {
+                                        "sendMail": {
                                             "type": "boolean",
                                             "description": "Enable sending a mail to the form initiator when this specific error occurs.",
                                             "default": false
