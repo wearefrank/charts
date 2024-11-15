@@ -149,6 +149,7 @@ service:
   web:
     type: ClusterIP
     port: 80
+    annotations: { }
   ## Drill User Api for external client, such as Tableau, to connect into the cluster nodes.
   ## @param service.user.type Drill User Api service type
   ## @param service.user.port Drill User Api service port
@@ -156,6 +157,7 @@ service:
   user:
     type: ClusterIP
     port: 31010
+    annotations: { }
 
 ## Configure the ingress resource that allows you to access the Drill Web UI
 ## ref: https://kubernetes.io/docs/concepts/services-networking/ingress/
