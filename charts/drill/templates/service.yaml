@@ -4,6 +4,10 @@ metadata:
   name: {{ include "drill.fullname" . }}-web
   labels:
     {{- include "drill.labels" . | nindent 4 }}
+  {{- with .Values.service.web.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
 spec:
   sessionAffinity: ClientIP
   ports:
@@ -20,6 +24,10 @@ metadata:
   name: {{ include "drill.fullname" . }}-user
   labels:
     {{- include "drill.labels" . | nindent 4 }}
+  {{- with .Values.service.user.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
 spec:
   sessionAffinity: ClientIP
   ports:
