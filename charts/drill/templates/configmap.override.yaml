@@ -31,6 +31,7 @@ data:
   storage-plugins-override.conf: |-
     {{- toString . | nindent 4 }}
   {{- end }}
+  {{- if .Values.drill.overrideLogging.enabled }}
   logback.xml: |-
     <configuration>
       <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
@@ -58,3 +59,4 @@ data:
       <logger name="{{ .name }}" level="{{ .level | default "trace" }}"/>
       {{- end }}
     </configuration>
+  {{- end }}
