@@ -17,12 +17,12 @@ spec:
         - name: tmpfs
           emptyDir: { }
         {{- end }}
-        {{- if .Values.frank.credentials.secret }}
+        {{- if .Values.application.credentials.secret }}
         - name: {{ template "ff-common.fullname" . }}-credentials
           secret:
-            secretName: {{ .Values.frank.credentials.secret }}
+            secretName: {{ .Values.application.credentials.secret }}
         {{- end }}
-        {{- if .Values.frank.security.http.localUsers }}
+        {{- if .Values.application.security.http.localUsers }}
         - name: {{ template "ff-common.fullname" . }}-tomcat-users
           configMap:
             name: {{ template "ff-common.fullname" . }}-tomcat-users
@@ -32,7 +32,7 @@ spec:
           configMap:
             name: {{ template "ff-common.fullname" . }}-context
         {{- end }}
-        {{- if .Values.frank.security.http.activeDirectory.enabled }}
+        {{- if .Values.application.security.http.activeDirectory.enabled }}
         - name: {{ template "ff-common.fullname" . }}-ldap-role-mapping
           configMap:
             name: {{ template "ff-common.fullname" . }}-ldap-role-mapping
@@ -42,7 +42,7 @@ spec:
           persistentVolumeClaim:
             claimName: {{ template "ff-common.fullname" . }}-data
         {{- end }}
-        {{- range $i, $e := .Values.frank.security.certificateStores }}
+        {{- range $i, $e := .Values.application.security.certificateStores }}
         - name: {{ template "ff-common.fullname" $ }}-certificate-store-{{ $i }}
           secret:
             secretName: {{ $e.secretName }}
@@ -87,19 +87,19 @@ volumeMounts:
   - mountPath: /usr/local/tomcat/temp
     name: tmpfs
   {{- end }}
-  {{- if .Values.frank.security.http.localUsers }}
+  {{- if .Values.application.security.http.localUsers }}
   - name: {{ template "ff-common.fullname" . }}-tomcat-users
     mountPath: /usr/local/tomcat/conf/tomcat-users.xml
     subPath: tomcat-users.xml
     readOnly: true
   {{- end }}
-  {{- if .Values.frank.security.http.activeDirectory.enabled }}
+  {{- if .Values.application.security.http.activeDirectory.enabled }}
   - name: {{ template "ff-common.fullname" . }}-ldap-role-mapping
     mountPath: /usr/local/tomcat/webapps/ROOT/WEB-INF/classes/ldap-role-mapping.properties
     subPath: ldap-role-mapping.properties
     readOnly: true
   {{- end }}
-  {{- if .Values.frank.credentials.secret }}
+  {{- if .Values.application.credentials.secret }}
   - name: {{ template "ff-common.fullname" . }}-credentials
     mountPath: /opt/frank/secrets/
     readOnly: true
@@ -115,7 +115,7 @@ volumeMounts:
     subPath: heap-dumps
     mountPath: /heap-dumps
   {{- end }}
-  {{- range $i, $e := .Values.frank.security.certificateStores }}
+  {{- range $i, $e := .Values.application.security.certificateStores }}
   - name: {{ template "ff-common.fullname" $ }}-certificate-store-{{ $i }}
     mountPath: /opt/frank/resources/{{ $e.resourceUrl | default $e.key }}
     subPath: {{ $e.key }}
