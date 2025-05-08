@@ -1,0 +1,6 @@
+dependencies:
+- name: ff-common
+  repository: https://frankframework.github.io/charts/
+  version: 0.1.24
+digest: sha256:afb8e8490d3986457eb76ec6b20dfc44cb83866895195548abe245c09b270b65
+generated: "2024-11-15T13:21:27.3957982+01:00"
