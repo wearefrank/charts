@@ -507,43 +507,111 @@ zaakbrug:
     ## Make sure that all Url's contain two "parts" e.g. `openzaak-nginx.zaakbrug`. Openzaak can't use a single part domain.
     ## @descriptionEnd
     ##
-    ## @param zaakbrug.zgw.zakenApi.rootUrl Endpoint for the zaken API
-    ## @param zaakbrug.zgw.zakenApi.authType Options: 'jwt', 'basic', 'value'. 'value' uses the password field of the given authAlias as Authorization header
-    ## @param zaakbrug.zgw.zakenApi.authAlias Reference to an auth alias configured in credentials.properties
-    ## @param zaakbrug.zgw.zakenApi.timeout Set timeout for the zaken API
-    ## @param zaakbrug.zgw.catalogiApi.rootUrl Endpoint for the catalogi API
-    ## @param zaakbrug.zgw.catalogiApi.authType Options: 'jwt', 'basic', 'value'. 'value' uses the password field of the given authAlias as Authorization header
-    ## @param zaakbrug.zgw.catalogiApi.authAlias Reference to an auth alias configured in credentials.properties
-    ## @param zaakbrug.zgw.catalogiApi.timeout Set timeout for the catalogi API
-    ## @param zaakbrug.zgw.documentenApi.rootUrl Endpoint for the documenten API
-    ## @param zaakbrug.zgw.documentenApi.authType Options: 'jwt', 'basic', 'value'. 'value' uses the password field of the given authAlias as Authorization header
-    ## @param zaakbrug.zgw.documentenApi.authAlias Reference to an auth alias configured in credentials.properties
-    ## @param zaakbrug.zgw.documentenApi.timeout Set timeout for the documenten API
-    ## @param zaakbrug.zgw.besluitenApi.rootUrl Endpoint for the besluiten API
-    ## @param zaakbrug.zgw.besluitenApi.authType Options: 'jwt', 'basic', 'value'. 'value' uses the password field of the given authAlias as Authorization header
-    ## @param zaakbrug.zgw.besluitenApi.authAlias Reference to an auth alias configured in credentials.properties
-    ## @param zaakbrug.zgw.besluitenApi.timeout Set timeout for the besluiten API
+    ## @param zaakbrug.zgw.zakenApi.rootUrl Endpoint for the zaken API.
+    ## @param zaakbrug.zgw.zakenApi.authType Options: 'jwt', 'basic', 'value'. 'value' uses the password field of the given authAlias as Authorization header.
+    ## @param zaakbrug.zgw.zakenApi.authAlias Reference to an auth alias configured in 'credentials.properties'.
+    ## @param zaakbrug.zgw.zakenApi.timeout Set timeout for the zaken API.
+    ## @param zaakbrug.zgw.zakenApi.verifyHostname If 'true', the hostname in the certificate will be checked against the actual hostname of the Zaken API.
+    ## @param zaakbrug.zgw.zakenApi.allowSelfSignedCertificates If true, self signed certificates are accepted.
+    ## @param zaakbrug.zgw.zakenApi.disableCookies Disables the use of cookies, making the calls to zaken API completely stateless.
+    ## @param zaakbrug.zgw.zakenApi.ignoreCertificateExpiredException If true, CertificateExpiredExceptions are ignored.
+    ## @param zaakbrug.zgw.zakenApi.truststore.uri Resource URL to truststore to be used for authenticating Zaken API. If none specified, the JVMs default truststore will be used.
+    ## @extra zaakbrug.zgw.zakenApi.truststore.uri Custom truststores are usually mounted in the container at 'opt/frank/resources'.
+    ## @param zaakbrug.zgw.zakenApi.truststore.authAlias Reference to an auth alias configured in 'credentials.properties' used to obtain the truststore password.
+    ## @param zaakbrug.zgw.zakenApi.truststore.type Type of truststore. Available options: 'PEM', 'PKCS12', 'JKS', 'JCEKS'.
+    ## @extra zaakbrug.zgw.zakenApi.truststore.type 'PEM' is currently only used by the SignaturePipe to use a PEM certificate directly as a truststore.
+    ## @param zaakbrug.zgw.catalogiApi.rootUrl Endpoint for the catalogi API.
+    ## @param zaakbrug.zgw.catalogiApi.authType Options: 'jwt', 'basic', 'value'. 'value' uses the password field of the given authAlias as Authorization header.
+    ## @param zaakbrug.zgw.catalogiApi.authAlias Reference to an auth alias configured in 'credentials.properties'.
+    ## @param zaakbrug.zgw.catalogiApi.timeout Set timeout for the catalogi API.
+    ## @param zaakbrug.zgw.catalogiApi.verifyHostname If 'true', the hostname in the certificate will be checked against the actual hostname of the catalogi API.
+    ## @param zaakbrug.zgw.catalogiApi.allowSelfSignedCertificates If true, self signed certificates are accepted.
+    ## @param zaakbrug.zgw.catalogiApi.disableCookies Disables the use of cookies, making the calls to catalogi API completely stateless.
+    ## @param zaakbrug.zgw.catalogiApi.ignoreCertificateExpiredException If true, CertificateExpiredExceptions are ignored.
+    ## @param zaakbrug.zgw.catalogiApi.truststore.uri Resource URL to truststore to be used for authenticating catalogi API. If none specified, the JVMs default truststore will be used.
+    ## @extra zaakbrug.zgw.catalogiApi.truststore.uri Custom truststores are usually mounted in the container at 'opt/frank/resources'.
+    ## @param zaakbrug.zgw.catalogiApi.truststore.authAlias Reference to an auth alias configured in 'credentials.properties' used to obtain the truststore password.
+    ## @param zaakbrug.zgw.catalogiApi.truststore.type Type of truststore. Available options: 'PEM', 'PKCS12', 'JKS', 'JCEKS'.
+    ## @extra zaakbrug.zgw.catalogiApi.truststore.type 'PEM' is currently only used by the SignaturePipe to use a PEM certificate directly as a truststore.
+    ## @param zaakbrug.zgw.documentenApi.rootUrl Endpoint for the documenten API.
+    ## @param zaakbrug.zgw.documentenApi.authType Options: 'jwt', 'basic', 'value'. 'value' uses the password field of the given authAlias as Authorization header.
+    ## @param zaakbrug.zgw.documentenApi.authAlias Reference to an auth alias configured in 'credentials.properties'.
+    ## @param zaakbrug.zgw.documentenApi.timeout Set timeout for the documenten API.
+    ## @param zaakbrug.zgw.documentenApi.verifyHostname If 'true', the hostname in the certificate will be checked against the actual hostname of the documenten API.
+    ## @param zaakbrug.zgw.documentenApi.allowSelfSignedCertificates If true, self signed certificates are accepted.
+    ## @param zaakbrug.zgw.documentenApi.disableCookies Disables the use of cookies, making the calls to documenten API completely stateless.
+    ## @param zaakbrug.zgw.documentenApi.ignoreCertificateExpiredException If true, CertificateExpiredExceptions are ignored.
+    ## @param zaakbrug.zgw.documentenApi.truststore.uri Resource URL to truststore to be used for authenticating documenten API. If none specified, the JVMs default truststore will be used.
+    ## @extra zaakbrug.zgw.documentenApi.truststore.uri Custom truststores are usually mounted in the container at 'opt/frank/resources'.
+    ## @param zaakbrug.zgw.documentenApi.truststore.authAlias Reference to an auth alias configured in 'credentials.properties' used to obtain the truststore password.
+    ## @param zaakbrug.zgw.documentenApi.truststore.type Type of truststore. Available options: 'PEM', 'PKCS12', 'JKS', 'JCEKS'.
+    ## @extra zaakbrug.zgw.documentenApi.truststore.type 'PEM' is currently only used by the SignaturePipe to use a PEM certificate directly as a truststore.
+    ## @param zaakbrug.zgw.besluitenApi.rootUrl Endpoint for the besluiten API.
+    ## @param zaakbrug.zgw.besluitenApi.authType Options: 'jwt', 'basic', 'value'. 'value' uses the password field of the given authAlias as Authorization header.
+    ## @param zaakbrug.zgw.besluitenApi.authAlias Reference to an auth alias configured in 'credentials.properties'.
+    ## @param zaakbrug.zgw.besluitenApi.timeout Set timeout for the besluiten API.
+    ## @param zaakbrug.zgw.besluitenApi.verifyHostname If 'true', the hostname in the certificate will be checked against the actual hostname of the besluiten API.
+    ## @param zaakbrug.zgw.besluitenApi.allowSelfSignedCertificates If true, self signed certificates are accepted.
+    ## @param zaakbrug.zgw.besluitenApi.disableCookies Disables the use of cookies, making the calls to besluiten API completely stateless.
+    ## @param zaakbrug.zgw.besluitenApi.ignoreCertificateExpiredException If true, CertificateExpiredExceptions are ignored.
+    ## @param zaakbrug.zgw.besluitenApi.truststore.uri Resource URL to truststore to be used for authenticating besluiten API. If none specified, the JVMs default truststore will be used.
+    ## @extra zaakbrug.zgw.besluitenApi.truststore.uri Custom truststores are usually mounted in the container at 'opt/frank/resources'.
+    ## @param zaakbrug.zgw.besluitenApi.truststore.authAlias Reference to an auth alias configured in 'credentials.properties' used to obtain the truststore password.
+    ## @param zaakbrug.zgw.besluitenApi.truststore.type Type of truststore. Available options: 'PEM', 'PKCS12', 'JKS', 'JCEKS'.
+    ## @extra zaakbrug.zgw.besluitenApi.truststore.type 'PEM' is currently only used by the SignaturePipe to use a PEM certificate directly as a truststore.
     ##
     zakenApi:
       rootUrl: "http://open-zaak/zaken/api/v1/"
       authType: jwt
       authAlias: zaken-api.jwt
       timeout: 20000
+      verifyHostname: true
+      allowSelfSignedCertificates: false
+      disableCookies: false
+      ignoreCertificateExpiredException: false
+      truststore:
+        uri: ""
+        authAlias: ""
+        type: ""
     catalogiApi:
       rootUrl: "http://open-zaak/catalogi/api/v1/"
       authType: jwt
       authAlias: zaken-api.jwt
       timeout: 20000
+      verifyHostname: true
+      allowSelfSignedCertificates: false
+      disableCookies: false
+      ignoreCertificateExpiredException: false
+      truststore:
+        uri: ""
+        authAlias: ""
+        type: ""
     documentenApi:
       rootUrl: "http://open-zaak/documenten/api/v1/"
       authType: jwt
       authAlias: zaken-api.jwt
       timeout: 20000
+      verifyHostname: true
+      allowSelfSignedCertificates: false
+      disableCookies: false
+      ignoreCertificateExpiredException: false
+      truststore:
+        uri: ""
+        authAlias: ""
+        type: ""
     besluitenApi:
       rootUrl: "http://open-zaak/besluiten/api/v1/"
       authType: jwt
       authAlias: zaken-api.jwt
       timeout: 20000
+      verifyHostname: true
+      allowSelfSignedCertificates: false
+      disableCookies: false
+      ignoreCertificateExpiredException: false
+      truststore:
+        uri: ""
+        authAlias: ""
+        type: ""
   ## @section Globals
   ## @param zaakbrug.globals.organizations [array] Map gemeentecode and RSIN
   ## @param zaakbrug.globals.organizations.gemeenteNaam [string] Name for organisation

@@ -43,24 +43,52 @@ data:
   zaakbrug.zgw.zaken-api.timeout: "{{ toString .timeout }}"
   zaakbrug.zgw.zaken-api.auth-type: "{{ .authType }}"
   zaakbrug.zgw.zaken-api.auth-alias: "{{ .authAlias }}"
+  zaakbrug.zgw.zaken-api.verifyHostname: {{ .verifyHostname | default "true" | quote }}
+  zaakbrug.zgw.zaken-api.allowSelfSignedCertificates: {{ .allowSelfSignedCertificates | default "false" | quote }}
+  zaakbrug.zgw.zaken-api.disableCookies: {{ .disableCookies | default "false" | quote }}
+  zaakbrug.zgw.zaken-api.ignoreCertificateExpiredException: {{ .ignoreCertificateExpiredException | default "false" | quote }}
+  zaakbrug.zgw.zaken-api.truststore.uri: "{{ .truststore.uri }}"
+  zaakbrug.zgw.zaken-api.truststore.authAlias: "{{ .truststore.authAlias }}"
+  zaakbrug.zgw.zaken-api.truststore.type: "{{ .truststore.type }}"
   {{- end }}
   {{- with .documentenApi }}
   zaakbrug.zgw.documenten-api.root-url: "{{ .rootUrl }}"
   zaakbrug.zgw.documenten-api.timeout: "{{ toString .timeout }}"
   zaakbrug.zgw.documenten-api.auth-type: "{{ .authType }}"
   zaakbrug.zgw.documenten-api.auth-alias: "{{ .authAlias }}"
+  zaakbrug.zgw.documenten-api.verifyHostname: {{ .verifyHostname | default "true" | quote }}
+  zaakbrug.zgw.documenten-api.allowSelfSignedCertificates: {{ .allowSelfSignedCertificates | default "false" | quote }}
+  zaakbrug.zgw.documenten-api.disableCookies: {{ .disableCookies | default "false" | quote }}
+  zaakbrug.zgw.documenten-api.ignoreCertificateExpiredException: {{ .ignoreCertificateExpiredException | default "false" | quote }}
+  zaakbrug.zgw.documenten-api.truststore.uri: "{{ .truststore.uri }}"
+  zaakbrug.zgw.documenten-api.truststore.authAlias: "{{ .truststore.authAlias }}"
+  zaakbrug.zgw.documenten-api.truststore.type: "{{ .truststore.type }}"
   {{- end }}
   {{- with .catalogiApi }}
   zaakbrug.zgw.catalogi-api.root-url: "{{ .rootUrl }}"
   zaakbrug.zgw.catalogi-api.timeout: "{{ toString .timeout }}"
   zaakbrug.zgw.catalogi-api.auth-type: "{{ .authType }}"
   zaakbrug.zgw.catalogi-api.auth-alias: "{{ .authAlias }}"
+  zaakbrug.zgw.catalogi-api.verifyHostname: {{ .verifyHostname | default "true" | quote }}
+  zaakbrug.zgw.catalogi-api.allowSelfSignedCertificates: {{ .allowSelfSignedCertificates | default "false" | quote }}
+  zaakbrug.zgw.catalogi-api.disableCookies: {{ .disableCookies | default "false" | quote }}
+  zaakbrug.zgw.catalogi-api.ignoreCertificateExpiredException: {{ .ignoreCertificateExpiredException | default "false" | quote }}
+  zaakbrug.zgw.catalogi-api.truststore.uri: "{{ .truststore.uri }}"
+  zaakbrug.zgw.catalogi-api.truststore.authAlias: "{{ .truststore.authAlias }}"
+  zaakbrug.zgw.catalogi-api.truststore.type: "{{ .truststore.type }}"
   {{- end }}
   {{- with .besluitenApi }}
   zaakbrug.zgw.besluiten-api.root-url: "{{ .rootUrl }}"
   zaakbrug.zgw.besluiten-api.timeout: "{{ toString .timeout }}"
   zaakbrug.zgw.besluiten-api.auth-type: "{{ .authType }}"
   zaakbrug.zgw.besluiten-api.auth-alias: "{{ .authAlias }}"
+  zaakbrug.zgw.besluiten-api.verifyHostname: {{ .verifyHostname | default "true" | quote }}
+  zaakbrug.zgw.besluiten-api.allowSelfSignedCertificates: {{ .allowSelfSignedCertificates | default "false" | quote }}
+  zaakbrug.zgw.besluiten-api.disableCookies: {{ .disableCookies | default "false" | quote }}
+  zaakbrug.zgw.besluiten-api.ignoreCertificateExpiredException: {{ .ignoreCertificateExpiredException | default "false" | quote }}
+  zaakbrug.zgw.besluiten-api.truststore.uri: "{{ .truststore.uri }}"
+  zaakbrug.zgw.besluiten-api.truststore.authAlias: "{{ .truststore.authAlias }}"
+  zaakbrug.zgw.besluiten-api.truststore.type: "{{ .truststore.type }}"
   {{- end }}
   {{- end }}
   {{- with .Values.staging }}

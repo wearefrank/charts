@@ -538,108 +538,6 @@
         "zaakbrug": {
             "type": "object",
             "properties": {
-                "globals": {
-                    "type": "object",
-                    "properties": {
-                        "organizations": {
-                            "type": "array",
-                            "description": "",
-                            "items": {
-                                "type": "object",
-                                "properties": {
-                                    "gemeenteNaam": {
-                                        "type": "string",
-                                        "description": ""
-                                    },
-                                    "gemeenteCode": {
-                                        "type": "string",
-                                        "description": ""
-                                    },
-                                    "RSIN": {
-                                        "type": "string",
-                                        "description": ""
-                                    }
-                                }
-                            }
-                        },
-                        "rolMapping": {
-                            "type": "object",
-                            "properties": {
-                                "heeftBetrekkingOp": {
-                                    "type": "string",
-                                    "description": "",
-                                    "default": "BetrekkingOp"
-                                },
-                                "heeftAlsBelanghebbende": {
-                                    "type": "string",
-                                    "description": "",
-                                    "default": "Belanghebbende"
-                                },
-                                "heeftAlsInitiator": {
-                                    "type": "string",
-                                    "description": "",
-                                    "default": "Initiator"
-                                },
-                                "heeftAlsUitvoerende": {
-                                    "type": "string",
-                                    "description": "",
-                                    "default": "Uitvoerende"
-                                },
-                                "heeftAlsVerantwoordelijke": {
-                                    "type": "string",
-                                    "description": "",
-                                    "default": "Verantwoordelijke"
-                                },
-                                "heeftAlsGemachtigde": {
-                                    "type": "string",
-                                    "description": "",
-                                    "default": "Gemachtigde"
-                                },
-                                "heeftAlsOverigBetrokkene": {
-                                    "type": "string",
-                                    "description": "",
-                                    "default": "OverigeBetrokkene"
-                                }
-                            }
-                        }
-                    }
-                },
-                "profiles": {
-                    "type": "object",
-                    "properties": {
-                        "profile": {
-                            "type": "array",
-                            "description": "",
-                            "items": {
-                                "type": "object",
-                                "properties": {
-                                    "zaakTypeIdentificatie": {
-                                        "type": "string",
-                                        "description": ""
-                                    },
-                                    "endCaseEndDate": {
-                                        "type": "object",
-                                        "properties": {
-                                            "coalesceResultaat": {
-                                                "type": "string",
-                                                "description": ""
-                                            }
-                                        }
-                                    },
-                                    "endDateAndResultLastStatus": {
-                                        "type": "object",
-                                        "properties": {
-                                            "coalesceResultaat": {
-                                                "type": "string",
-                                                "description": ""
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                },
                 "zds": {
                     "type": "object",
                     "properties": {
@@ -783,23 +681,63 @@
                             "properties": {
                                 "rootUrl": {
                                     "type": "string",
-                                    "description": "Endpoint for the zaken API",
+                                    "description": "Endpoint for the zaken API.",
                                     "default": "http://open-zaak/zaken/api/v1/"
                                 },
                                 "authType": {
                                     "type": "string",
-                                    "description": "Options: 'jwt', 'basic', 'value'. 'value' uses the password field of the given authAlias as Authorization header",
+                                    "description": "Options: 'jwt', 'basic', 'value'. 'value' uses the password field of the given authAlias as Authorization header.",
                                     "default": "jwt"
                                 },
                                 "authAlias": {
                                     "type": "string",
-                                    "description": "Reference to an auth alias configured in credentials.properties",
+                                    "description": "Reference to an auth alias configured in 'credentials.properties'.",
                                     "default": "zaken-api.jwt"
                                 },
                                 "timeout": {
                                     "type": "number",
-                                    "description": "Set timeout for the zaken API",
+                                    "description": "Set timeout for the zaken API.",
                                     "default": 20000
+                                },
+                                "verifyHostname": {
+                                    "type": "boolean",
+                                    "description": "If 'true', the hostname in the certificate will be checked against the actual hostname of the Zaken API.",
+                                    "default": true
+                                },
+                                "allowSelfSignedCertificates": {
+                                    "type": "boolean",
+                                    "description": "If true, self signed certificates are accepted.",
+                                    "default": false
+                                },
+                                "disableCookies": {
+                                    "type": "boolean",
+                                    "description": "Disables the use of cookies, making the calls to zaken API completely stateless.",
+                                    "default": false
+                                },
+                                "ignoreCertificateExpiredException": {
+                                    "type": "boolean",
+                                    "description": "If true, CertificateExpiredExceptions are ignored.",
+                                    "default": false
+                                },
+                                "truststore": {
+                                    "type": "object",
+                                    "properties": {
+                                        "uri": {
+                                            "type": "string",
+                                            "description": "Resource URL to truststore to be used for authenticating Zaken API. If none specified, the JVMs default truststore will be used.",
+                                            "default": ""
+                                        },
+                                        "authAlias": {
+                                            "type": "string",
+                                            "description": "Reference to an auth alias configured in 'credentials.properties' used to obtain the truststore password.",
+                                            "default": ""
+                                        },
+                                        "type": {
+                                            "type": "string",
+                                            "description": "Type of truststore. Available options: 'PEM', 'PKCS12', 'JKS', 'JCEKS'.",
+                                            "default": ""
+                                        }
+                                    }
                                 }
                             }
                         },
@@ -808,23 +746,63 @@
                             "properties": {
                                 "rootUrl": {
                                     "type": "string",
-                                    "description": "Endpoint for the catalogi API",
+                                    "description": "Endpoint for the catalogi API.",
                                     "default": "http://open-zaak/catalogi/api/v1/"
                                 },
                                 "authType": {
                                     "type": "string",
-                                    "description": "Options: 'jwt', 'basic', 'value'. 'value' uses the password field of the given authAlias as Authorization header",
+                                    "description": "Options: 'jwt', 'basic', 'value'. 'value' uses the password field of the given authAlias as Authorization header.",
                                     "default": "jwt"
                                 },
                                 "authAlias": {
                                     "type": "string",
-                                    "description": "Reference to an auth alias configured in credentials.properties",
+                                    "description": "Reference to an auth alias configured in 'credentials.properties'.",
                                     "default": "zaken-api.jwt"
                                 },
                                 "timeout": {
                                     "type": "number",
-                                    "description": "Set timeout for the catalogi API",
+                                    "description": "Set timeout for the catalogi API.",
                                     "default": 20000
+                                },
+                                "verifyHostname": {
+                                    "type": "boolean",
+                                    "description": "If 'true', the hostname in the certificate will be checked against the actual hostname of the catalogi API.",
+                                    "default": true
+                                },
+                                "allowSelfSignedCertificates": {
+                                    "type": "boolean",
+                                    "description": "If true, self signed certificates are accepted.",
+                                    "default": false
+                                },
+                                "disableCookies": {
+                                    "type": "boolean",
+                                    "description": "Disables the use of cookies, making the calls to catalogi API completely stateless.",
+                                    "default": false
+                                },
+                                "ignoreCertificateExpiredException": {
+                                    "type": "boolean",
+                                    "description": "If true, CertificateExpiredExceptions are ignored.",
+                                    "default": false
+                                },
+                                "truststore": {
+                                    "type": "object",
+                                    "properties": {
+                                        "uri": {
+                                            "type": "string",
+                                            "description": "Resource URL to truststore to be used for authenticating catalogi API. If none specified, the JVMs default truststore will be used.",
+                                            "default": ""
+                                        },
+                                        "authAlias": {
+                                            "type": "string",
+                                            "description": "Reference to an auth alias configured in 'credentials.properties' used to obtain the truststore password.",
+                                            "default": ""
+                                        },
+                                        "type": {
+                                            "type": "string",
+                                            "description": "Type of truststore. Available options: 'PEM', 'PKCS12', 'JKS', 'JCEKS'.",
+                                            "default": ""
+                                        }
+                                    }
                                 }
                             }
                         },
@@ -833,23 +811,63 @@
                             "properties": {
                                 "rootUrl": {
                                     "type": "string",
-                                    "description": "Endpoint for the documenten API",
+                                    "description": "Endpoint for the documenten API.",
                                     "default": "http://open-zaak/documenten/api/v1/"
                                 },
                                 "authType": {
                                     "type": "string",
-                                    "description": "Options: 'jwt', 'basic', 'value'. 'value' uses the password field of the given authAlias as Authorization header",
+                                    "description": "Options: 'jwt', 'basic', 'value'. 'value' uses the password field of the given authAlias as Authorization header.",
                                     "default": "jwt"
                                 },
                                 "authAlias": {
                                     "type": "string",
-                                    "description": "Reference to an auth alias configured in credentials.properties",
+                                    "description": "Reference to an auth alias configured in 'credentials.properties'.",
                                     "default": "zaken-api.jwt"
                                 },
                                 "timeout": {
                                     "type": "number",
-                                    "description": "Set timeout for the documenten API",
+                                    "description": "Set timeout for the documenten API.",
                                     "default": 20000
+                                },
+                                "verifyHostname": {
+                                    "type": "boolean",
+                                    "description": "If 'true', the hostname in the certificate will be checked against the actual hostname of the documenten API.",
+                                    "default": true
+                                },
+                                "allowSelfSignedCertificates": {
+                                    "type": "boolean",
+                                    "description": "If true, self signed certificates are accepted.",
+                                    "default": false
+                                },
+                                "disableCookies": {
+                                    "type": "boolean",
+                                    "description": "Disables the use of cookies, making the calls to documenten API completely stateless.",
+                                    "default": false
+                                },
+                                "ignoreCertificateExpiredException": {
+                                    "type": "boolean",
+                                    "description": "If true, CertificateExpiredExceptions are ignored.",
+                                    "default": false
+                                },
+                                "truststore": {
+                                    "type": "object",
+                                    "properties": {
+                                        "uri": {
+                                            "type": "string",
+                                            "description": "Resource URL to truststore to be used for authenticating documenten API. If none specified, the JVMs default truststore will be used.",
+                                            "default": ""
+                                        },
+                                        "authAlias": {
+                                            "type": "string",
+                                            "description": "Reference to an auth alias configured in 'credentials.properties' used to obtain the truststore password.",
+                                            "default": ""
+                                        },
+                                        "type": {
+                                            "type": "string",
+                                            "description": "Type of truststore. Available options: 'PEM', 'PKCS12', 'JKS', 'JCEKS'.",
+                                            "default": ""
+                                        }
+                                    }
                                 }
                             }
                         },
@@ -858,23 +876,165 @@
                             "properties": {
                                 "rootUrl": {
                                     "type": "string",
-                                    "description": "Endpoint for the besluiten API",
+                                    "description": "Endpoint for the besluiten API.",
                                     "default": "http://open-zaak/besluiten/api/v1/"
                                 },
                                 "authType": {
                                     "type": "string",
-                                    "description": "Options: 'jwt', 'basic', 'value'. 'value' uses the password field of the given authAlias as Authorization header",
+                                    "description": "Options: 'jwt', 'basic', 'value'. 'value' uses the password field of the given authAlias as Authorization header.",
                                     "default": "jwt"
                                 },
                                 "authAlias": {
                                     "type": "string",
-                                    "description": "Reference to an auth alias configured in credentials.properties",
+                                    "description": "Reference to an auth alias configured in 'credentials.properties'.",
                                     "default": "zaken-api.jwt"
                                 },
                                 "timeout": {
                                     "type": "number",
-                                    "description": "Set timeout for the besluiten API",
+                                    "description": "Set timeout for the besluiten API.",
                                     "default": 20000
+                                },
+                                "verifyHostname": {
+                                    "type": "boolean",
+                                    "description": "If 'true', the hostname in the certificate will be checked against the actual hostname of the besluiten API.",
+                                    "default": true
+                                },
+                                "allowSelfSignedCertificates": {
+                                    "type": "boolean",
+                                    "description": "If true, self signed certificates are accepted.",
+                                    "default": false
+                                },
+                                "disableCookies": {
+                                    "type": "boolean",
+                                    "description": "Disables the use of cookies, making the calls to besluiten API completely stateless.",
+                                    "default": false
+                                },
+                                "ignoreCertificateExpiredException": {
+                                    "type": "boolean",
+                                    "description": "If true, CertificateExpiredExceptions are ignored.",
+                                    "default": false
+                                },
+                                "truststore": {
+                                    "type": "object",
+                                    "properties": {
+                                        "uri": {
+                                            "type": "string",
+                                            "description": "Resource URL to truststore to be used for authenticating besluiten API. If none specified, the JVMs default truststore will be used.",
+                                            "default": ""
+                                        },
+                                        "authAlias": {
+                                            "type": "string",
+                                            "description": "Reference to an auth alias configured in 'credentials.properties' used to obtain the truststore password.",
+                                            "default": ""
+                                        },
+                                        "type": {
+                                            "type": "string",
+                                            "description": "Type of truststore. Available options: 'PEM', 'PKCS12', 'JKS', 'JCEKS'.",
+                                            "default": ""
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "globals": {
+                    "type": "object",
+                    "properties": {
+                        "organizations": {
+                            "type": "array",
+                            "description": "",
+                            "items": {
+                                "type": "object",
+                                "properties": {
+                                    "gemeenteNaam": {
+                                        "type": "string",
+                                        "description": ""
+                                    },
+                                    "gemeenteCode": {
+                                        "type": "string",
+                                        "description": ""
+                                    },
+                                    "RSIN": {
+                                        "type": "string",
+                                        "description": ""
+                                    }
+                                }
+                            }
+                        },
+                        "rolMapping": {
+                            "type": "object",
+                            "properties": {
+                                "heeftBetrekkingOp": {
+                                    "type": "string",
+                                    "description": "",
+                                    "default": "BetrekkingOp"
+                                },
+                                "heeftAlsBelanghebbende": {
+                                    "type": "string",
+                                    "description": "",
+                                    "default": "Belanghebbende"
+                                },
+                                "heeftAlsInitiator": {
+                                    "type": "string",
+                                    "description": "",
+                                    "default": "Initiator"
+                                },
+                                "heeftAlsUitvoerende": {
+                                    "type": "string",
+                                    "description": "",
+                                    "default": "Uitvoerende"
+                                },
+                                "heeftAlsVerantwoordelijke": {
+                                    "type": "string",
+                                    "description": "",
+                                    "default": "Verantwoordelijke"
+                                },
+                                "heeftAlsGemachtigde": {
+                                    "type": "string",
+                                    "description": "",
+                                    "default": "Gemachtigde"
+                                },
+                                "heeftAlsOverigBetrokkene": {
+                                    "type": "string",
+                                    "description": "",
+                                    "default": "OverigeBetrokkene"
+                                }
+                            }
+                        }
+                    }
+                },
+                "profiles": {
+                    "type": "object",
+                    "properties": {
+                        "profile": {
+                            "type": "array",
+                            "description": "",
+                            "items": {
+                                "type": "object",
+                                "properties": {
+                                    "zaakTypeIdentificatie": {
+                                        "type": "string",
+                                        "description": ""
+                                    },
+                                    "endCaseEndDate": {
+                                        "type": "object",
+                                        "properties": {
+                                            "coalesceResultaat": {
+                                                "type": "string",
+                                                "description": ""
+                                            }
+                                        }
+                                    },
+                                    "endDateAndResultLastStatus": {
+                                        "type": "object",
+                                        "properties": {
+                                            "coalesceResultaat": {
+                                                "type": "string",
+                                                "description": ""
+                                            }
+                                        }
+                                    }
                                 }
                             }
                         }
