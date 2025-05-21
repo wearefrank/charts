@@ -107,6 +107,12 @@ frank:
       ##        - IbisTester
       ##
       localUsers: []
+      ## @param frank.security.http.localUsersExistingSecret [string, nullable] The name of the existing secret, containing the 'tomcat-users.xml' and 'localUsers.yml' files.
+      ## e.g.
+      ## localUsersExistingSecret: >- 
+      ##   {{ template "ff-common.fullname" . }}-my-own-tomcat-users
+      ##
+      localUsersExistingSecret: ""
       ## @skip frank.security.http.activeDirectory [object]
       ## @param frank.security.http.activeDirectory.enabled Enable Active Directory for authentication
       ## @param frank.security.http.activeDirectory.url Set url for Active Directory

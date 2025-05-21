@@ -140,6 +140,12 @@
                                     "default": [],
                                     "items": {}
                                 },
+                                "localUsersExistingSecret": {
+                                    "type": "string",
+                                    "description": "The name of the existing secret, containing the 'tomcat-users.xml' and 'localUsers.yml' files.",
+                                    "default": "",
+                                    "nullable": true
+                                },
                                 "activeDirectory": {
                                     "type": "object",
                                     "properties": {
