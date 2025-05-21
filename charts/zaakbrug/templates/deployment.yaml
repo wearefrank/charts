@@ -23,10 +23,15 @@ spec:
           secret:
             secretName: {{ .Values.frank.credentials.secret }}
         {{- end }}
-        {{- if .Values.frank.security.http.localUsers }}
+        {{- if (or .Values.frank.security.http.localUsers .Values.frank.security.http.localUsersExistingSecret) }}
         - name: {{ template "ff-common.fullname" . }}-tomcat-users
+          {{- if .Values.frank.security.http.localUsersExistingSecret }}
+          secret:
+            secretName: {{ tpl .Values.frank.security.http.localUsersExistingSecret . }}
+          {{- else }}
           configMap:
             name: {{ template "ff-common.fullname" . }}-tomcat-users
+          {{- end }}
         {{- end }}
         {{- if .Values.connections.create }}
         - name: {{ template "ff-common.fullname" . }}-context
@@ -80,7 +85,7 @@ volumeMounts:
   - mountPath: /usr/local/tomcat/temp
     name: tmpfs
   {{- end }}
-  {{- if .Values.frank.security.http.localUsers }}
+  {{- if (or .Values.frank.security.http.localUsers .Values.frank.security.http.localUsersExistingSecret) }}
   - name: {{ template "ff-common.fullname" . }}-tomcat-users
     mountPath: /usr/local/tomcat/conf/tomcat-users.xml
     subPath: tomcat-users.xml
