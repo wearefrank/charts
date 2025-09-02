@@ -55,25 +55,19 @@ spec:
               name: data
           startupProbe:
             {{- toYaml .Values.startupProbe | nindent 12 }}
-            exec:
-              command:
-                - /bin/bash
-                - -c
-                - "${DRILL_HOME}/bin/drillbit.sh status"
+            httpGet:
+              path: /
+              port: web
           readinessProbe:
             {{- toYaml .Values.readinessProbe | nindent 12 }}
-            exec:
-              command:
-                  - /bin/bash
-                  - -c
-                  - "${DRILL_HOME}/bin/drillbit.sh status"
+            httpGet:
+              path: /
+              port: web
           livenessProbe:
             {{- toYaml .Values.livenessProbe | nindent 12 }}
-            exec:
-              command:
-                - /bin/bash
-                - -c
-                - "${DRILL_HOME}/bin/drillbit.sh status"
+            httpGet:
+              path: /
+              port: web
           lifecycle:
             preStop:
               exec:
@@ -121,8 +115,8 @@ spec:
             {{- end }}
         {{- if .Values.persistence.enabled }}
         -  name: {{ template "drill.fullname" . }}-data
-           persistentVolumeClaim:
-             claimName: {{ .Values.persistence.existingClaim | default (printf "%s-%s" ( include "drill.fullname" . ) "data") }}
+            persistentVolumeClaim:
+            claimName: {{ .Values.persistence.existingClaim | default (printf "%s-%s" ( include "drill.fullname" . ) "data") }}
         {{- else }}
         - name: {{ template "drill.fullname" . }}-data
           emptyDir: { }
