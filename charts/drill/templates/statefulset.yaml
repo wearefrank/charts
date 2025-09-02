@@ -115,7 +115,7 @@ spec:
             {{- end }}
         {{- if .Values.persistence.enabled }}
         -  name: {{ template "drill.fullname" . }}-data
-            persistentVolumeClaim:
+          persistentVolumeClaim:
             claimName: {{ .Values.persistence.existingClaim | default (printf "%s-%s" ( include "drill.fullname" . ) "data") }}
         {{- else }}
         - name: {{ template "drill.fullname" . }}-data
