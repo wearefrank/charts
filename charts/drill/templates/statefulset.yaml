@@ -64,9 +64,9 @@ spec:
             {{- toYaml .Values.readinessProbe | nindent 12 }}
             exec:
               command:
-                  - /bin/bash
-                  - -c
-                  - "${DRILL_HOME}/bin/drillbit.sh status"
+                - /bin/bash
+                - -c
+                - "curl http://localhost:8047/"
           livenessProbe:
             {{- toYaml .Values.livenessProbe | nindent 12 }}
             exec:
@@ -120,9 +120,9 @@ spec:
             secretName: {{ template "drill.fullname" . }}-users
             {{- end }}
         {{- if .Values.persistence.enabled }}
-        -  name: {{ template "drill.fullname" . }}-data
-           persistentVolumeClaim:
-             claimName: {{ .Values.persistence.existingClaim | default (printf "%s-%s" ( include "drill.fullname" . ) "data") }}
+        - name: {{ template "drill.fullname" . }}-data
+          persistentVolumeClaim:
+            claimName: {{ .Values.persistence.existingClaim | default (printf "%s-%s" ( include "drill.fullname" . ) "data") }}
         {{- else }}
         - name: {{ template "drill.fullname" . }}-data
           emptyDir: { }
