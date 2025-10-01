@@ -86,6 +86,15 @@ livenessProbe:
   failureThreshold: 6
   successThreshold: 1
 
+## Update the location of bitnami images to the legacy repository
+## Bitnami has moved their images to a new location since 2025-08-28
+## No more updates will be done to the legacy images, but they will remain available
+## Eventually a new source for ZooKeeper will be needed, to keep receiving updates
+zookeeper:
+  image:
+    repository: bitnamilegacy/zookeeper
+
+
 ## Drill container's resource requests and limits
 ## ref: https://kubernetes.io/docs/user-guide/compute-resources/
 ## @param resources [object] Set the resources for the Drill containers
