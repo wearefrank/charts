@@ -1,0 +1,11 @@
+{{- if .Values.zaakbrug.routing.profiles -}}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ template "ff-common.fullname" . }}-routing-profiles
+  labels:
+    {{- include "ff-common.labels" . | nindent 4 }}
+data:
+  RoutingProfiles.json: |-
+   {{ .Values.zaakbrug.routing.profiles | toJson }}
+{{- end -}}
