@@ -308,6 +308,22 @@ Make sure that all Url's contain two "parts" e.g. `openzaak-nginx.zaakbrug`. Ope
 | `zaakbrug.profiles.profile.endDateAndResultLastStatus`                   |                                            | `undefined` |
 | `zaakbrug.profiles.profile.endDateAndResultLastStatus.coalesceResultaat` | Options: `Onbekend`, `Toegekend`           | `""`        |
 
+### RoutingProfileDefaults
+
+| Name                                            | Description                                                                                                                             | Value |
+| ----------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------- | ----- |
+| `zaakbrug.routing.profileDefaults`              | Translation profile defaults                                                                                                            | `{}`  |
+| `zaakbrug.routing.profileDefaults.<SoapAction>` | Routing path per SoapAction. Options: ['translate'\|'replicate'\|'proxy'].['beantwoord-vraag'\|'ontvang-asynchroon'\|'vrije-berichten'] | `""`  |
+
+### RoutingProfiles
+
+| Name                                              | Description                                                                                                                             | Value |
+| ------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------- | ----- |
+| `zaakbrug.routing.profiles`                       | Translation profile, specific per zaakType                                                                                              | `[]`  |
+| `zaakbrug.routing.profiles`                       | Example shown in values.yaml                                                                                                            |       |
+| `zaakbrug.routing.profiles.zaakTypeIdentificatie` | zaakType identificatie to apply these routes on                                                                                         | `""`  |
+| `zaakbrug.routing.profiles.<SoapAction>`          | routing path per SoapAction. Options: ['translate'\|'replicate'\|'proxy'].['beantwoord-vraag'\|'ontvang-asynchroon'\|'vrije-berichten'] | `""`  |
+
 ### Staging
 
 Staging is needed if you want to use zgw-to-zds.
