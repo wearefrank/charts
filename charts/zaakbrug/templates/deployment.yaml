@@ -8,6 +8,8 @@ spec:
         checksum/configmap.env: {{ include (print $.Template.BasePath "/configmap.zaakbrug.env.yaml") . | sha256sum }}
         checksum/configmap.globals: {{ include (print $.Template.BasePath "/configmap.zaakbrug.globals.yaml") . | sha256sum }}
         checksum/configmap.profiles: {{ include (print $.Template.BasePath "/configmap.zaakbrug.profiles.yaml") . | sha256sum }}
+        checksum/configmap.profiles: {{ include (print $.Template.BasePath "/configmap.zaakbrug.routing-profiles.yaml") . | sha256sum }}
+        checksum/configmap.profiles: {{ include (print $.Template.BasePath "/configmap.zaakbrug.routing-profile-defaults.yaml") . | sha256sum }}
         checksum/configmap.specifics: {{ include (print $.Template.BasePath "/configmap.zaakbrug.specifics.yaml") . | sha256sum }}
     spec:
       containers:
@@ -52,6 +54,15 @@ spec:
         - name: {{ template "ff-common.fullname" . }}-profiles
           configMap:
             name: {{ template "ff-common.fullname" . }}-profiles
+        {{- end -}}
+        {{- if .Values.zaakbrug.routing-profile-defaults }}
+        - name: {{ template "ff-common.fullname" . }}-routing-profile-defaults
+          configMap:
+            name: {{ template "ff-common.fullname" . }}-routing-profile-defaults
+        {{- if .Values.zaakbrug.routing-profiles }}
+        - name: {{ template "ff-common.fullname" . }}-routing-profiles
+          configMap:
+            name: {{ template "ff-common.fullname" . }}-routing-profiles
         {{- end -}}
         {{- if .Values.persistence.enabled }}
         - name: {{ template "ff-common.fullname" . }}-data
@@ -122,6 +133,17 @@ volumeMounts:
   - name: {{ template "ff-common.fullname" . }}-profiles
     mountPath: /opt/frank/configurations/Translate/Profiles.json
     subPath: Profiles.json
+    readOnly: true
+  {{- end }}
+  {{- if .Values.zaakbrug.routing-profile-defaults }}
+  - name: {{ template "ff-common.fullname" . }}-routing-profile-defaults
+    mountPath: /opt/frank/resources/RoutingProfileDefaults.json
+    subPath: RoutingProfileDefaults.json
+    readOnly: true
+  {{- if .Values.zaakbrug.routing-profiles }}
+  - name: {{ template "ff-common.fullname" . }}-routing-profiles
+    mountPath: /opt/frank/resources/RoutingProfiles.json
+    subPath: RoutingProfiles.json
     readOnly: true
   {{- end }}
   {{- if .Values.persistence.enabled }}
