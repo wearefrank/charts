@@ -135,12 +135,12 @@ volumeMounts:
     subPath: Profiles.json
     readOnly: true
   {{- end }}
-  {{- if .Values.zaakbrug.routing-profile-defaults }}
+  {{- if .Values.zaakbrug.routing.profileDefaults }}
   - name: {{ template "ff-common.fullname" . }}-routing-profile-defaults
     mountPath: /opt/frank/resources/RoutingProfileDefaults.json
     subPath: RoutingProfileDefaults.json
     readOnly: true
-  {{- if .Values.zaakbrug.routing-profiles }}
+  {{- if .Values.zaakbrug.routing.profiles }}
   - name: {{ template "ff-common.fullname" . }}-routing-profiles
     mountPath: /opt/frank/resources/RoutingProfiles.json
     subPath: RoutingProfiles.json
