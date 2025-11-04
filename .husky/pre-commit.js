@@ -69,10 +69,8 @@ function lintChartFolder(folder) {
 function main() {
     console.log(`🔍 Check if changed folders are charts\n`);
     const changedFiles = getChangedFiles();
-    console.log('files', changedFiles);
     const changedFolders = getChangedFolders(changedFiles);
     for (const folder of changedFolders) {
-        console.log('folder', folder)
         if (isChartFolder(folder)) {
             updateChartDependencies(folder);
             generateChartReadmeAndSchema(folder);
