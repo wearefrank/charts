@@ -4,7 +4,7 @@ description: A Helm chart for running ZaakBrug on Kubernetes
 name: zaakbrug
 icon: https://raw.githubusercontent.com/wearefrank/charts/master/charts/zaakbrug/icon.png
 type: application
-version: 2.3.12
+version: 2.3.13
 
 dependencies:
 - name: ff-common

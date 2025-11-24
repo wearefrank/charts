@@ -1053,74 +1053,214 @@
                             "type": "object",
                             "properties": {
                                 "geefZaakdocumentLezen_Lv01": {
-                                    "type": "string",
-                                    "description": "",
-                                    "default": "translate.beantwoord-vraag"
+                                    "type": "object",
+                                    "properties": {
+                                        "route": {
+                                            "type": "string",
+                                            "description": "",
+                                            "default": "translate.beantwoord-vraag"
+                                        },
+                                        "stopOnError": {
+                                            "type": "boolean",
+                                            "description": "",
+                                            "default": true
+                                        }
+                                    }
                                 },
                                 "geefZaakstatus_Lv01": {
-                                    "type": "string",
-                                    "description": "",
-                                    "default": "translate.beantwoord-vraag"
+                                    "type": "object",
+                                    "properties": {
+                                        "route": {
+                                            "type": "string",
+                                            "description": "",
+                                            "default": "translate.beantwoord-vraag"
+                                        },
+                                        "stopOnError": {
+                                            "type": "boolean",
+                                            "description": "",
+                                            "default": true
+                                        }
+                                    }
                                 },
                                 "geefZaakdetails_Lv01": {
-                                    "type": "string",
-                                    "description": "",
-                                    "default": "translate.beantwoord-vraag"
+                                    "type": "object",
+                                    "properties": {
+                                        "route": {
+                                            "type": "string",
+                                            "description": "",
+                                            "default": "translate.beantwoord-vraag"
+                                        },
+                                        "stopOnError": {
+                                            "type": "boolean",
+                                            "description": "",
+                                            "default": true
+                                        }
+                                    }
                                 },
                                 "geefLijstZaakdocumenten_Lv01": {
-                                    "type": "string",
-                                    "description": "",
-                                    "default": "translate.beantwoord-vraag"
+                                    "type": "object",
+                                    "properties": {
+                                        "route": {
+                                            "type": "string",
+                                            "description": "",
+                                            "default": "translate.beantwoord-vraag"
+                                        },
+                                        "stopOnError": {
+                                            "type": "boolean",
+                                            "description": "",
+                                            "default": true
+                                        }
+                                    }
                                 },
                                 "voegZaakdocumentToe_Lk01": {
-                                    "type": "string",
-                                    "description": "",
-                                    "default": "translate.ontvang-asynchroon"
+                                    "type": "object",
+                                    "properties": {
+                                        "route": {
+                                            "type": "string",
+                                            "description": "",
+                                            "default": "translate.ontvang-asynchroon"
+                                        },
+                                        "stopOnError": {
+                                            "type": "boolean",
+                                            "description": "",
+                                            "default": true
+                                        }
+                                    }
                                 },
                                 "maakZaakdocument_Lk01": {
-                                    "type": "string",
-                                    "description": "",
-                                    "default": "translate.ontvang-asynchroon"
+                                    "type": "object",
+                                    "properties": {
+                                        "route": {
+                                            "type": "string",
+                                            "description": "",
+                                            "default": "translate.ontvang-asynchroon"
+                                        },
+                                        "stopOnError": {
+                                            "type": "boolean",
+                                            "description": "",
+                                            "default": true
+                                        }
+                                    }
                                 },
                                 "actualiseerZaakstatus_Lk01": {
-                                    "type": "string",
-                                    "description": "",
-                                    "default": "translate.ontvang-asynchroon"
+                                    "type": "object",
+                                    "properties": {
+                                        "route": {
+                                            "type": "string",
+                                            "description": "",
+                                            "default": "translate.ontvang-asynchroon"
+                                        },
+                                        "stopOnError": {
+                                            "type": "boolean",
+                                            "description": "",
+                                            "default": true
+                                        }
+                                    }
                                 },
                                 "creeerZaak_Lk01": {
-                                    "type": "string",
-                                    "description": "",
-                                    "default": "translate.ontvang-asynchroon"
+                                    "type": "object",
+                                    "properties": {
+                                        "route": {
+                                            "type": "string",
+                                            "description": "",
+                                            "default": "translate.ontvang-asynchroon"
+                                        },
+                                        "stopOnError": {
+                                            "type": "boolean",
+                                            "description": "",
+                                            "default": true
+                                        }
+                                    }
                                 },
                                 "updateZaak_Lk01": {
-                                    "type": "string",
-                                    "description": "",
-                                    "default": "translate.ontvang-asynchroon"
+                                    "type": "object",
+                                    "properties": {
+                                        "route": {
+                                            "type": "string",
+                                            "description": "",
+                                            "default": "translate.ontvang-asynchroon"
+                                        },
+                                        "stopOnError": {
+                                            "type": "boolean",
+                                            "description": "",
+                                            "default": true
+                                        }
+                                    }
                                 },
                                 "genereerDocumentIdentificatie_Di02": {
-                                    "type": "string",
-                                    "description": "",
-                                    "default": "translate.vrije-berichten"
+                                    "type": "object",
+                                    "properties": {
+                                        "route": {
+                                            "type": "string",
+                                            "description": "",
+                                            "default": "translate.vrije-berichten"
+                                        },
+                                        "stopOnError": {
+                                            "type": "boolean",
+                                            "description": "",
+                                            "default": true
+                                        }
+                                    }
                                 },
                                 "genereerZaakIdentificatie_Di02": {
-                                    "type": "string",
-                                    "description": "",
-                                    "default": "translate.vrije-berichten"
+                                    "type": "object",
+                                    "properties": {
+                                        "route": {
+                                            "type": "string",
+                                            "description": "",
+                                            "default": "translate.vrije-berichten"
+                                        },
+                                        "stopOnError": {
+                                            "type": "boolean",
+                                            "description": "",
+                                            "default": true
+                                        }
+                                    }
                                 },
                                 "geefZaakdocumentbewerken_Di02": {
-                                    "type": "string",
-                                    "description": "",
-                                    "default": "translate.vrije-berichten"
+                                    "type": "object",
+                                    "properties": {
+                                        "route": {
+                                            "type": "string",
+                                            "description": "",
+                                            "default": "translate.vrije-berichten"
+                                        },
+                                        "stopOnError": {
+                                            "type": "boolean",
+                                            "description": "",
+                                            "default": true
+                                        }
+                                    }
                                 },
                                 "updateZaakdocument_Di02": {
-                                    "type": "string",
-                                    "description": "",
-                                    "default": "translate.vrije-berichten"
+                                    "type": "object",
+                                    "properties": {
+                                        "route": {
+                                            "type": "string",
+                                            "description": "",
+                                            "default": "translate.vrije-berichten"
+                                        },
+                                        "stopOnError": {
+                                            "type": "boolean",
+                                            "description": "",
+                                            "default": true
+                                        }
+                                    }
                                 },
                                 "cancelCheckout_Di02": {
-                                    "type": "string",
-                                    "description": "",
-                                    "default": "translate.vrije-berichten"
+                                    "type": "object",
+                                    "properties": {
+                                        "route": {
+                                            "type": "string",
+                                            "description": "",
+                                            "default": "translate.vrije-berichten"
+                                        },
+                                        "stopOnError": {
+                                            "type": "boolean",
+                                            "description": "",
+                                            "default": true
+                                        }
+                                    }
                                 }
                             }
                         }
