@@ -8,8 +8,8 @@ spec:
         checksum/configmap.env: {{ include (print $.Template.BasePath "/configmap.zaakbrug.env.yaml") . | sha256sum }}
         checksum/configmap.globals: {{ include (print $.Template.BasePath "/configmap.zaakbrug.globals.yaml") . | sha256sum }}
         checksum/configmap.profiles: {{ include (print $.Template.BasePath "/configmap.zaakbrug.profiles.yaml") . | sha256sum }}
-        checksum/configmap.profiles: {{ include (print $.Template.BasePath "/configmap.zaakbrug.routing-profiles.yaml") . | sha256sum }}
-        checksum/configmap.profiles: {{ include (print $.Template.BasePath "/configmap.zaakbrug.routing-profile-defaults.yaml") . | sha256sum }}
+        checksum/configmap.routing-profiles: {{ include (print $.Template.BasePath "/configmap.zaakbrug.routing-profiles.yaml") . | sha256sum }}
+        checksum/configmap.routing-profile-defaults: {{ include (print $.Template.BasePath "/configmap.zaakbrug.routing-profile-defaults.yaml") . | sha256sum }}
         checksum/configmap.specifics: {{ include (print $.Template.BasePath "/configmap.zaakbrug.specifics.yaml") . | sha256sum }}
     spec:
       containers:
@@ -59,6 +59,7 @@ spec:
         - name: {{ template "ff-common.fullname" . }}-routing-profile-defaults
           configMap:
             name: {{ template "ff-common.fullname" . }}-routing-profile-defaults
+        {{- end -}}
         {{- if .Values.zaakbrug.routing.profiles }}
         - name: {{ template "ff-common.fullname" . }}-routing-profiles
           configMap:
