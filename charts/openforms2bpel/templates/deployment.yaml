@@ -1,0 +1,140 @@
+{{- template "ff-common.deployment" (list . "openforms2bpel.deployment") -}}
+{{- define "openforms2bpel.deployment" -}}
+spec:
+  template:
+    metadata:
+      annotations:
+        checksum/configmap.env: {{ include (print $.Template.BasePath "/configmap.openforms2bpel.env.yaml") . | sha256sum }}
+        checksum/configmap.specifics: {{ include (print $.Template.BasePath "/configmap.openforms2bpel.specifics.yaml") . | sha256sum }}
+        checksum/configmap.mailtemplates: {{ include (print $.Template.BasePath "/configmap.openforms2bpel.mailtemplates.yaml") . | sha256sum }}
+        checksum/configmap.formdata: {{ include (print $.Template.BasePath "/configmap.openforms2bpel.formdata.yaml") . | sha256sum }}
+    spec:
+      containers:
+        -
+          {{ include "ff-common.container" (list . "openforms2bpel.deployment.container") | nindent 10}}
+      volumes:
+        {{- if .Values.securityContext.readOnlyRootFilesystem }}
+        - name: tmpfs
+          emptyDir: { }
+        {{- end }}
+        {{- if .Values.application.credentials.secret }}
+        - name: {{ template "ff-common.fullname" . }}-credentials
+          secret:
+            secretName: {{ .Values.application.credentials.secret }}
+        {{- end }}
+        {{- if .Values.application.security.http.localUsers }}
+        - name: {{ template "ff-common.fullname" . }}-tomcat-users
+          configMap:
+            name: {{ template "ff-common.fullname" . }}-tomcat-users
+        {{- end }}
+        {{- if .Values.connections.create }}
+        - name: {{ template "ff-common.fullname" . }}-context
+          configMap:
+            name: {{ template "ff-common.fullname" . }}-context
+        {{- end }}
+        {{- if .Values.application.security.http.activeDirectory.enabled }}
+        - name: {{ template "ff-common.fullname" . }}-ldap-role-mapping
+          configMap:
+            name: {{ template "ff-common.fullname" . }}-ldap-role-mapping
+        {{- end }}
+        {{- if .Values.persistence.enabled }}
+        - name: {{ template "ff-common.fullname" . }}-data
+          persistentVolumeClaim:
+            claimName: {{ template "ff-common.fullname" . }}-data
+        {{- end }}
+        {{- range $i, $e := .Values.application.security.certificateStores }}
+        - name: {{ template "ff-common.fullname" $ }}-certificate-store-{{ $i }}
+          secret:
+            secretName: {{ $e.secretName }}
+            items:
+              - key: {{ $e.key }}
+                path: {{ $e.key }}
+            defaultMode: 0664
+        {{- end }}
+        {{- if .Values.openforms2bpel.mailTemplates }}
+        - name: {{ template "ff-common.fullname" . }}-mailtemplates
+          configMap:
+            {{- if .Values.openforms2bpel.mailTemplates.existingConfigMap }}
+            name: {{ .Values.openforms2bpel.mailTemplates.existingConfigMap }}
+            {{- else }}
+            name: {{ template "ff-common.fullname" . }}-mailtemplates
+            {{- end }}
+        {{- end -}}
+        {{- if .Values.openforms2bpel.formdata }}
+        - name: {{ template "ff-common.fullname" . }}-formdata
+          configMap:
+            {{- if .Values.openforms2bpel.formdata.existingConfigMap }}
+            name: {{ .Values.openforms2bpel.formdata.existingConfigMap }}
+            {{- else }}
+            name: {{ template "ff-common.fullname" . }}-formdata
+            {{- end }}
+        {{- end -}}
+{{- end -}}
+{{- define "openforms2bpel.deployment.container" -}}
+envFrom:
+  - configMapRef:
+      name: {{ template "ff-common.fullname" . }}-env
+  - configMapRef:
+      name: {{ template "ff-common.fullname" . }}-specifics
+volumeMounts:
+  {{- if .Values.securityContext.readOnlyRootFilesystem }}
+  - mountPath: /usr/local/tomcat/logs
+    name: tmpfs
+  - mountPath: /usr/local/tomcat/conf/Catalina
+    name: tmpfs
+  - mountPath: /usr/local/tomcat/work/Catalina/localhost
+    name: tmpfs
+  - mountPath: /usr/local/tomcat/temp
+    name: tmpfs
+  {{- end }}
+  {{- if .Values.application.security.http.localUsers }}
+  - name: {{ template "ff-common.fullname" . }}-tomcat-users
+    mountPath: /usr/local/tomcat/conf/tomcat-users.xml
+    subPath: tomcat-users.xml
+    readOnly: true
+  {{- end }}
+  {{- if .Values.application.security.http.activeDirectory.enabled }}
+  - name: {{ template "ff-common.fullname" . }}-ldap-role-mapping
+    mountPath: /usr/local/tomcat/webapps/ROOT/WEB-INF/classes/ldap-role-mapping.properties
+    subPath: ldap-role-mapping.properties
+    readOnly: true
+  {{- end }}
+  {{- if .Values.application.credentials.secret }}
+  - name: {{ template "ff-common.fullname" . }}-credentials
+    mountPath: /opt/frank/secrets/
+    readOnly: true
+  {{- end }}
+  {{- if .Values.connections.create }}
+  - name: {{ template "ff-common.fullname" . }}-context
+    mountPath: /usr/local/tomcat/conf/Catalina/localhost/ROOT.xml
+    subPath: context.xml
+    readOnly: true
+  {{- end }}
+  {{- if .Values.persistence.enabled }}
+  - name: {{ template "ff-common.fullname" . }}-data
+    subPath: heap-dumps
+    mountPath: /heap-dumps
+  {{- end }}
+  {{- range $i, $e := .Values.application.security.certificateStores }}
+  - name: {{ template "ff-common.fullname" $ }}-certificate-store-{{ $i }}
+    mountPath: /opt/frank/resources/{{ $e.resourceUrl | default $e.key }}
+    subPath: {{ $e.key }}
+    readOnly: true
+  {{- end }}
+  {{- if .Values.openforms2bpel.mailTemplates }}
+  - name: {{ template "ff-common.fullname" . }}-mailtemplates
+    mountPath: /opt/frank/resources/MailTemplates.xml
+    subPath: MailTemplates.xml
+    readOnly: true
+  {{- end }}
+  {{- if .Values.openforms2bpel.formdata }}
+  - name: {{ template "ff-common.fullname" . }}-formdata
+    mountPath: /opt/frank/resources/FormDataCollector_ObjectsApi_Custom.xslt
+    subPath: FormDataCollector_ObjectsApi_Custom.xslt
+    readOnly: true
+  - name: {{ template "ff-common.fullname" . }}-formdata
+    mountPath: /opt/frank/resources/FormDataTransform_Custom.xslt
+    subPath: FormDataTransform_Custom.xslt
+    readOnly: true
+  {{- end }}
+{{- end -}}
