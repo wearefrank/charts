@@ -1,10 +1,10 @@
 apiVersion: v2
-appVersion: 1.26.15
+appVersion: 1.26.16
 description: A Helm chart for running ZaakBrug on Kubernetes
 name: zaakbrug
 icon: https://raw.githubusercontent.com/wearefrank/charts/master/charts/zaakbrug/icon.png
 type: application
-version: 2.3.28
+version: 2.3.29
 
 dependencies:
 - name: ff-common
