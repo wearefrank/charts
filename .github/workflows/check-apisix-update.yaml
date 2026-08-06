@@ -23,11 +23,11 @@ jobs:
       - name: Install Helm
         uses: azure/setup-helm@v4
         with:
-          version: "latest"
+          version: "v3.21.3"
 
       - name: Install yq
         run: |
-          sudo wget -qO /usr/local/bin/yq https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64
+          sudo wget -qO /usr/local/bin/yq https://github.com/mikefarah/yq/releases/download/v4.53.3/yq_linux_amd64
           sudo chmod +x /usr/local/bin/yq
 
       - name: Add apisix helm repo (met fallback)
@@ -87,7 +87,7 @@ jobs:
             Gegenereerd door de `check-apisix-update` workflow.
             Check vóór het mergen de release notes van [apache/apisix-helm-chart](https://github.com/apache/apisix-helm-chart/releases)
             en of onze eigen `values.yaml`-overrides nog kloppen (bv. standalone-config-keys,
-            image defaults, etcd/dashboard-toggles).
+            image defaults, etcd-toggle).
           branch: chore/bump-apisix-chart
           delete-branch: true
           labels: |

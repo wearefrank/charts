@@ -7,7 +7,11 @@ appVersion: "3.16.0"
 dependencies:
   - name: apisix
     version: "2.14.0"          # hoort bij APISIX 3.16.0
-    # Primaire repo (ASF-officieel, 1-op-1 met apache/apisix-helm-chart source):
-    repository: "https://apache.github.io/apisix-helm-chart"
-    # Fallback als apache.github.io niet resolvbaar is (zie README §Troubleshooting):
-    # repository: "https://charts.apiseven.com"
+    # Primaire repo: door API7.ai gehoste mirror, stabieler dan het ASF-officiele
+    # apache.github.io (dat af en toe DNS-resolutieproblemen heeft, zie README
+    # §Troubleshooting en apache/apisix-helm-chart#959). Onze release.yml draait
+    # `helm dependency update` zonder fallback-logica, dus een flaky primaire repo
+    # kan releases voor alle charts in deze repo blokkeren.
+    repository: "https://charts.apiseven.com"
+    # Fallback/alternatief: het ASF-officiele adres (1-op-1 met apache/apisix-helm-chart source):
+    # repository: "https://apache.github.io/apisix-helm-chart"

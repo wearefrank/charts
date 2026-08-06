@@ -14,8 +14,6 @@ gebruik dan de alternatieve, door API7.ai gehoste repo:
     helm repo update
     helm dependency update .
 
-Of draai `./scripts/update-deps.sh`, die dit automatisch afhandelt.
-
 > **Let op:** deze twee repo's zijn in het verleden niet altijd exact synchroon gebleken
 > ([apache/apisix-helm-chart#610](https://github.com/apache/apisix-helm-chart/issues/610)).
 > Controleer na een fallback altijd de chart-versie met `helm dependency list`.
