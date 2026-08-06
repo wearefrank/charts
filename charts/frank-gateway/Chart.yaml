@@ -1,0 +1,13 @@
+apiVersion: v2
+name: frank-gateway
+description: Frank!Gateway - Apache APISIX met WeAreFrank plugins voor SOAP/FSC/OIDC
+type: application
+version: 0.1.0
+appVersion: "3.16.0"
+dependencies:
+  - name: apisix
+    version: "2.14.0"          # hoort bij APISIX 3.16.0
+    # Primaire repo (ASF-officieel, 1-op-1 met apache/apisix-helm-chart source):
+    repository: "https://apache.github.io/apisix-helm-chart"
+    # Fallback als apache.github.io niet resolvbaar is (zie README §Troubleshooting):
+    # repository: "https://charts.apiseven.com"

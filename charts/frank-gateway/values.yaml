@@ -1,0 +1,40 @@
+# Let op: dit zijn allemaal overrides voor de `apisix` subchart-dependency, dus
+# alles moet genest staan onder de `apisix:` key (anders komt het nooit aan bij
+# de subchart, zie apache/apisix-helm-chart values.yaml). Er is in chart-versie
+# 2.14.0 geen aparte dashboard-subchart/dependency (meer), dus daar is geen key voor.
+#
+# Extra addertje: de subchart heeft zelf ook weer een top-level `apisix:` key
+# (een 1-op-1 spiegel van de APISIX config.yaml `apisix:`-sectie, met daaronder
+# o.a. `deployment:`). Om daar iets in te overriden moet je dus `apisix.apisix.*`
+# gebruiken vanuit onze values.yaml — de eerste `apisix:` is de dependency, de
+# tweede is hun eigen config-sectie.
+apisix:
+  image:
+    repository: ghcr.io/wearefrank/frank-api-gateway   # check exacte naam in jullie GHCR packages
+    tag: "3.16.0"                                       # jullie eigen build-tag
+
+  apisix:
+    deployment:
+      mode: standalone
+      role_traditional:
+        config_provider: yaml
+      standalone:
+        # optie A: config direct inline (klanten overriden dit met hun eigen routes)
+        config: |
+          routes: []
+        # optie B (aanrader, zie toelichting hieronder): verwijs naar een externe ConfigMap
+        # existingConfigMap: "frank-gateway-routes"
+
+  etcd:
+    enabled: false
+
+  # We gebruiken standalone/yaml mode en praten helemaal niet met etcd (intern
+  # noch extern). De chart gaat er bij `etcd.enabled: false` standaard van uit
+  # dat je een *externe* etcd draait (externalEtcd.user default is "root"),
+  # en genereert dan een secret + env var voor het externe etcd-wachtwoord.
+  # Leeg maken voorkomt die onnodige/nooit-gebruikte etcd-secret en -env var.
+  externalEtcd:
+    user: ""
+
+  ingress-controller:
+    enabled: false

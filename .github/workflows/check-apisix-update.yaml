@@ -1,0 +1,95 @@
+name: Check for APISIX Helm chart updates
+
+on:
+  schedule:
+    # Elke maandag 07:00 UTC
+    - cron: "0 7 * * 1"
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  check-update:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: charts/frank-gateway
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install Helm
+        uses: azure/setup-helm@v4
+        with:
+          version: "latest"
+
+      - name: Install yq
+        run: |
+          sudo wget -qO /usr/local/bin/yq https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64
+          sudo chmod +x /usr/local/bin/yq
+
+      - name: Add apisix helm repo (met fallback)
+        run: |
+          set -euo pipefail
+          PRIMARY="https://apache.github.io/apisix-helm-chart"
+          FALLBACK="https://charts.apiseven.com"
+
+          if helm repo add apisix "$PRIMARY" --force-update && helm repo update apisix; then
+            echo "Gebruik primaire repo: $PRIMARY"
+          else
+            echo "Primaire repo niet bereikbaar, val terug op $FALLBACK"
+            helm repo add apisix "$FALLBACK" --force-update
+            helm repo update apisix
+          fi
+
+      - name: Bepaal huidige en laatste versie
+        id: versions
+        run: |
+          set -euo pipefail
+          CURRENT=$(yq '.dependencies[] | select(.name == "apisix") | .version' Chart.yaml)
+          LATEST=$(helm search repo apisix/apisix --versions -o json | yq '.[0].version' -p json)
+
+          echo "current=$CURRENT" >> "$GITHUB_OUTPUT"
+          echo "latest=$LATEST" >> "$GITHUB_OUTPUT"
+
+          echo "Huidige gepinde chart-versie: $CURRENT"
+          echo "Laatste beschikbare chart-versie: $LATEST"
+
+      - name: Update Chart.yaml als er een nieuwere versie is
+        if: steps.versions.outputs.current != steps.versions.outputs.latest
+        run: |
+          set -euo pipefail
+          LATEST="${{ steps.versions.outputs.latest }}"
+
+          yq -i '(.dependencies[] | select(.name == "apisix") | .version) = strenv(LATEST)' Chart.yaml
+          helm dependency update .
+
+      - name: Sanity check met helm template
+        if: steps.versions.outputs.current != steps.versions.outputs.latest
+        run: |
+          helm template frank-gateway . --debug > /dev/null
+
+      - name: Open pull request
+        if: steps.versions.outputs.current != steps.versions.outputs.latest
+        uses: peter-evans/create-pull-request@v6
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: "chore: bump apisix helm chart dependency to ${{ steps.versions.outputs.latest }}"
+          title: "chore: bump apisix chart dependency ${{ steps.versions.outputs.current }} -> ${{ steps.versions.outputs.latest }}"
+          body: |
+            Automatische update van de `apisix` Helm chart dependency.
+
+            - Huidige versie: `${{ steps.versions.outputs.current }}`
+            - Nieuwe versie: `${{ steps.versions.outputs.latest }}`
+
+            Gegenereerd door de `check-apisix-update` workflow.
+            Check vóór het mergen de release notes van [apache/apisix-helm-chart](https://github.com/apache/apisix-helm-chart/releases)
+            en of onze eigen `values.yaml`-overrides nog kloppen (bv. standalone-config-keys,
+            image defaults, etcd/dashboard-toggles).
+          branch: chore/bump-apisix-chart
+          delete-branch: true
+          labels: |
+            dependencies
+            helm
