@@ -48,12 +48,47 @@ apisix:
       # Plugin code is baked into the Frank Gateway image under:
       # /usr/local/apisix/custom-plugins/apisix/plugins
       luaPath: "/usr/local/apisix/custom-plugins/?.lua"
-      ## @param apisix.apisix.customPlugins.plugins[0].name Name of the custom plugin (must match its Lua module name)
-      ## @param apisix.apisix.customPlugins.plugins[0].attrs Plugin-specific attributes passed through to the APISIX plugin config
-      ## @param apisix.apisix.customPlugins.plugins[0].configMap.name Name of an existing ConfigMap to mount for this plugin's config; empty disables mounting
-      ## @param apisix.apisix.customPlugins.plugins[0].configMap.mounts List of file mounts (e.g. subPath/mountPath) sourced from `configMap.name`
+      ## @skip apisix.apisix.customPlugins.plugins
+      # Custom plugin definitions: each entry has `name` (must match its Lua module name),
+      # `attrs` (passed through to the APISIX plugin config), and an optional `configMap`
+      # (`name`/`mounts`) to mount plugin config from an existing ConfigMap.
       plugins:
         - name: cert-auth
+          attrs: {}
+          configMap:
+            name: ""
+            mounts: []
+        - name: frank-sender
+          attrs: {}
+          configMap:
+            name: ""
+            mounts: []
+        - name: generic-oauth-client
+          attrs: {}
+          configMap:
+            name: ""
+            mounts: []
+        - name: jwt-client
+          attrs: {}
+          configMap:
+            name: ""
+            mounts: []
+        - name: limit-size
+          attrs: {}
+          configMap:
+            name: ""
+            mounts: []
+        - name: soap-action-router
+          attrs: {}
+          configMap:
+            name: ""
+            mounts: []
+        - name: openid-connect-client
+          attrs: {}
+          configMap:
+            name: ""
+            mounts: []
+        - name: fsc
           attrs: {}
           configMap:
             name: ""
@@ -61,12 +96,108 @@ apisix:
 
     ## @param apisix.apisix.plugins Enabled APISIX plugin list; custom plugins (see `customPlugins.plugins` above) must also be listed here, or APISIX won't load them
     # Custom plugins currently are required to be listed here as well
-    plugins:
-      - proxy-rewrite
-      - consumer-restriction
-      - loki-logger
-      - prometheus
-      - opentelemetry
+
+    plugins:                           # plugin list (sorted by priority)
+      - real-ip                   # priority: 23000
+      #- ai                       # priority: 22900
+      - client-control            # priority: 22000
+      - proxy-control             # priority: 21990
+      - request-id                # priority: 12015
+      #- zipkin                   # priority: 12011
+      #- skywalking               # priority: 12010
+      - opentelemetry             # priority: 12009
+      - ext-plugin-pre-req        # priority: 12000
+      - fault-injection           # priority: 11000
+      - mocking                   # priority: 10900
+      - serverless-pre-function   # priority: 10000
+      #- batch-requests           # priority: 4010
+      - cors                      # priority: 4000
+      - ip-restriction            # priority: 3000
+      - ua-restriction            # priority: 2999
+      - referer-restriction       # priority: 2990
+      - csrf                      # priority: 2980
+      - uri-blocker               # priority: 2900
+      - request-validation        # priority: 2800
+      - chaitin-waf               # priority: 2700
+      - multi-auth                # priority: 2600
+      - openid-connect            # priority: 2599
+      - cas-auth                  # priority: 2597
+      - authz-casbin              # priority: 2560
+      - authz-casdoor             # priority: 2559
+      - wolf-rbac                 # priority: 2555
+      - ldap-auth                 # priority: 2540
+      - hmac-auth                 # priority: 2530
+      - basic-auth                # priority: 2520
+      - jwt-auth                  # priority: 2510
+      - jwe-decrypt               # priority: 2509
+      - key-auth                  # priority: 2500
+      - consumer-restriction      # priority: 2400
+      - forward-auth              # priority: 2002
+      - opa                       # priority: 2001
+      - authz-keycloak            # priority: 2000
+      #- error-log-logger         # priority: 1091
+      - proxy-cache               # priority: 1085
+      - body-transformer          # priority: 1080
+      - proxy-mirror              # priority: 1010
+      - proxy-rewrite             # priority: 1008
+      - workflow                  # priority: 1006
+      - api-breaker               # priority: 1005
+      - limit-conn                # priority: 1003
+      - limit-count               # priority: 1002
+      - limit-req                 # priority: 1001
+      #- node-status              # priority: 1000
+      - response-extractor
+      #- brotli                   # priority: 996
+      - gzip                      # priority: 995
+      - server-info               # priority: 990
+      - traffic-split             # priority: 966
+      - redirect                  # priority: 900
+      - response-rewrite          # priority: 899
+      - degraphql                 # priority: 509
+      #- kafka-proxy              # priority: 508
+      #- dubbo-proxy              # priority: 507
+      - grpc-transcode            # priority: 506
+      - grpc-web                  # priority: 505
+      - public-api                # priority: 501
+      - prometheus                # priority: 500
+      - datadog                   # priority: 495
+      - loki-logger               # priority: 414
+      - elasticsearch-logger      # priority: 413
+      - echo                      # priority: 412
+      - loggly                    # priority: 411
+      - http-logger               # priority: 410
+      - splunk-hec-logging        # priority: 409
+      - skywalking-logger         # priority: 408
+      - google-cloud-logging      # priority: 407
+      - sls-logger                # priority: 406
+      - tcp-logger                # priority: 405
+      - kafka-logger              # priority: 403
+      - rocketmq-logger           # priority: 402
+      - syslog                    # priority: 401
+      - udp-logger                # priority: 400
+      - file-logger               # priority: 399
+      - clickhouse-logger         # priority: 398
+      #- tencent-cloud-cls        # priority: 397
+      - inspect                   # priority: 200
+      #- log-rotate               # priority: 100
+      # <- recommend to use priority (0, 100) for your custom plugins
+      - example-plugin            # priority: 0
+      - cert-auth                 # priority 100
+      - frank-sender
+      - generic-oauth-client
+      - jwt-client
+      - limit-size
+      - soap-action-router
+      - openid-connect-client
+      - fsc
+      #- gm                       # priority: -43
+      #- aws-lambda               # priority: -1899
+      #- azure-functions          # priority: -1900
+      #- openwhisk                # priority: -1901
+      #- openfunction             # priority: -1902
+      - serverless-post-function  # priority: -2000
+      - ext-plugin-post-req       # priority: -3000
+      - ext-plugin-post-resp      # priority: -4000
 
   ## @section etcd
   ## We use standalone/yaml mode and don't talk to etcd at all (internal or external).

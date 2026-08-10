@@ -68,28 +68,28 @@
                                 },
                                 "plugins": {
                                     "type": "array",
-                                    "description": "Name of the custom plugin (must match its Lua module name)",
+                                    "description": "",
                                     "items": {
                                         "type": "object",
                                         "properties": {
                                             "name": {
                                                 "type": "string",
-                                                "description": "Name of the custom plugin (must match its Lua module name)"
+                                                "description": ""
                                             },
                                             "attrs": {
                                                 "type": "object",
-                                                "description": "Plugin-specific attributes passed through to the APISIX plugin config"
+                                                "description": ""
                                             },
                                             "configMap": {
                                                 "type": "object",
                                                 "properties": {
                                                     "name": {
                                                         "type": "string",
-                                                        "description": "Name of an existing ConfigMap to mount for this plugin's config; empty disables mounting"
+                                                        "description": ""
                                                     },
                                                     "mounts": {
                                                         "type": "array",
-                                                        "description": "List of file mounts (e.g. subPath/mountPath) sourced from `configMap.name`",
+                                                        "description": "",
                                                         "items": {}
                                                     }
                                                 }
@@ -103,11 +103,89 @@
                             "type": "array",
                             "description": "Enabled APISIX plugin list; custom plugins (see `customPlugins.plugins` above) must also be listed here, or APISIX won't load them",
                             "default": [
-                                "proxy-rewrite",
+                                "real-ip",
+                                "client-control",
+                                "proxy-control",
+                                "request-id",
+                                "opentelemetry",
+                                "ext-plugin-pre-req",
+                                "fault-injection",
+                                "mocking",
+                                "serverless-pre-function",
+                                "cors",
+                                "ip-restriction",
+                                "ua-restriction",
+                                "referer-restriction",
+                                "csrf",
+                                "uri-blocker",
+                                "request-validation",
+                                "chaitin-waf",
+                                "multi-auth",
+                                "openid-connect",
+                                "cas-auth",
+                                "authz-casbin",
+                                "authz-casdoor",
+                                "wolf-rbac",
+                                "ldap-auth",
+                                "hmac-auth",
+                                "basic-auth",
+                                "jwt-auth",
+                                "jwe-decrypt",
+                                "key-auth",
                                 "consumer-restriction",
-                                "loki-logger",
+                                "forward-auth",
+                                "opa",
+                                "authz-keycloak",
+                                "proxy-cache",
+                                "body-transformer",
+                                "proxy-mirror",
+                                "proxy-rewrite",
+                                "workflow",
+                                "api-breaker",
+                                "limit-conn",
+                                "limit-count",
+                                "limit-req",
+                                "response-extractor",
+                                "gzip",
+                                "server-info",
+                                "traffic-split",
+                                "redirect",
+                                "response-rewrite",
+                                "degraphql",
+                                "grpc-transcode",
+                                "grpc-web",
+                                "public-api",
                                 "prometheus",
-                                "opentelemetry"
+                                "datadog",
+                                "loki-logger",
+                                "elasticsearch-logger",
+                                "echo",
+                                "loggly",
+                                "http-logger",
+                                "splunk-hec-logging",
+                                "skywalking-logger",
+                                "google-cloud-logging",
+                                "sls-logger",
+                                "tcp-logger",
+                                "kafka-logger",
+                                "rocketmq-logger",
+                                "syslog",
+                                "udp-logger",
+                                "file-logger",
+                                "clickhouse-logger",
+                                "inspect",
+                                "example-plugin",
+                                "cert-auth",
+                                "frank-sender",
+                                "generic-oauth-client",
+                                "jwt-client",
+                                "limit-size",
+                                "soap-action-router",
+                                "openid-connect-client",
+                                "fsc",
+                                "serverless-post-function",
+                                "ext-plugin-post-req",
+                                "ext-plugin-post-resp"
                             ],
                             "items": {
                                 "type": "string"
