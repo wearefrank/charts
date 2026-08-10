@@ -1,3 +1,46 @@
+## Parameters
+
+### Image
+
+| Name                      | Description                                                 | Value                                  |
+| ------------------------- | ----------------------------------------------------------- | -------------------------------------- |
+| `apisix.image.repository` | APISIX container image repository                           | `ghcr.io/wearefrank/frank-api-gateway` |
+| `apisix.image.tag`        | APISIX container image tag (immutable tags are recommended) | `3.16.0`                               |
+
+### Deployment mode
+
+| Name                                                        | Description                                                                                     | Value         |
+| ----------------------------------------------------------- | ----------------------------------------------------------------------------------------------- | ------------- |
+| `apisix.apisix.deployment.mode`                             | APISIX deployment mode (we run standalone, without etcd)                                        | `standalone`  |
+| `apisix.apisix.deployment.role_traditional.config_provider` | Configuration provider used in standalone mode                                                  | `yaml`        |
+| `apisix.apisix.deployment.standalone.config`                | Inline APISIX routes configuration (YAML string); customers override this with their own routes | `routes: []
+` |
+
+### Custom plugins
+
+| Name                                                      | Description                                                                                                                        | Value                                                                                 |
+| --------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------- |
+| `apisix.apisix.customPlugins.enabled`                     | Enable custom (WeAreFrank) Lua plugins baked into the image                                                                        | `true`                                                                                |
+| `apisix.apisix.customPlugins.luaPath`                     | Lua module search path pattern used to locate custom plugin code                                                                   | `/usr/local/apisix/custom-plugins/?.lua`                                              |
+| `apisix.apisix.customPlugins.plugins[0].name`             | Name of the custom plugin (must match its Lua module name)                                                                         | `cert-auth`                                                                           |
+| `apisix.apisix.customPlugins.plugins[0].attrs`            | Plugin-specific attributes passed through to the APISIX plugin config                                                              | `{}`                                                                                  |
+| `apisix.apisix.customPlugins.plugins[0].configMap.name`   | Name of an existing ConfigMap to mount for this plugin's config; empty disables mounting                                           | `""`                                                                                  |
+| `apisix.apisix.customPlugins.plugins[0].configMap.mounts` | List of file mounts (e.g. subPath/mountPath) sourced from `configMap.name`                                                         | `[]`                                                                                  |
+| `apisix.apisix.plugins`                                   | Enabled APISIX plugin list; custom plugins (see `customPlugins.plugins` above) must also be listed here, or APISIX won't load them | `["proxy-rewrite","consumer-restriction","loki-logger","prometheus","opentelemetry"]` |
+
+### etcd
+
+| Name                       | Description                                                                                          | Value   |
+| -------------------------- | ---------------------------------------------------------------------------------------------------- | ------- |
+| `apisix.etcd.enabled`      | Enable the bundled etcd subchart                                                                     | `false` |
+| `apisix.externalEtcd.user` | External etcd username, emptied to avoid an unused etcd secret/env var since `etcd.enabled` is false | `""`    |
+
+### Ingress controller
+
+| Name                                | Description                                           | Value   |
+| ----------------------------------- | ----------------------------------------------------- | ------- |
+| `apisix.ingress-controller.enabled` | Enable the bundled APISIX ingress-controller subchart | `false` |
+
 ## Troubleshooting: `helm dependency update` faalt
 
 De chart hangt af van de officiële `apisix` chart via `https://apache.github.io/apisix-helm-chart`.

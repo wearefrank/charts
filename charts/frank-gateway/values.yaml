@@ -9,32 +9,78 @@
 # gebruiken vanuit onze values.yaml — de eerste `apisix:` is de dependency, de
 # tweede is hun eigen config-sectie.
 apisix:
+  ## @section Image
+  ## Custom GHCR image for the APISIX container, built with WeAreFrank plugins (SOAP/FSC/OIDC).
+  ##
   image:
-    repository: ghcr.io/wearefrank/frank-api-gateway   # check exacte naam in jullie GHCR packages
-    tag: "3.16.0"                                       # jullie eigen build-tag
+    ## @param apisix.image.repository APISIX container image repository
+    repository: ghcr.io/wearefrank/frank-api-gateway
+    ## @param apisix.image.tag APISIX container image tag (immutable tags are recommended)
+    tag: "3.16.0"
 
+  ## @section Deployment mode
+  ## Extra addertje: de subchart heeft zelf ook weer een top-level `apisix:` key
+  ## (1-op-1 spiegel van de APISIX config.yaml `apisix:`-sectie). Om daar iets in
+  ## te overriden gebruik je dus `apisix.apisix.*` — de eerste `apisix:` is de
+  ## dependency, de tweede is hun eigen config-sectie.
+  ##
   apisix:
     deployment:
+      ## @param apisix.apisix.deployment.mode APISIX deployment mode (we run standalone, without etcd)
       mode: standalone
       role_traditional:
+        ## @param apisix.apisix.deployment.role_traditional.config_provider Configuration provider used in standalone mode
         config_provider: yaml
       standalone:
-        # optie A: config direct inline (klanten overriden dit met hun eigen routes)
+        ## @param apisix.apisix.deployment.standalone.config Inline APISIX routes configuration (YAML string); customers override this with their own routes
         config: |
           routes: []
-        # optie B (aanrader, zie toelichting hieronder): verwijs naar een externe ConfigMap
-        # existingConfigMap: "frank-gateway-routes"
+        # existingConfigMap: "frank-gateway-routes" # alternative: point to an existing ConfigMap instead of inline config
 
+    ## @section Custom plugins
+    ## Lua plugins baked into the WeAreFrank image (SOAP/FSC/OIDC/etc.), loaded via the
+    ## APISIX `custom-plugins` mechanism rather than upstream's `plugins`/`apisix.plugins`.
+    ##
+    ## @param apisix.apisix.customPlugins.enabled Enable custom (WeAreFrank) Lua plugins baked into the image
+    ## @param apisix.apisix.customPlugins.luaPath Lua module search path pattern used to locate custom plugin code
+    customPlugins:
+      enabled: true
+      # Plugin code is baked into the Frank Gateway image under:
+      # /usr/local/apisix/custom-plugins/apisix/plugins
+      luaPath: "/usr/local/apisix/custom-plugins/?.lua"
+      ## @param apisix.apisix.customPlugins.plugins[0].name Name of the custom plugin (must match its Lua module name)
+      ## @param apisix.apisix.customPlugins.plugins[0].attrs Plugin-specific attributes passed through to the APISIX plugin config
+      ## @param apisix.apisix.customPlugins.plugins[0].configMap.name Name of an existing ConfigMap to mount for this plugin's config; empty disables mounting
+      ## @param apisix.apisix.customPlugins.plugins[0].configMap.mounts List of file mounts (e.g. subPath/mountPath) sourced from `configMap.name`
+      plugins:
+        - name: cert-auth
+          attrs: {}
+          configMap:
+            name: ""
+            mounts: []
+
+    ## @param apisix.apisix.plugins Enabled APISIX plugin list; custom plugins (see `customPlugins.plugins` above) must also be listed here, or APISIX won't load them
+    # Custom plugins currently are required to be listed here as well
+    plugins:
+      - proxy-rewrite
+      - consumer-restriction
+      - loki-logger
+      - prometheus
+      - opentelemetry
+
+  ## @section etcd
+  ## We use standalone/yaml mode and don't talk to etcd at all (internal or external).
+  ##
   etcd:
+    ## @param apisix.etcd.enabled Enable the bundled etcd subchart
     enabled: false
 
-  # We gebruiken standalone/yaml mode en praten helemaal niet met etcd (intern
-  # noch extern). De chart gaat er bij `etcd.enabled: false` standaard van uit
-  # dat je een *externe* etcd draait (externalEtcd.user default is "root"),
-  # en genereert dan een secret + env var voor het externe etcd-wachtwoord.
-  # Leeg maken voorkomt die onnodige/nooit-gebruikte etcd-secret en -env var.
+  ## @param apisix.externalEtcd.user External etcd username, emptied to avoid an unused etcd secret/env var since `etcd.enabled` is false
   externalEtcd:
     user: ""
 
+  ## @section Ingress controller
+  ##
   ingress-controller:
+    ## @param apisix.ingress-controller.enabled Enable the bundled APISIX ingress-controller subchart
     enabled: false

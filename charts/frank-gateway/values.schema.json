@@ -1,0 +1,151 @@
+{
+    "title": "Chart Values",
+    "type": "object",
+    "properties": {
+        "apisix": {
+            "type": "object",
+            "properties": {
+                "image": {
+                    "type": "object",
+                    "properties": {
+                        "repository": {
+                            "type": "string",
+                            "description": "APISIX container image repository",
+                            "default": "ghcr.io/wearefrank/frank-api-gateway"
+                        },
+                        "tag": {
+                            "type": "string",
+                            "description": "APISIX container image tag (immutable tags are recommended)",
+                            "default": "3.16.0"
+                        }
+                    }
+                },
+                "apisix": {
+                    "type": "object",
+                    "properties": {
+                        "deployment": {
+                            "type": "object",
+                            "properties": {
+                                "mode": {
+                                    "type": "string",
+                                    "description": "APISIX deployment mode (we run standalone, without etcd)",
+                                    "default": "standalone"
+                                },
+                                "role_traditional": {
+                                    "type": "object",
+                                    "properties": {
+                                        "config_provider": {
+                                            "type": "string",
+                                            "description": "Configuration provider used in standalone mode",
+                                            "default": "yaml"
+                                        }
+                                    }
+                                },
+                                "standalone": {
+                                    "type": "object",
+                                    "properties": {
+                                        "config": {
+                                            "type": "string",
+                                            "description": "Inline APISIX routes configuration (YAML string); customers override this with their own routes",
+                                            "default": "routes: []\n"
+                                        }
+                                    }
+                                }
+                            }
+                        },
+                        "customPlugins": {
+                            "type": "object",
+                            "properties": {
+                                "enabled": {
+                                    "type": "boolean",
+                                    "description": "Enable custom (WeAreFrank) Lua plugins baked into the image",
+                                    "default": true
+                                },
+                                "luaPath": {
+                                    "type": "string",
+                                    "description": "Lua module search path pattern used to locate custom plugin code",
+                                    "default": "/usr/local/apisix/custom-plugins/?.lua"
+                                },
+                                "plugins": {
+                                    "type": "array",
+                                    "description": "Name of the custom plugin (must match its Lua module name)",
+                                    "items": {
+                                        "type": "object",
+                                        "properties": {
+                                            "name": {
+                                                "type": "string",
+                                                "description": "Name of the custom plugin (must match its Lua module name)"
+                                            },
+                                            "attrs": {
+                                                "type": "object",
+                                                "description": "Plugin-specific attributes passed through to the APISIX plugin config"
+                                            },
+                                            "configMap": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "name": {
+                                                        "type": "string",
+                                                        "description": "Name of an existing ConfigMap to mount for this plugin's config; empty disables mounting"
+                                                    },
+                                                    "mounts": {
+                                                        "type": "array",
+                                                        "description": "List of file mounts (e.g. subPath/mountPath) sourced from `configMap.name`",
+                                                        "items": {}
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        },
+                        "plugins": {
+                            "type": "array",
+                            "description": "Enabled APISIX plugin list; custom plugins (see `customPlugins.plugins` above) must also be listed here, or APISIX won't load them",
+                            "default": [
+                                "proxy-rewrite",
+                                "consumer-restriction",
+                                "loki-logger",
+                                "prometheus",
+                                "opentelemetry"
+                            ],
+                            "items": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                },
+                "etcd": {
+                    "type": "object",
+                    "properties": {
+                        "enabled": {
+                            "type": "boolean",
+                            "description": "Enable the bundled etcd subchart",
+                            "default": false
+                        }
+                    }
+                },
+                "externalEtcd": {
+                    "type": "object",
+                    "properties": {
+                        "user": {
+                            "type": "string",
+                            "description": "External etcd username, emptied to avoid an unused etcd secret/env var since `etcd.enabled` is false",
+                            "default": ""
+                        }
+                    }
+                },
+                "ingress-controller": {
+                    "type": "object",
+                    "properties": {
+                        "enabled": {
+                            "type": "boolean",
+                            "description": "Enable the bundled APISIX ingress-controller subchart",
+                            "default": false
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
