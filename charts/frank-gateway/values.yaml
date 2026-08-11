@@ -16,7 +16,7 @@ apisix:
     ## @param apisix.image.repository APISIX container image repository
     repository: ghcr.io/wearefrank/frank-api-gateway
     ## @param apisix.image.tag APISIX container image tag (immutable tags are recommended)
-    tag: "3.16.0"
+    tag: "1.0.0"
 
   ## @section Deployment mode
   ## Extra addertje: de subchart heeft zelf ook weer een top-level `apisix:` key
