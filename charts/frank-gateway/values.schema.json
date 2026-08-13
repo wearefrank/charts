@@ -16,7 +16,7 @@
                         "tag": {
                             "type": "string",
                             "description": "APISIX container image tag (immutable tags are recommended)",
-                            "default": "3.16.0"
+                            "default": "1.0.0"
                         }
                     }
                 },
