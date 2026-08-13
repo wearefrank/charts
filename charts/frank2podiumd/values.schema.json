@@ -1,0 +1,177 @@
+{
+    "title": "Chart Values",
+    "type": "object",
+    "properties": {
+        "frankframework": {
+            "type": "object",
+            "properties": {
+                "image": {
+                    "type": "object",
+                    "properties": {
+                        "registry": {
+                            "type": "string",
+                            "description": "frank2podiumd image registry",
+                            "default": "wearefrank"
+                        },
+                        "repository": {
+                            "type": "string",
+                            "description": "frank2podiumd image repository",
+                            "default": "frank2podiumd"
+                        },
+                        "tag": {
+                            "type": "string",
+                            "description": "frank2podiumd image tag (immutable tags are recommended)",
+                            "default": "1.0.0"
+                        },
+                        "pullPolicy": {
+                            "type": "string",
+                            "description": "frank2podiumd image pull policy",
+                            "default": "IfNotPresent"
+                        },
+                        "pullSecrets": {
+                            "type": "array",
+                            "description": "frank2podiumd image pull secrets",
+                            "default": [],
+                            "items": {}
+                        }
+                    }
+                },
+                "application": {
+                    "type": "object",
+                    "properties": {
+                        "dtap": {
+                            "type": "object",
+                            "properties": {
+                                "stage": {
+                                    "type": "string",
+                                    "description": "",
+                                    "default": "LOC"
+                                }
+                            }
+                        }
+                    }
+                },
+                "environmentVariables": {
+                    "type": "object",
+                    "properties": {
+                        "application": {
+                            "type": "object",
+                            "properties": {
+                                "security": {
+                                    "type": "object",
+                                    "properties": {
+                                        "console": {
+                                            "type": "object",
+                                            "properties": {
+                                                "authentication": {
+                                                    "type": "object",
+                                                    "properties": {
+                                                        "type": {
+                                                            "type": "string",
+                                                            "description": "",
+                                                            "default": "NONE"
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        },
+                                        "http": {
+                                            "type": "object",
+                                            "properties": {
+                                                "authenticators": {
+                                                    "type": "string",
+                                                    "description": "",
+                                                    "default": "noAuth"
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        },
+                        "servlet": {
+                            "type": "object",
+                            "properties": {
+                                "LarvaServlet": {
+                                    "type": "object",
+                                    "properties": {
+                                        "authenticator": {
+                                            "type": "string",
+                                            "description": "",
+                                            "default": "noAuth"
+                                        }
+                                    }
+                                }
+                            }
+                        },
+                        "jdbc": {
+                            "type": "object",
+                            "properties": {
+                                "datasource": {
+                                    "type": "object",
+                                    "properties": {
+                                        "default": {
+                                            "type": "string",
+                                            "description": "",
+                                            "default": "jdbc/frank2podiumd"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "generateSecret": {
+                    "type": "array",
+                    "description": "",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "name": {
+                                "type": "string",
+                                "description": ""
+                            },
+                            "mountPath": {
+                                "type": "string",
+                                "description": ""
+                            },
+                            "subPath": {
+                                "type": "string",
+                                "description": ""
+                            },
+                            "stringData": {
+                                "type": "object",
+                                "properties": {
+                                    "resources": {
+                                        "type": "object",
+                                        "properties": {
+                                            "yml": {
+                                                "type": "object",
+                                                "description": ""
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "replicaCount": {
+                    "type": "number",
+                    "description": "Number of Frank!Framework replicas to deploy",
+                    "default": 1
+                },
+                "securityContext": {
+                    "type": "object",
+                    "properties": {
+                        "readOnlyRootFilesystem": {
+                            "type": "boolean",
+                            "description": "Set the security context for the Frank!Framework containers",
+                            "default": true
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

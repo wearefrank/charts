@@ -1,0 +1,70 @@
+## @section Frank!Framework parameters
+## @descriptionStart
+## This chart is a wrapper for the Frank!Framework chart.
+## See the documentation for the Frank!Framework chart for more information.
+## @descriptionEnd
+
+frankframework:
+  ## @param frankframework.image.registry frank2podiumd image registry
+  ## @param frankframework.image.repository frank2podiumd image repository
+  ## @param frankframework.image.tag frank2podiumd image tag (immutable tags are recommended)
+  ## @param frankframework.image.pullPolicy frank2podiumd image pull policy
+  ## Specify a imagePullPolicy
+  ## Defaults to 'Always' if image tag is 'latest', else set to 'IfNotPresent'
+  ## ref: https://kubernetes.io/docs/user-guide/images/#pre-pulling-images
+  ##
+  ## @param frankframework.image.pullSecrets frank2podiumd image pull secrets
+  ## Optionally specify an array of imagePullSecrets.
+  ## Secrets must be manually created in the namespace.
+  ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
+  ## e.g:
+  ## pullSecrets:
+  ##   - name: myRegistryKeySecretName
+  ##
+  image:
+    registry: wearefrank
+    repository: frank2podiumd
+    tag: "1.0.0"
+    pullPolicy: IfNotPresent
+    pullSecrets: []
+
+  application:
+    ## @skip frankframework.application.dtap.stage
+    ##
+    dtap:
+      stage: "LOC"
+
+
+    ##
+  ## Extra environment variables for the Frank!Framework, using Java property-style dotted keys.
+  ## @skip frankframework.environmentVariables
+  ##
+  environmentVariables:
+    application.security.console.authentication.type: NONE
+    application.security.http.authenticators: noAuth
+    application.security.http.authenticators.noAuth.type: NONE
+    servlet.LarvaServlet.authenticator: noAuth
+    jdbc.datasource.default: "jdbc/frank2podiumd"
+
+  ## @skip frankframework.generateSecret
+  ##
+  generateSecret:
+    - name: frankframework-resources
+      mountPath: /opt/frank/resources/resources.yml
+      subPath: resources.yml
+      stringData:
+        resources.yml: |-
+          jdbc:
+            - name: frank2podiumd
+              type: org.h2.jdbcx.JdbcDataSource
+              url: jdbc:h2:mem:frank2podiumd;NON_KEYWORDS=VALUE;DB_CLOSE_ON_EXIT=FALSE;DB_CLOSE_DELAY=-1;TRACE_LEVEL_FILE=0;
+
+  ## @param frankframework.replicaCount Number of Frank!Framework replicas to deploy
+  ##
+  replicaCount: 1
+
+  ## @param frankframework.securityContext.readOnlyRootFilesystem Set the security context for the Frank!Framework containers
+  ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container
+  ##
+  securityContext:
+    readOnlyRootFilesystem: true

@@ -1,0 +1,17 @@
+apiVersion: v2
+name: frank2podiumd
+description: A Helm chart for running Frank2PodiumD on Kubernetes
+version: 0.1.0
+type: application
+home: https://frankframework.org
+icon: https://raw.githubusercontent.com/wearefrank/charts/master/charts/frank2podiumd/icon.svg
+sources:
+  - https://github.com/wearefrank/charts
+
+keywords:
+  - podiumd
+
+dependencies:
+  - name: frankframework
+    version: 0.7.4
+    repository: https://frankframework.github.io/charts
