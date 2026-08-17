@@ -5,7 +5,7 @@
 | Name                      | Description                                                 | Value                                  |
 | ------------------------- | ----------------------------------------------------------- | -------------------------------------- |
 | `apisix.image.repository` | APISIX container image repository                           | `ghcr.io/wearefrank/frank-api-gateway` |
-| `apisix.image.tag`        | APISIX container image tag (immutable tags are recommended) | `3.16.0`                               |
+| `apisix.image.tag`        | APISIX container image tag (immutable tags are recommended) | `1.0.0`                                |
 
 ### Deployment mode
 
