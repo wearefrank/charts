@@ -11,7 +11,7 @@
                         "repository": {
                             "type": "string",
                             "description": "APISIX container image repository",
-                            "default": "ghcr.io/wearefrank/frank-api-gateway"
+                            "default": "ghcr.io/wearefrank/frank-gateway"
                         },
                         "tag": {
                             "type": "string",
