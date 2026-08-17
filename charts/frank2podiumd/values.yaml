@@ -37,7 +37,11 @@ frankframework:
 
     ##
   ## Extra environment variables for the Frank!Framework, using Java property-style dotted keys.
-  ## @skip frankframework.environmentVariables
+  ## @param frankframework.environmentVariables.application.security.console.authentication.type Authentication type for the Frank!Console (management console). "NONE" disables authentication.
+  ## @param frankframework.environmentVariables.application.security.http.authenticators Comma-separated names of the HTTP authenticators to register, referenced by servlets to secure them.
+  ## @param frankframework.environmentVariables.application.security.http.authenticators.noAuth.type Type of the "noAuth" HTTP authenticator. "NONE" means no authentication is performed.
+  ## @param frankframework.environmentVariables.servlet.LarvaServlet.authenticator Name of the authenticator (defined under application.security.http.authenticators) used to secure the Larva test servlet.
+  ## @param frankframework.environmentVariables.jdbc.datasource.default JNDI name of the default JDBC datasource used by the Frank!Framework.
   ##
   environmentVariables:
     application.security.console.authentication.type: NONE

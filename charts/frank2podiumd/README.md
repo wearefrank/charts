@@ -36,15 +36,20 @@ helm delete my-frank2podiumd
 This chart is a wrapper for the Frank!Framework chart.
 See the documentation for the Frank!Framework chart for more information.
 
-| Name                                                    | Description                                                 | Value           |
-| ------------------------------------------------------- | ----------------------------------------------------------- | --------------- |
-| `frankframework.image.registry`                         | frank2podiumd image registry                                | `wearefrank`    |
-| `frankframework.image.repository`                       | frank2podiumd image repository                              | `frank2podiumd` |
-| `frankframework.image.tag`                              | frank2podiumd image tag (immutable tags are recommended)    | `1.0.0`         |
-| `frankframework.image.pullPolicy`                       | frank2podiumd image pull policy                             | `IfNotPresent`  |
-| `frankframework.image.pullSecrets`                      | frank2podiumd image pull secrets                            | `[]`            |
-| `frankframework.replicaCount`                           | Number of Frank!Framework replicas to deploy                | `1`             |
-| `frankframework.securityContext.readOnlyRootFilesystem` | Set the security context for the Frank!Framework containers | `true`          |
+| Name                                                                                       | Description                                                                                                               | Value                |
+| ------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------- | -------------------- |
+| `frankframework.image.registry`                                                            | frank2podiumd image registry                                                                                              | `wearefrank`         |
+| `frankframework.image.repository`                                                          | frank2podiumd image repository                                                                                            | `frank2podiumd`      |
+| `frankframework.image.tag`                                                                 | frank2podiumd image tag (immutable tags are recommended)                                                                  | `1.0.0`              |
+| `frankframework.image.pullPolicy`                                                          | frank2podiumd image pull policy                                                                                           | `IfNotPresent`       |
+| `frankframework.image.pullSecrets`                                                         | frank2podiumd image pull secrets                                                                                          | `[]`                 |
+| `frankframework.environmentVariables.application.security.console.authentication.type`     | Authentication type for the Frank!Console (management console). "NONE" disables authentication.                           | `NONE`               |
+| `frankframework.environmentVariables.application.security.http.authenticators`             | Comma-separated names of the HTTP authenticators to register, referenced by servlets to secure them.                      | `noAuth`             |
+| `frankframework.environmentVariables.application.security.http.authenticators.noAuth.type` | Type of the "noAuth" HTTP authenticator. "NONE" means no authentication is performed.                                     | `undefined`          |
+| `frankframework.environmentVariables.servlet.LarvaServlet.authenticator`                   | Name of the authenticator (defined under application.security.http.authenticators) used to secure the Larva test servlet. | `noAuth`             |
+| `frankframework.environmentVariables.jdbc.datasource.default`                              | JNDI name of the default JDBC datasource used by the Frank!Framework.                                                     | `jdbc/frank2podiumd` |
+| `frankframework.replicaCount`                                                              | Number of Frank!Framework replicas to deploy                                                                              | `1`                  |
+| `frankframework.securityContext.readOnlyRootFilesystem`                                    | Set the security context for the Frank!Framework containers                                                               | `true`               |
 
 ## Configuration and installation details
 
