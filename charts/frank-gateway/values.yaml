@@ -1,13 +1,16 @@
-# Let op: dit zijn allemaal overrides voor de `apisix` subchart-dependency, dus
-# alles moet genest staan onder de `apisix:` key (anders komt het nooit aan bij
-# de subchart, zie apache/apisix-helm-chart values.yaml). Er is in chart-versie
-# 2.14.0 geen aparte dashboard-subchart/dependency (meer), dus daar is geen key voor.
-#
-# Extra addertje: de subchart heeft zelf ook weer een top-level `apisix:` key
-# (een 1-op-1 spiegel van de APISIX config.yaml `apisix:`-sectie, met daaronder
-# o.a. `deployment:`). Om daar iets in te overriden moet je dus `apisix.apisix.*`
-# gebruiken vanuit onze values.yaml — de eerste `apisix:` is de dependency, de
-# tweede is hun eigen config-sectie.
+## @section General
+## @descriptionStart
+## These are all overrides for the `apisix` subchart dependency, so everything must be
+## nested under the `apisix:` key (otherwise it never reaches the subchart, see
+## apache/apisix-helm-chart's values.yaml). Chart version 2.14.0 no longer has a separate
+## dashboard subchart/dependency, so there is no key for that.
+##
+## Gotcha: the subchart itself also has its own top-level `apisix:` key (a 1-to-1 mirror
+## of the APISIX `config.yaml` `apisix:` section, which includes `deployment:` among
+## others). To override something in there you need `apisix.apisix.*` from our
+## values.yaml — the first `apisix:` is the dependency, the second is their own config
+## section.
+## @descriptionEnd
 apisix:
   ## @section Image
   ## Custom GHCR image for the APISIX container, built with WeAreFrank plugins (SOAP/FSC/OIDC).
@@ -19,10 +22,10 @@ apisix:
     tag: "1.0.0"
 
   ## @section Deployment mode
-  ## Extra addertje: de subchart heeft zelf ook weer een top-level `apisix:` key
-  ## (1-op-1 spiegel van de APISIX config.yaml `apisix:`-sectie). Om daar iets in
-  ## te overriden gebruik je dus `apisix.apisix.*` — de eerste `apisix:` is de
-  ## dependency, de tweede is hun eigen config-sectie.
+  ## Gotcha: the subchart itself also has its own top-level `apisix:` key (a 1-to-1
+  ## mirror of the APISIX config.yaml `apisix:` section). To override something in
+  ## there you use `apisix.apisix.*` — the first `apisix:` is the dependency, the
+  ## second is their own config section.
   ##
   apisix:
     deployment:
@@ -40,18 +43,15 @@ apisix:
     ## @section Custom plugins
     ## Lua plugins baked into the WeAreFrank image (SOAP/FSC/OIDC/etc.), loaded via the
     ## APISIX `custom-plugins` mechanism rather than upstream's `plugins`/`apisix.plugins`.
+    ## Plugin code is baked into the image under `/usr/local/apisix/custom-plugins/apisix/plugins`.
     ##
     ## @param apisix.apisix.customPlugins.enabled Enable custom (WeAreFrank) Lua plugins baked into the image
     ## @param apisix.apisix.customPlugins.luaPath Lua module search path pattern used to locate custom plugin code
     customPlugins:
       enabled: true
-      # Plugin code is baked into the Frank Gateway image under:
-      # /usr/local/apisix/custom-plugins/apisix/plugins
       luaPath: "/usr/local/apisix/custom-plugins/?.lua"
       ## @skip apisix.apisix.customPlugins.plugins
-      # Custom plugin definitions: each entry has `name` (must match its Lua module name),
-      # `attrs` (passed through to the APISIX plugin config), and an optional `configMap`
-      # (`name`/`mounts`) to mount plugin config from an existing ConfigMap.
+      ## @extra apisix.apisix.customPlugins.plugins Custom plugin definitions: each entry has `name` (must match its Lua module name), `attrs` (passed through to the APISIX plugin config), and an optional `configMap` (`name`/`mounts`) to mount plugin config from an existing ConfigMap.
       plugins:
         - name: cert-auth
           attrs: {}
@@ -95,8 +95,6 @@ apisix:
             mounts: []
 
     ## @param apisix.apisix.plugins Enabled APISIX plugin list; custom plugins (see `customPlugins.plugins` above) must also be listed here, or APISIX won't load them
-    # Custom plugins currently are required to be listed here as well
-
     plugins:                           # plugin list (sorted by priority)
       - real-ip                   # priority: 23000
       #- ai                       # priority: 22900
@@ -182,7 +180,9 @@ apisix:
       #- log-rotate               # priority: 100
       # <- recommend to use priority (0, 100) for your custom plugins
       - example-plugin            # priority: 0
-      - cert-auth                 # priority 100
+      # WeAreFrank custom plugins; priority is defined in each plugin's own Lua module
+      # (baked into the image), not tracked here
+      - cert-auth
       - frank-sender
       - generic-oauth-client
       - jwt-client
@@ -200,8 +200,9 @@ apisix:
       - ext-plugin-post-resp      # priority: -4000
 
   ## @section etcd
+  ## @descriptionStart
   ## We use standalone/yaml mode and don't talk to etcd at all (internal or external).
-  ##
+  ## @descriptionEnd
   etcd:
     ## @param apisix.etcd.enabled Enable the bundled etcd subchart
     enabled: false
