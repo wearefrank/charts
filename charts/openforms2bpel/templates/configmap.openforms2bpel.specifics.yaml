@@ -1,0 +1,152 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ template "ff-common.fullname" . }}-specifics
+  labels:
+    {{- include "ff-common.labels" . | nindent 4 }}
+data:
+  {{- with .Values.openforms2bpel.connections }}
+  {{- with .bpelBasicService }}
+  openforms2bpel.connections.bpelBasicService.endpoint: "{{ .endpoint }}"
+  openforms2bpel.connections.bpelBasicService.verifyHostname: "{{ .verifyHostname }}"
+  openforms2bpel.connections.bpelBasicService.allowSelfSignedCerts: "{{ .allowSelfSignedCerts }}"
+  openforms2bpel.connections.bpelBasicService.ignoreExpiredCerts: "{{ .ignoreExpiredCerts }}"
+  openforms2bpel.connections.bpelBasicService.authAlias: "{{ .authAlias }}"
+  openforms2bpel.connections.bpelBasicService.timeout: "{{ .timeout }}"
+  {{- end }}
+  {{- with .bpelDocumentsService }}
+  openforms2bpel.connections.bpelDocumentsService.endpoint: "{{ .endpoint }}"
+  openforms2bpel.connections.bpelDocumentsService.verifyHostname: "{{ .verifyHostname }}"
+  openforms2bpel.connections.bpelDocumentsService.allowSelfSignedCerts: "{{ .allowSelfSignedCerts }}"
+  openforms2bpel.connections.bpelDocumentsService.ignoreExpiredCerts: "{{ .ignoreExpiredCerts }}"
+  openforms2bpel.connections.bpelDocumentsService.timeout: "{{ .timeout }}"
+  {{- end }}
+  {{- with .bpelCasesService }}
+  openforms2bpel.connections.bpelCasesService.endpoint: "{{ .endpoint }}"
+  openforms2bpel.connections.bpelCasesService.verifyHostname: "{{ .verifyHostname }}"
+  openforms2bpel.connections.bpelCasesService.allowSelfSignedCerts: "{{ .allowSelfSignedCerts }}"
+  openforms2bpel.connections.bpelCasesService.ignoreExpiredCerts: "{{ .ignoreExpiredCerts }}"
+  openforms2bpel.connections.bpelCasesService.timeout: "{{ .timeout }}"
+  {{- end }}
+  {{- with .bpelMtomService }}
+  openforms2bpel.connections.bpelMtomService.endpoint: "{{ .endpoint }}"
+  openforms2bpel.connections.bpelMtomService.verifyHostname: "{{ .verifyHostname }}"
+  openforms2bpel.connections.bpelMtomService.allowSelfSignedCerts: "{{ .allowSelfSignedCerts }}"
+  openforms2bpel.connections.bpelMtomService.ignoreExpiredCerts: "{{ .ignoreExpiredCerts }}"
+  openforms2bpel.connections.bpelMtomService.timeout: "{{ .timeout }}"
+  {{- end }}
+  {{- with .bpelBasicStatusUpdateService }}
+  openforms2bpel.connections.bpelBasicStatusUpdateService.endpoint: "{{ .endpoint }}"
+  openforms2bpel.connections.bpelBasicStatusUpdateService.verifyHostname: "{{ .verifyHostname }}"
+  openforms2bpel.connections.bpelBasicStatusUpdateService.allowSelfSignedCerts: "{{ .allowSelfSignedCerts }}"
+  openforms2bpel.connections.bpelBasicStatusUpdateService.ignoreExpiredCerts: "{{ .ignoreExpiredCerts }}"
+  openforms2bpel.connections.bpelBasicStatusUpdateService.timeout: "{{ .timeout }}"
+  {{- end }}
+  {{- with .bpelPaymentService }}
+  openforms2bpel.connections.bpelPaymentService.endpoint: "{{ .endpoint }}"
+  openforms2bpel.connections.bpelPaymentService.verifyHostname: "{{ .verifyHostname }}"
+  openforms2bpel.connections.bpelPaymentService.allowSelfSignedCerts: "{{ .allowSelfSignedCerts }}"
+  openforms2bpel.connections.bpelPaymentService.ignoreExpiredCerts: "{{ .ignoreExpiredCerts }}"
+  openforms2bpel.connections.bpelPaymentService.timeout: "{{ .timeout }}"
+  {{- end }}
+  {{- with .bpelGegMagService }}
+  openforms2bpel.connections.bpelGegMagService.endpoint: "{{ .endpoint }}"
+  openforms2bpel.connections.bpelGegMagService.verifyHostname: "{{ .verifyHostname }}"
+  openforms2bpel.connections.bpelGegMagService.allowSelfSignedCerts: "{{ .allowSelfSignedCerts }}"
+  openforms2bpel.connections.bpelGegMagService.ignoreExpiredCerts: "{{ .ignoreExpiredCerts }}"
+  openforms2bpel.connections.bpelGegMagService.timeout: "{{ .timeout }}"
+  {{- end }}
+  {{- with .notificatiesApi }}
+  openforms2bpel.connections.notificatiesApi.rootUrl: "{{ .rootUrl }}"
+  openforms2bpel.connections.notificatiesApi.authType: "{{ .authType }}"
+  openforms2bpel.connections.notificatiesApi.authAlias: "{{ .authAlias }}"
+  openforms2bpel.connections.notificatiesApi.timeout: "{{ .timeout }}"
+  {{- with .subscription }}
+  openforms2bpel.connections.notificatiesApi.subscription.callback: "{{ .callback }}"
+  openforms2bpel.connections.notificatiesApi.subscription.authAlias: "{{ .authAlias }}"
+  {{- with .filters }}
+  openforms2bpel.connections.notificatiesApi.subscription.filters.objectType: "{{ .objectType }}"
+  {{- end }}
+  {{- end }}
+  {{- end }}
+  {{- with .documentenApi }}
+  openforms2bpel.connections.documentenApi.authType: "{{ .authType }}"
+  openforms2bpel.connections.documentenApi.authAlias: "{{ .authAlias }}"
+  openforms2bpel.connections.documentenApi.timeout: "{{ .timeout }}"
+  {{- end }}
+  {{- with .objectsApi }}
+  openforms2bpel.connections.objectsApi.authType: "{{ .authType }}"
+  openforms2bpel.connections.objectsApi.authAlias: "{{ .authAlias }}"
+  openforms2bpel.connections.objectsApi.timeout: "{{ .timeout }}"
+  {{- end }}
+  {{- with .noReplySmtp }}
+  openforms2bpel.connections.noReplySmtp.enabled: "{{ .enabled }}"
+  openforms2bpel.connections.noReplySmtp.host: "{{ .host }}"
+  openforms2bpel.connections.noReplySmtp.port: "{{ .port }}"
+  openforms2bpel.connections.noReplySmtp.useSsl: "{{ .useSsl }}"
+  openforms2bpel.connections.noReplySmtp.authAlias: "{{ .authAlias }}"
+  openforms2bpel.connections.noReplySmtp.timeout: "{{ .timeout }}"
+  openforms2bpel.connections.noReplySmtp.defaultFromName: "{{ .defaultFromName }}"
+  openforms2bpel.connections.noReplySmtp.defaultFromAddress: "{{ .defaultFromAddress }}"
+  openforms2bpel.connections.noReplySmtp.signatureFromName: "{{ .signatureFromName | default .defaultFromName }}"
+  {{- end }}
+  {{- end }}
+  {{- with .Values.openforms2bpel.formdata }}
+  {{- if or .collectorStylesheet .existingConfigMap }}
+  openforms2bpel.formdata.collectorStylesheetFile: "FormDataCollector_ObjectsApi_Custom.xslt"
+  {{- else }}
+  openforms2bpel.formdata.collectorStylesheetFile: "FormDataCollector_ObjectsApi_Default.xslt"
+  {{- end }}
+  {{- if or .transformStylesheet .existingConfigMap }}
+  openforms2bpel.formdata.transformStylesheetFile: "FormDataTransform_Custom.xslt"
+  {{- else }}
+  openforms2bpel.formdata.transformStylesheetFile: "FormDataTransform_Default.xslt"
+  {{- end }}
+  {{- end }}
+  {{- with .Values.openforms2bpel.workflows }}
+  {{- with .autoRetries }}
+  openforms2bpel.workflows.autoRetries.enabled: "{{ .enabled }}"
+  openforms2bpel.workflows.autoRetries.cronExpression: "{{ .cronExpression }}"
+  openforms2bpel.workflows.autoRetries.maxRetries: "{{ .maxRetries }}"
+  {{- with .workflowSelector }}
+  openforms2bpel.workflows.autoRetries.workflowSelector.enabled: "{{ .enabled | default "${openforms2bpel.workflows.autoRetries.enabled}" }}"
+  openforms2bpel.workflows.autoRetries.workflowSelector.cronExpression: "{{ .cronExpression | default "${openforms2bpel.workflows.autoRetries.cronExpression}" }}"
+  openforms2bpel.workflows.autoRetries.workflowSelector.maxRetries: "{{ .maxRetries | default "${openforms2bpel.workflows.autoRetries.maxRetries}" }}"
+  {{- end }}
+  {{- with .addDocumentsToCase }}
+  openforms2bpel.workflows.autoRetries.addDocumentsToCase.enabled: "{{ .enabled | default "${openforms2bpel.workflows.autoRetries.enabled}" }}"
+  openforms2bpel.workflows.autoRetries.addDocumentsToCase.cronExpression: "{{ .cronExpression | default "${openforms2bpel.workflows.autoRetries.cronExpression}" }}"
+  openforms2bpel.workflows.autoRetries.addDocumentsToCase.maxRetries: "{{ .maxRetries | default "${openforms2bpel.workflows.autoRetries.maxRetries}" }}"
+  {{- end }}
+  {{- with .updatePaymentCommand }}
+  openforms2bpel.workflows.autoRetries.updatePaymentCommand.enabled: "{{ .enabled | default "${openforms2bpel.workflows.autoRetries.enabled}" }}"
+  openforms2bpel.workflows.autoRetries.updatePaymentCommand.cronExpression: "{{ .cronExpression | default "${openforms2bpel.workflows.autoRetries.cronExpression}" }}"
+  openforms2bpel.workflows.autoRetries.updatePaymentCommand.maxRetries: "{{ .maxRetries | default "${openforms2bpel.workflows.autoRetries.maxRetries}" }}"
+  {{- end }}
+  {{- with .sendNoReplyUserEmail }}
+  openforms2bpel.workflows.autoRetries.sendNoReplyUserEmail.enabled: "{{ .enabled | default "${openforms2bpel.workflows.autoRetries.enabled}" }}"
+  openforms2bpel.workflows.autoRetries.sendNoReplyUserEmail.cronExpression: "{{ .cronExpression | default "${openforms2bpel.workflows.autoRetries.cronExpression}" }}"
+  openforms2bpel.workflows.autoRetries.sendNoReplyUserEmail.maxRetries: "{{ .maxRetries | default "${openforms2bpel.workflows.autoRetries.maxRetries}" }}"
+  {{- end }}
+  {{- end }}
+  {{- with .scheduledStartReceiver }}
+  openforms2bpel.workflows.scheduledStartReceiver.workflowSelector.enabled: "{{ .enabled }}"
+  openforms2bpel.workflows.scheduledStartReceiver.workflowSelector.cronExpression: "{{ .cronExpression }}"
+  {{- end }}
+  {{- with .scheduledStopReceiver }}
+  openforms2bpel.workflows.scheduledStopReceiver.workflowSelector.enabled: "{{ .enabled }}"
+  openforms2bpel.workflows.scheduledStopReceiver.workflowSelector.cronExpression: "{{ .cronExpression }}"
+  {{- end }}
+  {{- with .onErrorActions.onCaseNotFound }}
+  openforms2bpel.workflows.onErrorActions.onCaseNotFound.sendMail: "{{ .sendMail }}"
+  openforms2bpel.workflows.onErrorActions.onCaseNotFound.templateName: "{{ .templateName }}"
+  {{- end }}
+  {{- with .onErrorActions.onSubjectNotEqualsCaseSubject }}
+  openforms2bpel.workflows.onErrorActions.onSubjectNotEqualsCaseSubject.sendMail: "{{ .sendMail }}"
+  openforms2bpel.workflows.onErrorActions.onSubjectNotEqualsCaseSubject.templateName: "{{ .templateName }}"
+  {{- end }}
+  {{- with .onErrorActions.onCaseClosed }}
+  openforms2bpel.workflows.onErrorActions.onCaseClosed.sendMail: "{{ .sendMail }}"
+  openforms2bpel.workflows.onErrorActions.onCaseClosed.templateName: "{{ .templateName }}"
+  {{- end }}
+  {{- end }}
