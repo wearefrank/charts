@@ -23,12 +23,21 @@ section.
 
 ### Deployment mode
 
-| Name                                                        | Description                                                                                     | Value         |
-| ----------------------------------------------------------- | ----------------------------------------------------------------------------------------------- | ------------- |
-| `apisix.apisix.deployment.mode`                             | APISIX deployment mode (we run standalone, without etcd)                                        | `standalone`  |
-| `apisix.apisix.deployment.role_traditional.config_provider` | Configuration provider used in standalone mode                                                  | `yaml`        |
-| `apisix.apisix.deployment.standalone.config`                | Inline APISIX routes configuration (YAML string); customers override this with their own routes | `routes: []
+| Name                                                        | Description                                                                                      | Value         |
+| ----------------------------------------------------------- | ------------------------------------------------------------------------------------------------ | ------------- |
+| `apisix.apisix.enableServerTokens`                          | hides apisix version in header and error pages (we don't want to leak our version to the public) | `false`       |
+| `apisix.apisix.deployment.mode`                             | APISIX deployment mode (we run standalone, without etcd)                                         | `standalone`  |
+| `apisix.apisix.deployment.role_traditional.config_provider` | Configuration provider used in standalone mode                                                   | `yaml`        |
+| `apisix.apisix.deployment.standalone.config`                | Inline APISIX routes configuration (YAML string); customers override this with their own routes  | `routes: []
 ` |
+
+### ssl settings and ciphers to limit the use of unsecure vyfers
+
+| Name                             | Description                                                                     | Value                                                                                                                 |
+| -------------------------------- | ------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------- |
+| `apisix.apisix.ssl.enabled`      | Enable TLS/SSL termination in APISIX (we always want this)                      | `true`                                                                                                                |
+| `apisix.apisix.ssl.sslProtocols` | TLS protocol versions to support (space-separated list, e.g. "TLSv1.2 TLSv1.3") | `TLSv1.2 TLSv1.3`                                                                                                     |
+| `apisix.apisix.ssl.sslCiphers`   | TLS cipher suites to support                                                    | `ECDHE-RSA-AES256-GCM-SHA384:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-ECDSA-AES128-GCM-SHA256` |
 
 ### Custom plugins
 
