@@ -1,0 +1,254 @@
+{
+    "title": "Chart Values",
+    "type": "object",
+    "properties": {
+        "apisix": {
+            "type": "object",
+            "properties": {
+                "image": {
+                    "type": "object",
+                    "properties": {
+                        "repository": {
+                            "type": "string",
+                            "description": "APISIX container image repository",
+                            "default": "ghcr.io/wearefrank/frank-gateway"
+                        },
+                        "tag": {
+                            "type": "string",
+                            "description": "APISIX container image tag (immutable tags are recommended)",
+                            "default": "1.0.0"
+                        }
+                    }
+                },
+                "apisix": {
+                    "type": "object",
+                    "properties": {
+                        "enableServerTokens": {
+                            "type": "boolean",
+                            "description": "hides apisix version in header and error pages (we don't want to leak our version to the public)",
+                            "default": false
+                        },
+                        "deployment": {
+                            "type": "object",
+                            "properties": {
+                                "mode": {
+                                    "type": "string",
+                                    "description": "APISIX deployment mode (we run standalone, without etcd)",
+                                    "default": "standalone"
+                                },
+                                "role_traditional": {
+                                    "type": "object",
+                                    "properties": {
+                                        "config_provider": {
+                                            "type": "string",
+                                            "description": "Configuration provider used in standalone mode",
+                                            "default": "yaml"
+                                        }
+                                    }
+                                },
+                                "standalone": {
+                                    "type": "object",
+                                    "properties": {
+                                        "config": {
+                                            "type": "string",
+                                            "description": "Inline APISIX routes configuration (YAML string); customers override this with their own routes",
+                                            "default": "routes: []\n"
+                                        }
+                                    }
+                                }
+                            }
+                        },
+                        "ssl": {
+                            "type": "object",
+                            "properties": {
+                                "enabled": {
+                                    "type": "boolean",
+                                    "description": "Enable TLS/SSL termination in APISIX (we always want this)",
+                                    "default": true
+                                },
+                                "sslProtocols": {
+                                    "type": "string",
+                                    "description": "TLS protocol versions to support (space-separated list, e.g. \"TLSv1.2 TLSv1.3\")",
+                                    "default": "TLSv1.2 TLSv1.3"
+                                },
+                                "sslCiphers": {
+                                    "type": "string",
+                                    "description": "TLS cipher suites to support",
+                                    "default": "ECDHE-RSA-AES256-GCM-SHA384:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-ECDSA-AES128-GCM-SHA256"
+                                }
+                            }
+                        },
+                        "customPlugins": {
+                            "type": "object",
+                            "properties": {
+                                "enabled": {
+                                    "type": "boolean",
+                                    "description": "Enable custom (WeAreFrank) Lua plugins baked into the image",
+                                    "default": true
+                                },
+                                "luaPath": {
+                                    "type": "string",
+                                    "description": "Lua module search path pattern used to locate custom plugin code",
+                                    "default": "/usr/local/apisix/custom-plugins/?.lua"
+                                },
+                                "plugins": {
+                                    "type": "array",
+                                    "description": "",
+                                    "items": {
+                                        "type": "object",
+                                        "properties": {
+                                            "name": {
+                                                "type": "string",
+                                                "description": ""
+                                            },
+                                            "attrs": {
+                                                "type": "object",
+                                                "description": ""
+                                            },
+                                            "configMap": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "name": {
+                                                        "type": "string",
+                                                        "description": ""
+                                                    },
+                                                    "mounts": {
+                                                        "type": "array",
+                                                        "description": "",
+                                                        "items": {}
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        },
+                        "plugins": {
+                            "type": "array",
+                            "description": "Enabled APISIX plugin list; custom plugins (see `customPlugins.plugins` above) must also be listed here, or APISIX won't load them",
+                            "default": [
+                                "real-ip",
+                                "client-control",
+                                "proxy-control",
+                                "request-id",
+                                "opentelemetry",
+                                "ext-plugin-pre-req",
+                                "fault-injection",
+                                "mocking",
+                                "serverless-pre-function",
+                                "cors",
+                                "ip-restriction",
+                                "ua-restriction",
+                                "referer-restriction",
+                                "csrf",
+                                "uri-blocker",
+                                "request-validation",
+                                "chaitin-waf",
+                                "multi-auth",
+                                "openid-connect",
+                                "cas-auth",
+                                "authz-casbin",
+                                "authz-casdoor",
+                                "wolf-rbac",
+                                "ldap-auth",
+                                "hmac-auth",
+                                "basic-auth",
+                                "jwt-auth",
+                                "jwe-decrypt",
+                                "key-auth",
+                                "consumer-restriction",
+                                "forward-auth",
+                                "opa",
+                                "authz-keycloak",
+                                "proxy-cache",
+                                "body-transformer",
+                                "proxy-mirror",
+                                "proxy-rewrite",
+                                "workflow",
+                                "api-breaker",
+                                "limit-conn",
+                                "limit-count",
+                                "limit-req",
+                                "response-extractor",
+                                "gzip",
+                                "server-info",
+                                "traffic-split",
+                                "redirect",
+                                "response-rewrite",
+                                "degraphql",
+                                "grpc-transcode",
+                                "grpc-web",
+                                "public-api",
+                                "prometheus",
+                                "datadog",
+                                "loki-logger",
+                                "elasticsearch-logger",
+                                "echo",
+                                "loggly",
+                                "http-logger",
+                                "splunk-hec-logging",
+                                "skywalking-logger",
+                                "google-cloud-logging",
+                                "sls-logger",
+                                "tcp-logger",
+                                "kafka-logger",
+                                "rocketmq-logger",
+                                "syslog",
+                                "udp-logger",
+                                "file-logger",
+                                "clickhouse-logger",
+                                "inspect",
+                                "example-plugin",
+                                "cert-auth",
+                                "frank-sender",
+                                "generic-oauth-client",
+                                "jwt-client",
+                                "limit-size",
+                                "soap-action-router",
+                                "openid-connect-client",
+                                "fsc",
+                                "serverless-post-function",
+                                "ext-plugin-post-req",
+                                "ext-plugin-post-resp"
+                            ],
+                            "items": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                },
+                "etcd": {
+                    "type": "object",
+                    "properties": {
+                        "enabled": {
+                            "type": "boolean",
+                            "description": "Enable the bundled etcd subchart",
+                            "default": false
+                        }
+                    }
+                },
+                "externalEtcd": {
+                    "type": "object",
+                    "properties": {
+                        "user": {
+                            "type": "string",
+                            "description": "External etcd username, emptied to avoid an unused etcd secret/env var since `etcd.enabled` is false",
+                            "default": ""
+                        }
+                    }
+                },
+                "ingress-controller": {
+                    "type": "object",
+                    "properties": {
+                        "enabled": {
+                            "type": "boolean",
+                            "description": "Enable the bundled APISIX ingress-controller subchart",
+                            "default": false
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

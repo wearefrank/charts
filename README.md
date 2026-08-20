@@ -6,6 +6,7 @@ Popular applications, and Franks! build on top of the [Frank!Framework](https://
 
 * [Apache Drill](/charts/drill/README.md)
 * [ZaakBrug](/charts/zaakbrug/README.md)
+* [frank-gateway](/charts/frank-gateway/README.md)
 
 ## Usage
 
