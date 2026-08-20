@@ -28,6 +28,8 @@ apisix:
   ## second is their own config section.
   ##
   apisix:
+    ## @param apisix.apisix.enableServerTokens hides apisix version in header and error pages (we don't want to leak our version to the public)
+    enableServerTokens: false
     deployment:
       ## @param apisix.apisix.deployment.mode APISIX deployment mode (we run standalone, without etcd)
       mode: standalone
@@ -39,7 +41,15 @@ apisix:
         config: |
           routes: []
         # existingConfigMap: "frank-gateway-routes" # alternative: point to an existing ConfigMap instead of inline config
-
+    ## @section ssl settings and ciphers to limit the use of unsecure vyfers
+    ## @param apisix.apisix.ssl.enabled Enable TLS/SSL termination in APISIX (we always want this)
+    ## @param apisix.apisix.ssl.sslProtocols TLS protocol versions to support (space-separated list, e.g. "TLSv1.2 TLSv1.3")
+    ## @param apisix.apisix.ssl.sslCiphers TLS cipher suites to support
+    ssl:
+        enabled: true
+        sslProtocols: "TLSv1.2 TLSv1.3"
+        # Smaller list of supported TLSv1.2 ciphers that are still considered secure. The default list will trip security scanners and is not recommended for production use.
+        sslCiphers: "ECDHE-RSA-AES256-GCM-SHA384:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-ECDSA-AES128-GCM-SHA256"
     ## @section Custom plugins
     ## Lua plugins baked into the WeAreFrank image (SOAP/FSC/OIDC/etc.), loaded via the
     ## APISIX `custom-plugins` mechanism rather than upstream's `plugins`/`apisix.plugins`.
