@@ -31,7 +31,7 @@ section.
 | `apisix.apisix.deployment.standalone.config`                | Inline APISIX routes configuration (YAML string); customers override this with their own routes  | `routes: []
 ` |
 
-### ssl settings and ciphers to limit the use of unsecure vyfers
+### ssl settings and ciphers to limit the use of unsecure ciphers
 
 | Name                             | Description                                                                     | Value                                                                                                                 |
 | -------------------------------- | ------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------- |

@@ -41,7 +41,7 @@ apisix:
         config: |
           routes: []
         # existingConfigMap: "frank-gateway-routes" # alternative: point to an existing ConfigMap instead of inline config
-    ## @section ssl settings and ciphers to limit the use of unsecure vyfers
+    ## @section ssl settings and ciphers to limit the use of unsecure ciphers
     ## @param apisix.apisix.ssl.enabled Enable TLS/SSL termination in APISIX (we always want this)
     ## @param apisix.apisix.ssl.sslProtocols TLS protocol versions to support (space-separated list, e.g. "TLSv1.2 TLSv1.3")
     ## @param apisix.apisix.ssl.sslCiphers TLS cipher suites to support
