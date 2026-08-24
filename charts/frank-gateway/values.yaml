@@ -13,8 +13,9 @@
 ## @descriptionEnd
 apisix:
   ## @section Image
+  ## @descriptionStart
   ## Custom GHCR image for the APISIX container, built with WeAreFrank plugins (SOAP/FSC/OIDC).
-  ##
+  ## @descriptionEnd
   image:
     ## @param apisix.image.repository APISIX container image repository
     repository: ghcr.io/wearefrank/frank-gateway
@@ -22,11 +23,6 @@ apisix:
     tag: "1.0.0"
 
   ## @section Deployment mode
-  ## Gotcha: the subchart itself also has its own top-level `apisix:` key (a 1-to-1
-  ## mirror of the APISIX config.yaml `apisix:` section). To override something in
-  ## there you use `apisix.apisix.*` — the first `apisix:` is the dependency, the
-  ## second is their own config section.
-  ##
   apisix:
     ## @param apisix.apisix.enableServerTokens hides apisix version in header and error pages (we don't want to leak our version to the public)
     enableServerTokens: false
@@ -51,10 +47,11 @@ apisix:
         # Smaller list of supported TLSv1.2 ciphers that are still considered secure. The default list will trip security scanners and is not recommended for production use.
         sslCiphers: "ECDHE-RSA-AES256-GCM-SHA384:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-ECDSA-AES128-GCM-SHA256"
     ## @section Custom plugins
+    ## @descriptionStart
     ## Lua plugins baked into the WeAreFrank image (SOAP/FSC/OIDC/etc.), loaded via the
     ## APISIX `custom-plugins` mechanism rather than upstream's `plugins`/`apisix.plugins`.
     ## Plugin code is baked into the image under `/usr/local/apisix/custom-plugins/apisix/plugins`.
-    ##
+    ## @descriptionEnd
     ## @param apisix.apisix.customPlugins.enabled Enable custom (WeAreFrank) Lua plugins baked into the image
     ## @param apisix.apisix.customPlugins.luaPath Lua module search path pattern used to locate custom plugin code
     customPlugins:
