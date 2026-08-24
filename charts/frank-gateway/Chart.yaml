@@ -1,0 +1,17 @@
+apiVersion: v2
+name: frank-gateway
+description: Frank!Gateway - Apache APISIX with WeAreFrank plugins for SOAP/FSC/OIDC
+type: application
+version: 0.1.0
+appVersion: "1.0.0"
+dependencies:
+  - name: apisix
+    version: "2.14.0"          # matches APISIX 3.16.0
+    # Primary repo: API7.ai-hosted mirror, more stable than the ASF-official
+    # apache.github.io (which occasionally has DNS resolution issues, see README
+    # §Troubleshooting and apache/apisix-helm-chart#959). Our release.yml runs
+    # `helm dependency update` without fallback logic, so a flaky primary repo
+    # can block releases for all charts in this repo.
+    repository: "https://charts.apiseven.com"
+    # Fallback/alternative: the ASF-official address (1-to-1 with the apache/apisix-helm-chart source):
+    # repository: "https://apache.github.io/apisix-helm-chart"
