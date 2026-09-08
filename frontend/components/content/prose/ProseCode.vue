@@ -69,8 +69,10 @@ pre code .line {
   min-height: 1rem;
 }
 
-pre code {
-  color: var(--lt-color-black);
+pre,
+pre code,
+pre code * {
+  color: rgb(var(--color-gray-900)) !important;
 }
 
 pre code .line.highlight {

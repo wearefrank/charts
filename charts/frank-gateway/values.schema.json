@@ -2,7 +2,7 @@
     "title": "Chart Values",
     "type": "object",
     "properties": {
-        "apisix": {
+        "frankgateway": {
             "type": "object",
             "properties": {
                 "image": {
@@ -36,15 +36,10 @@
                                     "description": "APISIX deployment mode (we run standalone, without etcd)",
                                     "default": "standalone"
                                 },
-                                "role_traditional": {
-                                    "type": "object",
-                                    "properties": {
-                                        "config_provider": {
-                                            "type": "string",
-                                            "description": "Configuration provider used in standalone mode",
-                                            "default": "yaml"
-                                        }
-                                    }
+                                "role": {
+                                    "type": "string",
+                                    "description": "APISIX deployment role required for standalone YAML configuration",
+                                    "default": "data_plane"
                                 },
                                 "standalone": {
                                     "type": "object",
