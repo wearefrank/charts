@@ -6,6 +6,7 @@ version: 0.2.0
 appVersion: "1.0.0"
 dependencies:
   - name: apisix
+    alias: frankgateway
     version: "2.17.0"
     # Primary repo: API7.ai-hosted mirror, more stable than the ASF-official
     # apache.github.io (which occasionally has DNS resolution issues, see README

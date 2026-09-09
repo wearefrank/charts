@@ -1,46 +1,45 @@
 ## @section General
 ## @descriptionStart
-## These are all overrides for the `apisix` subchart dependency, so everything must be
-## nested under the `apisix:` key (otherwise it never reaches the subchart, see
+## These are all overrides for the `frankgateway` dependency alias, so everything must be
+## nested under the `frankgateway:` key (otherwise it never reaches the subchart, see
 ## apache/apisix-helm-chart's values.yaml). Chart version 2.14.0 no longer has a separate
 ## dashboard subchart/dependency, so there is no key for that.
 ##
 ## Gotcha: the subchart itself also has its own top-level `apisix:` key (a 1-to-1 mirror
 ## of the APISIX `config.yaml` `apisix:` section, which includes `deployment:` among
-## others). To override something in there you need `apisix.apisix.*` from our
-## values.yaml — the first `apisix:` is the dependency, the second is their own config
+## others). To override something in there you need `frankgateway.apisix.*` from our
+## values.yaml — `frankgateway:` is the dependency alias, and `apisix:` is their own config
 ## section.
 ## @descriptionEnd
-apisix:
+frankgateway:
   ## @section Image
   ## @descriptionStart
   ## Custom GHCR image for the APISIX container, built with WeAreFrank plugins (SOAP/FSC/OIDC).
   ## @descriptionEnd
   image:
-    ## @param apisix.image.repository APISIX container image repository
+    ## @param frankgateway.image.repository APISIX container image repository
     repository: ghcr.io/wearefrank/frank-gateway
-    ## @param apisix.image.tag APISIX container image tag (immutable tags are recommended)
+    ## @param frankgateway.image.tag APISIX container image tag (immutable tags are recommended)
     tag: "1.0.0"
 
   ## @section Deployment mode
   apisix:
-    ## @param apisix.apisix.enableServerTokens hides apisix version in header and error pages (we don't want to leak our version to the public)
+    ## @param frankgateway.apisix.enableServerTokens hides apisix version in header and error pages (we don't want to leak our version to the public)
     enableServerTokens: false
     deployment:
-      ## @param apisix.apisix.deployment.mode APISIX deployment mode (we run standalone, without etcd)
+      ## @param frankgateway.apisix.deployment.mode APISIX deployment mode (we run standalone, without etcd)
       mode: standalone
-      role_traditional:
-        ## @param apisix.apisix.deployment.role_traditional.config_provider Configuration provider used in standalone mode
-        config_provider: yaml
+      ## @param frankgateway.apisix.deployment.role APISIX deployment role required for standalone YAML configuration
+      role: data_plane
       standalone:
-        ## @param apisix.apisix.deployment.standalone.config Inline APISIX routes configuration (YAML string); customers override this with their own routes
+        ## @param frankgateway.apisix.deployment.standalone.config Inline APISIX routes configuration (YAML string); customers override this with their own routes
         config: |
           routes: []
         # existingConfigMap: "frank-gateway-routes" # alternative: point to an existing ConfigMap instead of inline config
     ## @section ssl settings and ciphers to limit the use of unsecure ciphers
-    ## @param apisix.apisix.ssl.enabled Enable TLS/SSL termination in APISIX (we always want this)
-    ## @param apisix.apisix.ssl.sslProtocols TLS protocol versions to support (space-separated list, e.g. "TLSv1.2 TLSv1.3")
-    ## @param apisix.apisix.ssl.sslCiphers TLS cipher suites to support
+    ## @param frankgateway.apisix.ssl.enabled Enable TLS/SSL termination in APISIX (we always want this)
+    ## @param frankgateway.apisix.ssl.sslProtocols TLS protocol versions to support (space-separated list, e.g. "TLSv1.2 TLSv1.3")
+    ## @param frankgateway.apisix.ssl.sslCiphers TLS cipher suites to support
     ssl:
         enabled: true
         sslProtocols: "TLSv1.2 TLSv1.3"
@@ -52,13 +51,13 @@ apisix:
     ## APISIX `custom-plugins` mechanism rather than upstream's `plugins`/`apisix.plugins`.
     ## Plugin code is baked into the image under `/usr/local/apisix/custom-plugins/apisix/plugins`.
     ## @descriptionEnd
-    ## @param apisix.apisix.customPlugins.enabled Enable custom (WeAreFrank) Lua plugins baked into the image
-    ## @param apisix.apisix.customPlugins.luaPath Lua module search path pattern used to locate custom plugin code
+    ## @param frankgateway.apisix.customPlugins.enabled Enable custom (WeAreFrank) Lua plugins baked into the image
+    ## @param frankgateway.apisix.customPlugins.luaPath Lua module search path pattern used to locate custom plugin code
     customPlugins:
       enabled: true
       luaPath: "/usr/local/apisix/custom-plugins/?.lua"
-      ## @skip apisix.apisix.customPlugins.plugins
-      ## @extra apisix.apisix.customPlugins.plugins Custom plugin definitions: each entry has `name` (must match its Lua module name), `attrs` (passed through to the APISIX plugin config), and an optional `configMap` (`name`/`mounts`) to mount plugin config from an existing ConfigMap.
+      ## @skip frankgateway.apisix.customPlugins.plugins
+      ## @extra frankgateway.apisix.customPlugins.plugins Custom plugin definitions: each entry has `name` (must match its Lua module name), `attrs` (passed through to the APISIX plugin config), and an optional `configMap` (`name`/`mounts`) to mount plugin config from an existing ConfigMap.
       plugins:
         - name: cert-auth
           attrs: {}
@@ -101,7 +100,7 @@ apisix:
             name: ""
             mounts: []
 
-    ## @param apisix.apisix.plugins Enabled APISIX plugin list; custom plugins (see `customPlugins.plugins` above) must also be listed here, or APISIX won't load them
+    ## @param frankgateway.apisix.plugins Enabled APISIX plugin list; custom plugins (see `customPlugins.plugins` above) must also be listed here, or APISIX won't load them
     plugins:                           # plugin list (sorted by priority)
       - real-ip                   # priority: 23000
       #- ai                       # priority: 22900
@@ -211,15 +210,15 @@ apisix:
   ## We use standalone/yaml mode and don't talk to etcd at all (internal or external).
   ## @descriptionEnd
   etcd:
-    ## @param apisix.etcd.enabled Enable the bundled etcd subchart
+    ## @param frankgateway.etcd.enabled Enable the bundled etcd subchart
     enabled: false
 
-  ## @param apisix.externalEtcd.user External etcd username, emptied to avoid an unused etcd secret/env var since `etcd.enabled` is false
+  ## @param frankgateway.externalEtcd.user External etcd username, emptied to avoid an unused etcd secret/env var since `etcd.enabled` is false
   externalEtcd:
     user: ""
 
   ## @section Ingress controller
   ##
   ingress-controller:
-    ## @param apisix.ingress-controller.enabled Enable the bundled APISIX ingress-controller subchart
+    ## @param frankgateway.ingress-controller.enabled Enable the bundled APISIX ingress-controller subchart
     enabled: false
