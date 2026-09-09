@@ -470,6 +470,21 @@ entries:
   frank-gateway:
   - apiVersion: v2
     appVersion: 1.0.0
+    created: "2026-09-09T14:31:55.696348844Z"
+    dependencies:
+    - alias: frankgateway
+      name: apisix
+      repository: https://charts.apiseven.com
+      version: 2.17.0
+    description: Frank!Gateway - Apache APISIX with WeAreFrank plugins for SOAP/FSC/OIDC
+    digest: b082c6fb7696462c1e9b31bffb1f6f1b4b9adad9001ea5cd5fa68d2fddddf100
+    name: frank-gateway
+    type: application
+    urls:
+    - https://github.com/wearefrank/charts/releases/download/frank-gateway-0.3.0/frank-gateway-0.3.0.tgz
+    version: 0.3.0
+  - apiVersion: v2
+    appVersion: 1.0.0
     created: "2026-08-25T16:19:46.927760354Z"
     dependencies:
     - name: apisix
@@ -3062,4 +3077,4 @@ entries:
     urls:
     - https://github.com/wearefrank/charts/releases/download/zaakbrug-2.0.0/zaakbrug-2.0.0.tgz
     version: 2.0.0
-generated: "2026-08-25T16:19:47.133804205Z"
+generated: "2026-09-09T14:31:55.839357752Z"
