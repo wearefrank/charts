@@ -1,0 +1,20 @@
+{{/*
+ConfigMap for generating MailTemplates.xml
+*/}}
+{{- if (not .Values.openforms2bpel.formdata.existingConfigMap) -}}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ template "ff-common.fullname" . }}-formdata
+  labels:
+    {{- include "ff-common.labels" . | nindent 4 }}
+data:
+  {{- with .Values.openforms2bpel.formdata.collectorStylesheet }}
+  FormDataCollector_ObjectsApi_Custom.xslt: |-
+    {{- toString . | nindent 4 }}
+  {{- end }}
+  {{- with .Values.openforms2bpel.formdata.transformStylesheet }}
+  FormDataTransform_Custom.xslt: |-
+    {{- toString . | nindent 4 }}
+  {{- end }}
+{{- end -}}
