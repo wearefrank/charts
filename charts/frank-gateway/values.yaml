@@ -26,6 +26,19 @@ frankgateway:
   apisix:
     ## @param frankgateway.apisix.enableServerTokens hides apisix version in header and error pages (we don't want to leak our version to the public)
     enableServerTokens: false
+    nginx:
+      ## @param frankgateway.apisix.nginx.customLuaSharedDicts Shared memory dictionaries required by custom Lua plugins
+      customLuaSharedDicts:
+        - name: fsc-registration
+          size: 1m
+        - name: openid-connect-client-cache
+          size: 1m
+        - name: generic-oauth-client-cache
+          size: 1m
+        - name: jwt-client-cache
+          size: 1m
+        - name: merge-config
+          size: 1m
     deployment:
       ## @param frankgateway.apisix.deployment.mode APISIX deployment mode (we run standalone, without etcd)
       mode: standalone
