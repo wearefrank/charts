@@ -930,3 +930,15 @@ staging:
       ##       - chart-example.local
       ##
       tls: []
+
+## @section Frank!Framework
+## @descriptionStart
+## If you want to use the Frank!Framework for your translations, you can enable it here.
+## Make sure to also configure the Frank!Framework settings in the `frankframework` section of this values.yaml file and to set the routes for your translation profiles.
+## You can find more information about configuring the Frank!Framework in the documentation: https://github.com/frankframework/charts/tree/master/charts/frankframework
+## @descriptionEnd
+
+## @param frankframework.enabled Enable the Frank!Framework subchart, which deploys the Frank!Framework along with the ZaakBrug
+##
+frankframework:
+  enabled: false
