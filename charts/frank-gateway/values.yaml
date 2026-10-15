@@ -20,7 +20,7 @@ frankgateway:
     ## @param frankgateway.image.repository APISIX container image repository
     repository: ghcr.io/wearefrank/frank-gateway
     ## @param frankgateway.image.tag APISIX container image tag (immutable tags are recommended)
-    tag: "1.0.0"
+    tag: "1.1.4"
 
   ## @section Deployment mode
   apisix:
