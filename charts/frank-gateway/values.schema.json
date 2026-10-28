@@ -28,6 +28,48 @@
                             "description": "hides apisix version in header and error pages (we don't want to leak our version to the public)",
                             "default": false
                         },
+                        "nginx": {
+                            "type": "object",
+                            "properties": {
+                                "customLuaSharedDicts": {
+                                    "type": "array",
+                                    "description": "Shared memory dictionaries required by custom Lua plugins",
+                                    "default": [
+                                        {
+                                            "name": "fsc-registration",
+                                            "size": "1m"
+                                        },
+                                        {
+                                            "name": "openid-connect-client-cache",
+                                            "size": "1m"
+                                        },
+                                        {
+                                            "name": "generic-oauth-client-cache",
+                                            "size": "1m"
+                                        },
+                                        {
+                                            "name": "jwt-client-cache",
+                                            "size": "1m"
+                                        },
+                                        {
+                                            "name": "merge-config",
+                                            "size": "1m"
+                                        }
+                                    ],
+                                    "items": {
+                                        "type": "object",
+                                        "properties": {
+                                            "name": {
+                                                "type": "string"
+                                            },
+                                            "size": {
+                                                "type": "string"
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        },
                         "deployment": {
                             "type": "object",
                             "properties": {
