@@ -578,6 +578,26 @@ entries:
     version: 1.0.0
   zaakbrug:
   - apiVersion: v2
+    appVersion: 1.26.20
+    created: "2026-10-28T08:35:57.830206432Z"
+    dependencies:
+    - name: ff-common
+      repository: https://frankframework.github.io/charts/
+      version: ~0.2.0
+    - alias: staging
+      condition: staging.enabled
+      name: openzaak
+      repository: https://maykinmedia.github.io/charts/
+      version: 1.1.1
+    description: A Helm chart for running ZaakBrug on Kubernetes
+    digest: 070fa455c9cf3bde6c3a21cebf4dcaeb1a0035758b1b78730b1284ff4c823ca3
+    icon: https://raw.githubusercontent.com/wearefrank/charts/master/charts/zaakbrug/icon.png
+    name: zaakbrug
+    type: application
+    urls:
+    - https://github.com/wearefrank/charts/releases/download/zaakbrug-2.3.34/zaakbrug-2.3.34.tgz
+    version: 2.3.34
+  - apiVersion: v2
     appVersion: 1.26.19
     created: "2026-09-25T09:39:25.896631787Z"
     dependencies:
@@ -3097,4 +3117,4 @@ entries:
     urls:
     - https://github.com/wearefrank/charts/releases/download/zaakbrug-2.0.0/zaakbrug-2.0.0.tgz
     version: 2.0.0
-generated: "2026-09-25T09:39:25.896911849Z"
+generated: "2026-10-28T08:35:57.830484964Z"
