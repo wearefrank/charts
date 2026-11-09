@@ -1,0 +1,28 @@
+{{/*
+ConfigMap for generating MailTemplates.xml
+*/}}
+{{- if (not .Values.openforms2bpel.mailTemplates.existingConfigMap) -}}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ template "ff-common.fullname" . }}-mailtemplates
+  labels:
+    {{- include "ff-common.labels" . | nindent 4 }}
+data:
+  MailTemplates.xml: |-
+    <?xml version="1.0" encoding="UTF-8"?>
+    <root>
+      {{- range .Values.openforms2bpel.mailTemplates.templates }}
+        <mailTemplates>
+          <name>{{ .name }}</name>
+          <subject>{{ .subject }}</subject>
+          <messageType>{{ .messageType | default "text/html" }}</messageType>
+          <message>
+            <![CDATA[
+              {{- toString .message | nindent 14 }}
+            ]]>
+          </message>
+        </mailTemplates>
+      {{- end }}
+    </root>
+{{- end -}}
