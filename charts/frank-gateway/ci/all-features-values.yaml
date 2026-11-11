@@ -1,0 +1,103 @@
+# Every feature enabled, used by the CI workflow to lint, render and validate the chart.
+commonLabels:
+  team: integrations
+commonAnnotations:
+  owner: integrations
+
+image:
+  digest: sha256:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef
+
+standalone:
+  apisixYaml: |
+    routes:
+      - id: hello
+        uri: /hello
+        plugins:
+          mocking:
+            response_example: hello
+    global_rules:
+      - id: prometheus
+        plugins:
+          prometheus: {}
+
+env:
+  - name: TLS_CERT
+    valueFrom:
+      secretKeyRef:
+        name: "{{ .Release.Name }}-cert"
+        key: tls.crt
+
+service:
+  type: LoadBalancer
+  externalTrafficPolicy: Local
+  ipFamilyPolicy: PreferDualStack
+  sessionAffinity: ClientIP
+
+ingress:
+  enabled: true
+  ingressClassName: cilium
+  annotations:
+    ingress.cilium.io/tls-passthrough: enabled
+  rules:
+    - host: api.example.nl
+      http:
+        paths:
+          - path: /
+  tls:
+    - hosts:
+        - api.example.nl
+      secretName: frank-gateway-cert
+
+httpRoute:
+  enabled: true
+  hostnames:
+    - api.example.nl
+  parentRefs:
+    - name: shared-gateway
+      namespace: gateways
+      sectionName: https
+
+tlsRoute:
+  enabled: true
+  hostnames:
+    - api.example.nl
+  parentRefs:
+    - name: shared-gateway
+      namespace: gateways
+      sectionName: tls-passthrough
+
+control:
+  enabled: true
+
+metrics:
+  enabled: true
+  serviceMonitor:
+    enabled: true
+    labels:
+      release: prometheus
+    jobLabel: app.kubernetes.io/name
+
+networkPolicy:
+  enabled: true
+  control:
+    from:
+      - namespaceSelector:
+          matchLabels:
+            kubernetes.io/metadata.name: dashboard
+  metrics:
+    from:
+      - namespaceSelector:
+          matchLabels:
+            kubernetes.io/metadata.name: monitoring
+
+autoscaling:
+  enabled: true
+
+podDisruptionBudget:
+  enabled: true
+
+extraObjects:
+  - apiVersion: v1
+    kind: ConfigMap
+    metadata:
+      name: "{{ .Release.Name }}-extra"

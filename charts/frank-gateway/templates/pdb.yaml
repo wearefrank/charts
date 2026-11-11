@@ -1,0 +1,31 @@
+{{- if .Values.podDisruptionBudget.enabled }}
+{{- $min := .Values.podDisruptionBudget.minAvailable }}
+{{- $max := .Values.podDisruptionBudget.maxUnavailable }}
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: {{ include "frank-gateway.fullname" . }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "frank-gateway.labels" . | nindent 4 }}
+  {{- with (include "frank-gateway.annotations" (dict "context" $)) }}
+  annotations:
+    {{- . | nindent 4 }}
+  {{- end }}
+spec:
+  {{- if not (kindIs "invalid" $min) }}
+  minAvailable: {{ $min }}
+  {{- else if not (kindIs "invalid" $max) }}
+  maxUnavailable: {{ $max }}
+  {{- else }}
+  maxUnavailable: 1
+  {{- end }}
+  {{- with .Values.podDisruptionBudget.unhealthyPodEvictionPolicy }}
+  {{- if semverCompare ">=1.27.0-0" $.Capabilities.KubeVersion.Version }}
+  unhealthyPodEvictionPolicy: {{ . }}
+  {{- end }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "frank-gateway.selectorLabels" . | nindent 6 }}
+{{- end }}

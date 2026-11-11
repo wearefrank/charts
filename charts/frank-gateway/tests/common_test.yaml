@@ -1,0 +1,260 @@
+suite: common labels, annotations and templated values
+templates:
+  - templates/configmap.yaml
+  - templates/deployment.yaml
+  - templates/hpa.yaml
+  - templates/httproute.yaml
+  - templates/ingress.yaml
+  - templates/networkpolicy.yaml
+  - templates/pdb.yaml
+  - templates/service.yaml
+  - templates/service-control.yaml
+  - templates/service-metrics.yaml
+  - templates/serviceaccount.yaml
+  - templates/servicemonitor.yaml
+  - templates/tlsroute.yaml
+release:
+  name: gw
+  namespace: edge
+set:
+  autoscaling.enabled: true
+  control.enabled: true
+  httpRoute.enabled: true
+  httpRoute.parentRefs:
+    - name: shared
+  ingress.enabled: true
+  metrics.enabled: true
+  metrics.serviceMonitor.enabled: true
+  networkPolicy.enabled: true
+  podDisruptionBudget.enabled: true
+  tlsRoute.enabled: true
+  tlsRoute.parentRefs:
+    - name: shared
+  tlsRoute.hostnames:
+    - api.example.nl
+tests:
+  - it: adds commonLabels to every resource and the standard labels stay
+    set:
+      commonLabels:
+        team: integrations
+        release-name: "{{ .Release.Name }}"
+    asserts:
+      - equal:
+          path: metadata.labels.team
+          value: integrations
+      - equal:
+          path: metadata.labels["release-name"]
+          value: gw
+      - equal:
+          path: metadata.labels["app.kubernetes.io/instance"]
+          value: gw
+      - equal:
+          path: metadata.labels["app.kubernetes.io/part-of"]
+          value: frank-gateway
+      - exists:
+          path: metadata.labels["helm.sh/chart"]
+
+  - it: does not let commonLabels replace the standard labels
+    set:
+      commonLabels:
+        app.kubernetes.io/name: other
+        app.kubernetes.io/component: other
+    asserts:
+      - equal:
+          path: metadata.labels["app.kubernetes.io/name"]
+          value: frank-gateway
+      - matchRegex:
+          path: metadata.labels["app.kubernetes.io/component"]
+          pattern: ^(gateway|control|metrics)$
+
+  - it: does not add commonLabels to the pod selector
+    template: templates/deployment.yaml
+    set:
+      commonLabels:
+        team: integrations
+    asserts:
+      - equal:
+          path: spec.selector.matchLabels
+          value:
+            app.kubernetes.io/name: frank-gateway
+            app.kubernetes.io/instance: gw
+            app.kubernetes.io/component: gateway
+      - equal:
+          path: spec.template.metadata.labels.team
+          value: integrations
+
+  - it: adds commonAnnotations to every resource, rendered as templates
+    set:
+      commonAnnotations:
+        owner: integrations
+        namespace-of-release: "{{ .Release.Namespace }}"
+    asserts:
+      - equal:
+          path: metadata.annotations.owner
+          value: integrations
+      - equal:
+          path: metadata.annotations["namespace-of-release"]
+          value: edge
+
+  - it: adds commonAnnotations to the pods next to the checksums
+    template: templates/deployment.yaml
+    set:
+      commonAnnotations:
+        owner: integrations
+      podAnnotations:
+        prometheus.io/scrape: "false"
+    asserts:
+      - equal:
+          path: spec.template.metadata.annotations.owner
+          value: integrations
+      - equal:
+          path: spec.template.metadata.annotations["prometheus.io/scrape"]
+          value: "false"
+      - exists:
+          path: spec.template.metadata.annotations["checksum/config"]
+
+  - it: lets the annotations of a resource win over commonAnnotations
+    template: templates/service.yaml
+    set:
+      commonAnnotations:
+        owner: integrations
+        shared: common
+      service.annotations:
+        shared: specific
+    asserts:
+      - equal:
+          path: metadata.annotations.shared
+          value: specific
+      - equal:
+          path: metadata.annotations.owner
+          value: integrations
+
+  - it: renders templates in Ingress, HTTPRoute and TLSRoute values
+    set:
+      ingress.annotations:
+        example.com/name: "{{ .Release.Name }}-ingress"
+      ingress.rules:
+        - host: "{{ .Release.Name }}.example.nl"
+          http:
+            paths:
+              - path: /
+      ingress.tls:
+        - hosts:
+            - "{{ .Release.Name }}.example.nl"
+          secretName: "{{ .Release.Name }}-tls"
+      httpRoute.hostnames:
+        - "{{ .Release.Name }}.example.nl"
+      httpRoute.parentRefs:
+        - name: shared
+          namespace: "{{ .Release.Namespace }}"
+      tlsRoute.hostnames:
+        - "tls-{{ .Release.Name }}.example.nl"
+    asserts:
+      - equal:
+          path: metadata.annotations["example.com/name"]
+          value: gw-ingress
+        template: templates/ingress.yaml
+      - equal:
+          path: spec.rules[0].host
+          value: gw.example.nl
+        template: templates/ingress.yaml
+      - equal:
+          path: spec.tls[0].secretName
+          value: gw-tls
+        template: templates/ingress.yaml
+      - equal:
+          path: spec.hostnames[0]
+          value: gw.example.nl
+        template: templates/httproute.yaml
+      - equal:
+          path: spec.parentRefs[0].namespace
+          value: edge
+        template: templates/httproute.yaml
+      - equal:
+          path: spec.hostnames[0]
+          value: tls-gw.example.nl
+        template: templates/tlsroute.yaml
+
+  - it: renders templates in the pod values
+    template: templates/deployment.yaml
+    set:
+      podLabels:
+        release: "{{ .Release.Name }}"
+      env:
+        - name: RELEASE
+          value: "{{ .Release.Name }}"
+      envFrom:
+        - secretRef:
+            name: "{{ .Release.Name }}-secrets"
+      volumes:
+        - name: extra
+          configMap:
+            name: "{{ .Release.Name }}-extra"
+      volumeMounts:
+        - name: extra
+          mountPath: /extra
+      initContainers:
+        - name: wait
+          image: busybox
+          args: ["{{ .Release.Namespace }}"]
+      sidecars:
+        - name: logs
+          image: busybox
+          args: ["{{ .Release.Name }}"]
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              podAffinityTerm:
+                topologyKey: kubernetes.io/hostname
+                labelSelector:
+                  matchLabels:
+                    app.kubernetes.io/instance: "{{ .Release.Name }}"
+    asserts:
+      - equal:
+          path: spec.template.metadata.labels.release
+          value: gw
+      - equal:
+          path: spec.template.spec.containers[0].env[0].value
+          value: gw
+      - equal:
+          path: spec.template.spec.containers[0].envFrom[0].secretRef.name
+          value: gw-secrets
+      - equal:
+          path: spec.template.spec.volumes[10].configMap.name
+          value: gw-extra
+      - equal:
+          path: spec.template.spec.initContainers[1].args[0]
+          value: edge
+      - equal:
+          path: spec.template.spec.containers[1].args[0]
+          value: gw
+      - equal:
+          path: spec.template.spec.affinity.podAntiAffinity.preferredDuringSchedulingIgnoredDuringExecution[0].podAffinityTerm.labelSelector.matchLabels["app.kubernetes.io/instance"]
+          value: gw
+
+  - it: renders a template in the name of an existing ConfigMap
+    template: templates/deployment.yaml
+    set:
+      standalone.existingConfigMap: "{{ .Release.Name }}-routes"
+    asserts:
+      - contains:
+          path: spec.template.spec.volumes
+          content:
+            name: apisix-yaml
+            configMap:
+              name: gw-routes
+
+  - it: does not render templates in the apisix.yaml, its placeholders are for APISIX
+    template: templates/configmap.yaml
+    set:
+      standalone.apisixYaml: |
+        ssls:
+          - cert: ${{TLS_CERT}}
+    documentSelector:
+      path: metadata.name
+      value: gw-frank-gateway-apisix-yaml
+    asserts:
+      - matchRegex:
+          path: data["apisix.yaml"]
+          pattern: "cert: \\$\\{\\{TLS_CERT\\}\\}"

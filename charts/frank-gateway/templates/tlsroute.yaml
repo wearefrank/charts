@@ -1,0 +1,46 @@
+{{- if .Values.tlsRoute.enabled }}
+{{- $apiVersion := .Values.tlsRoute.apiVersion }}
+{{- if not $apiVersion }}
+{{- if .Capabilities.APIVersions.Has "gateway.networking.k8s.io/v1/TLSRoute" }}
+{{- $apiVersion = "gateway.networking.k8s.io/v1" }}
+{{- else if .Capabilities.APIVersions.Has "gateway.networking.k8s.io/v1alpha2/TLSRoute" }}
+{{- $apiVersion = "gateway.networking.k8s.io/v1alpha2" }}
+{{- else }}
+{{- $apiVersion = "gateway.networking.k8s.io/v1" }}
+{{- end }}
+{{- end }}
+{{- $backendRefs := include "frank-gateway.routeBackendRefs" (dict "root" . "port" .Values.tlsRoute.defaultBackendPort) | fromYamlArray }}
+{{- $rules := list }}
+{{- range (include "frank-gateway.tplvalues.render" (dict "value" .Values.tlsRoute.rules "context" $) | fromYamlArray) }}
+{{- $rule := deepCopy . }}
+{{- if not $rule.backendRefs }}
+{{- $_ := set $rule "backendRefs" (deepCopy $backendRefs) }}
+{{- end }}
+{{- $rules = append $rules $rule }}
+{{- end }}
+apiVersion: {{ $apiVersion }}
+kind: TLSRoute
+metadata:
+  name: {{ include "frank-gateway.fullname" . }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "frank-gateway.labels" . | nindent 4 }}
+    {{- with .Values.tlsRoute.labels }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+  {{- with (include "frank-gateway.annotations" (dict "annotations" .Values.tlsRoute.annotations "context" $)) }}
+  annotations:
+    {{- . | nindent 4 }}
+  {{- end }}
+spec:
+  {{- with .Values.tlsRoute.parentRefs }}
+  parentRefs:
+    {{- include "frank-gateway.tplvalues.render" (dict "value" . "context" $) | nindent 4 }}
+  {{- end }}
+  {{- with .Values.tlsRoute.hostnames }}
+  hostnames:
+    {{- include "frank-gateway.tplvalues.render" (dict "value" . "context" $) | nindent 4 }}
+  {{- end }}
+  rules:
+    {{- toYaml $rules | nindent 4 }}
+{{- end }}

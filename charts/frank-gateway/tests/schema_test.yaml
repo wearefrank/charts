@@ -1,0 +1,79 @@
+suite: values that Kubernetes allows in more than one form
+templates:
+  - templates/deployment.yaml
+  - templates/service.yaml
+tests:
+  - it: accepts a numeric targetPort, for example for a port that the chart does not know
+    template: templates/service.yaml
+    set:
+      service.ports:
+        - name: https-proxy-protocol
+          port: 444
+          targetPort: 9444
+    asserts:
+      - equal:
+          path: spec.ports[0].targetPort
+          value: 9444
+
+  - it: accepts a percentage in the rolling update strategy
+    template: templates/deployment.yaml
+    set:
+      strategy:
+        type: RollingUpdate
+        rollingUpdate:
+          maxUnavailable: 25%
+          maxSurge: 50%
+    asserts:
+      - equal:
+          path: spec.strategy.rollingUpdate.maxSurge
+          value: 50%
+      - equal:
+          path: spec.strategy.rollingUpdate.maxUnavailable
+          value: 25%
+
+  - it: starts a new pod before it stops an old one by default
+    template: templates/deployment.yaml
+    asserts:
+      - equal:
+          path: spec.strategy
+          value:
+            type: RollingUpdate
+            rollingUpdate:
+              maxUnavailable: 0
+              maxSurge: 1
+
+  - it: keeps the default of the setting that is not given
+    template: templates/deployment.yaml
+    set:
+      strategy:
+        rollingUpdate:
+          maxSurge: 3
+    asserts:
+      - equal:
+          path: spec.strategy.rollingUpdate
+          value:
+            maxUnavailable: 0
+            maxSurge: 3
+
+  - it: has no rolling update settings for the Recreate strategy
+    template: templates/deployment.yaml
+    set:
+      strategy:
+        type: Recreate
+    asserts:
+      - equal:
+          path: spec.strategy
+          value:
+            type: Recreate
+
+  - it: accepts numbers for CPU and memory in the form Kubernetes allows, when quoted as strings
+    template: templates/deployment.yaml
+    set:
+      resources:
+        requests:
+          cpu: "1"
+          memory: 1Gi
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].resources.requests.cpu
+          value: "1"

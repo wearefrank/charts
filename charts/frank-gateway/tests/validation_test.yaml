@@ -1,0 +1,162 @@
+suite: validation
+templates:
+  - templates/validate.yaml
+tests:
+  - it: renders without a manifest and without errors for the default values
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  - it: fails when both an existing ConfigMap and an existing Secret are set
+    set:
+      standalone.existingConfigMap: a
+      standalone.existingSecret: b
+    asserts:
+      - failedTemplate:
+          errorPattern: standalone.existingConfigMap and standalone.existingSecret are mutually exclusive
+
+  - it: fails for an unknown Service type
+    set:
+      service.type: ExternalName
+    asserts:
+      - failedTemplate:
+          errorPattern: service.type must be ClusterIP, NodePort or LoadBalancer, got "ExternalName"
+
+  - it: fails when the image repository contains the registry host
+    set:
+      image.repository: ghcr.io/wearefrank/frank-gateway
+    asserts:
+      - failedTemplate:
+          errorPattern: must not contain the registry host, set it in image.registry
+
+  - it: accepts a repository with a nested path
+    set:
+      image.registry: registry.example.nl:5000
+      image.repository: mirror/wearefrank/frank-gateway
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  - it: fails when container ports clash
+    set:
+      control.enabled: true
+      control.port: 9091
+      metrics.enabled: true
+    asserts:
+      - failedTemplate:
+          errorPattern: containerPorts.http, containerPorts.https, control.port and metrics.port must all be different
+
+  - it: ignores a port of a disabled feature
+    set:
+      control.port: 9091
+      metrics.enabled: true
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  - it: fails for an Ingress without rules
+    set:
+      ingress.enabled: true
+      ingress.rules: []
+    asserts:
+      - failedTemplate:
+          errorPattern: ingress.enabled is true but ingress.rules is empty
+
+  - it: fails when the Ingress default backend port does not exist
+    set:
+      ingress.enabled: true
+      ingress.defaultBackendPort: nope
+    asserts:
+      - failedTemplate:
+          errorPattern: ingress.defaultBackendPort "nope" is not the name of a port in service.ports
+
+  - it: fails when the Ingress default backend port name is longer than an Ingress allows
+    set:
+      ingress.enabled: true
+      ingress.defaultBackendPort: https-proxy-protocol
+      service.ports:
+        - name: https-proxy-protocol
+          port: 444
+          targetPort: 9444
+    asserts:
+      - failedTemplate:
+          errorPattern: longer than 15 characters
+
+  - it: does not need the default backend port when every path has a backend
+    set:
+      ingress.enabled: true
+      ingress.defaultBackendPort: nope
+      ingress.rules:
+        - host: a.example.nl
+          http:
+            paths:
+              - path: /
+                backend:
+                  service:
+                    name: other
+                    port:
+                      number: 80
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  - it: fails for an HTTPRoute without parentRefs
+    set:
+      httpRoute.enabled: true
+    asserts:
+      - failedTemplate:
+          errorPattern: httpRoute.enabled is true but httpRoute.parentRefs is empty
+
+  - it: fails when the HTTPRoute default backend port does not exist
+    set:
+      httpRoute.enabled: true
+      httpRoute.parentRefs:
+        - name: gw
+      httpRoute.defaultBackendPort: nope
+    asserts:
+      - failedTemplate:
+          errorPattern: httpRoute.defaultBackendPort "nope" is not the name of a port in service.ports
+
+  - it: fails for a TLSRoute without parentRefs and hostnames, and reports both
+    set:
+      tlsRoute.enabled: true
+    asserts:
+      - failedTemplate:
+          errorPattern: tlsRoute.parentRefs is empty[\s\S]*tlsRoute.hostnames is empty
+
+  - it: accepts a complete TLSRoute
+    set:
+      tlsRoute.enabled: true
+      tlsRoute.parentRefs:
+        - name: gw
+      tlsRoute.hostnames:
+        - api.example.nl
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  - it: fails for a ServiceMonitor without metrics
+    set:
+      metrics.serviceMonitor.enabled: true
+    asserts:
+      - failedTemplate:
+          errorPattern: metrics.serviceMonitor.enabled is true but metrics.enabled is false
+
+  - it: fails when minReplicas is greater than maxReplicas
+    set:
+      autoscaling.enabled: true
+      autoscaling.minReplicas: 6
+      autoscaling.maxReplicas: 3
+    asserts:
+      - failedTemplate:
+          errorPattern: autoscaling.minReplicas must not be greater than autoscaling.maxReplicas
+
+  - it: reports all problems at once
+    set:
+      service.type: Nope
+      ingress.enabled: true
+      ingress.rules: []
+      httpRoute.enabled: true
+    asserts:
+      - failedTemplate:
+          errorPattern: service.type must be[\s\S]*ingress.rules is empty[\s\S]*httpRoute.parentRefs is empty

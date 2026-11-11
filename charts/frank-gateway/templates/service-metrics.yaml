@@ -1,0 +1,22 @@
+{{- if .Values.metrics.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "frank-gateway.fullname" . }}-metrics
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "frank-gateway.labelsFor" (dict "context" $ "component" "metrics") | nindent 4 }}
+  {{- with (include "frank-gateway.annotations" (dict "annotations" .Values.metrics.service.annotations "context" $)) }}
+  annotations:
+    {{- . | nindent 4 }}
+  {{- end }}
+spec:
+  type: ClusterIP
+  ports:
+    - name: metrics
+      port: {{ .Values.metrics.port }}
+      targetPort: metrics
+      protocol: TCP
+  selector:
+    {{- include "frank-gateway.selectorLabels" . | nindent 4 }}
+{{- end }}

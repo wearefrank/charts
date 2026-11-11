@@ -1,0 +1,40 @@
+{{- if .Values.ingress.enabled }}
+{{- $defaultBackend := dict "service" (dict "name" (include "frank-gateway.fullname" .) "port" (dict "name" .Values.ingress.defaultBackendPort)) }}
+{{- $rules := list }}
+{{- range (include "frank-gateway.tplvalues.render" (dict "value" .Values.ingress.rules "context" $) | fromYamlArray) }}
+{{- $rule := deepCopy . }}
+{{- range $path := (($rule.http).paths | default list) }}
+{{- if not $path.backend }}
+{{- $_ := set $path "backend" (deepCopy $defaultBackend) }}
+{{- end }}
+{{- if not $path.pathType }}
+{{- $_ := set $path "pathType" "Prefix" }}
+{{- end }}
+{{- end }}
+{{- $rules = append $rules $rule }}
+{{- end }}
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ include "frank-gateway.fullname" . }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "frank-gateway.labels" . | nindent 4 }}
+    {{- with .Values.ingress.labels }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+  {{- with (include "frank-gateway.annotations" (dict "annotations" .Values.ingress.annotations "context" $)) }}
+  annotations:
+    {{- . | nindent 4 }}
+  {{- end }}
+spec:
+  {{- with .Values.ingress.ingressClassName }}
+  ingressClassName: {{ . }}
+  {{- end }}
+  {{- with .Values.ingress.tls }}
+  tls:
+    {{- include "frank-gateway.tplvalues.render" (dict "value" . "context" $) | nindent 4 }}
+  {{- end }}
+  rules:
+    {{- toYaml $rules | nindent 4 }}
+{{- end }}

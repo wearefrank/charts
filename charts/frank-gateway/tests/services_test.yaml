@@ -1,0 +1,317 @@
+suite: services
+templates:
+  - templates/service.yaml
+  - templates/service-control.yaml
+  - templates/service-metrics.yaml
+  - templates/servicemonitor.yaml
+tests:
+  - it: creates a ClusterIP gateway Service with http and https ports by default
+    template: templates/service.yaml
+    asserts:
+      - isKind:
+          of: Service
+      - equal:
+          path: spec.type
+          value: ClusterIP
+      - equal:
+          path: spec.ports
+          value:
+            - name: http
+              port: 80
+              targetPort: http
+              protocol: TCP
+            - name: https
+              port: 443
+              targetPort: https
+              protocol: TCP
+      - equal:
+          path: spec.selector
+          value:
+            app.kubernetes.io/name: frank-gateway
+            app.kubernetes.io/instance: RELEASE-NAME
+            app.kubernetes.io/component: gateway
+      - equal:
+          path: metadata.labels["app.kubernetes.io/component"]
+          value: gateway
+      - notExists:
+          path: spec.externalTrafficPolicy
+
+  - it: supports a LoadBalancer
+    template: templates/service.yaml
+    set:
+      service.type: LoadBalancer
+      service.externalTrafficPolicy: Local
+      service.loadBalancerClass: io.cilium/l2-announcer
+      service.loadBalancerSourceRanges:
+        - 10.0.0.0/8
+      service.annotations:
+        lbipam.cilium.io/ips: 10.1.2.3
+    asserts:
+      - equal:
+          path: spec.type
+          value: LoadBalancer
+      - equal:
+          path: spec.externalTrafficPolicy
+          value: Local
+      - equal:
+          path: spec.loadBalancerClass
+          value: io.cilium/l2-announcer
+      - equal:
+          path: spec.loadBalancerSourceRanges
+          value:
+            - 10.0.0.0/8
+      - equal:
+          path: metadata.annotations["lbipam.cilium.io/ips"]
+          value: 10.1.2.3
+
+  - it: ignores LoadBalancer only settings for a ClusterIP Service
+    template: templates/service.yaml
+    set:
+      service.externalTrafficPolicy: Local
+      service.loadBalancerClass: x
+      service.loadBalancerSourceRanges:
+        - 10.0.0.0/8
+    asserts:
+      - notExists:
+          path: spec.externalTrafficPolicy
+      - notExists:
+          path: spec.loadBalancerClass
+      - notExists:
+          path: spec.loadBalancerSourceRanges
+
+  - it: replaces the ports as a whole
+    template: templates/service.yaml
+    set:
+      service.type: NodePort
+      service.ports:
+        - name: https
+          port: 8443
+          targetPort: https
+          nodePort: 30443
+    asserts:
+      - equal:
+          path: spec.ports
+          value:
+            - name: https
+              port: 8443
+              targetPort: https
+              nodePort: 30443
+              protocol: TCP
+
+  - it: uses the name of a port as its targetPort and TCP as its protocol, unless they are set
+    template: templates/service.yaml
+    set:
+      service.ports:
+        - name: http
+          port: 80
+        - name: dns
+          port: 5353
+          targetPort: 9053
+          protocol: UDP
+    asserts:
+      - equal:
+          path: spec.ports
+          value:
+            - name: http
+              port: 80
+              targetPort: http
+              protocol: TCP
+            - name: dns
+              port: 5353
+              targetPort: 9053
+              protocol: UDP
+
+  - it: does not set the optional Service fields by default
+    template: templates/service.yaml
+    asserts:
+      - notExists:
+          path: spec.externalIPs
+      - notExists:
+          path: spec.ipFamilyPolicy
+      - notExists:
+          path: spec.ipFamilies
+      - notExists:
+          path: spec.internalTrafficPolicy
+      - notExists:
+          path: spec.sessionAffinity
+
+  - it: sets the optional Service fields
+    template: templates/service.yaml
+    set:
+      service.externalIPs:
+        - 192.0.2.10
+      service.ipFamilyPolicy: PreferDualStack
+      service.ipFamilies:
+        - IPv4
+        - IPv6
+      service.internalTrafficPolicy: Local
+      service.sessionAffinity: ClientIP
+    asserts:
+      - equal:
+          path: spec.externalIPs
+          value:
+            - 192.0.2.10
+      - equal:
+          path: spec.ipFamilyPolicy
+          value: PreferDualStack
+      - equal:
+          path: spec.ipFamilies
+          value:
+            - IPv4
+            - IPv6
+      - equal:
+          path: spec.internalTrafficPolicy
+          value: Local
+      - equal:
+          path: spec.sessionAffinity
+          value: ClientIP
+
+  - it: does not create the control Service by default
+    template: templates/service-control.yaml
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  - it: creates a separate ClusterIP control Service when enabled
+    template: templates/service-control.yaml
+    set:
+      control.enabled: true
+      control.service.port: 9999
+    asserts:
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME-frank-gateway-control
+      - equal:
+          path: spec.type
+          value: ClusterIP
+      - equal:
+          path: spec.ports
+          value:
+            - name: control
+              port: 9999
+              targetPort: control
+              protocol: TCP
+      - equal:
+          path: spec.selector
+          value:
+            app.kubernetes.io/name: frank-gateway
+            app.kubernetes.io/instance: RELEASE-NAME
+            app.kubernetes.io/component: gateway
+      - equal:
+          path: metadata.labels["app.kubernetes.io/component"]
+          value: control
+
+  - it: does not create the metrics Service by default
+    template: templates/service-metrics.yaml
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  - it: creates the metrics Service when enabled
+    template: templates/service-metrics.yaml
+    set:
+      metrics.enabled: true
+    asserts:
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME-frank-gateway-metrics
+      - equal:
+          path: spec.ports[0].port
+          value: 9091
+      - equal:
+          path: metadata.labels["app.kubernetes.io/component"]
+          value: metrics
+      - equal:
+          path: spec.selector
+          value:
+            app.kubernetes.io/name: frank-gateway
+            app.kubernetes.io/instance: RELEASE-NAME
+            app.kubernetes.io/component: gateway
+
+  - it: does not create a ServiceMonitor by default
+    template: templates/servicemonitor.yaml
+    set:
+      metrics.enabled: true
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  - it: needs metrics to create a ServiceMonitor
+    template: templates/servicemonitor.yaml
+    set:
+      metrics.serviceMonitor.enabled: true
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  - it: creates a ServiceMonitor in another namespace with a job label and honorLabels
+    template: templates/servicemonitor.yaml
+    set:
+      metrics.enabled: true
+      metrics.serviceMonitor.enabled: true
+      metrics.serviceMonitor.namespace: monitoring
+      metrics.serviceMonitor.jobLabel: app.kubernetes.io/name
+      metrics.serviceMonitor.honorLabels: true
+    release:
+      namespace: gw
+    asserts:
+      - equal:
+          path: metadata.namespace
+          value: monitoring
+      - equal:
+          path: spec.jobLabel
+          value: app.kubernetes.io/name
+      - equal:
+          path: spec.endpoints[0].honorLabels
+          value: true
+      - equal:
+          path: spec.namespaceSelector.matchNames
+          value:
+            - gw
+
+  - it: creates a ServiceMonitor in the release namespace without a job label by default
+    template: templates/servicemonitor.yaml
+    set:
+      metrics.enabled: true
+      metrics.serviceMonitor.enabled: true
+    release:
+      namespace: gw
+    asserts:
+      - equal:
+          path: metadata.namespace
+          value: gw
+      - notExists:
+          path: spec.jobLabel
+      - equal:
+          path: spec.endpoints[0].honorLabels
+          value: false
+
+  - it: creates a ServiceMonitor that selects the metrics Service
+    template: templates/servicemonitor.yaml
+    set:
+      metrics.enabled: true
+      metrics.serviceMonitor.enabled: true
+      metrics.serviceMonitor.labels:
+        release: prometheus
+      metrics.serviceMonitor.interval: 15s
+    asserts:
+      - isKind:
+          of: ServiceMonitor
+      - equal:
+          path: metadata.labels.release
+          value: prometheus
+      - equal:
+          path: spec.selector.matchLabels
+          value:
+            app.kubernetes.io/name: frank-gateway
+            app.kubernetes.io/instance: RELEASE-NAME
+            app.kubernetes.io/component: metrics
+      - equal:
+          path: spec.endpoints[0].port
+          value: metrics
+      - equal:
+          path: spec.endpoints[0].interval
+          value: 15s
+      - equal:
+          path: spec.endpoints[0].path
+          value: /apisix/prometheus/metrics

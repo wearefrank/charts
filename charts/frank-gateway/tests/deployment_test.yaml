@@ -1,0 +1,481 @@
+suite: deployment
+templates:
+  - templates/deployment.yaml
+tests:
+  - it: runs a single replica from the chart appVersion image by default
+    asserts:
+      - isKind:
+          of: Deployment
+      - equal:
+          path: spec.replicas
+          value: 1
+      - equal:
+          path: spec.template.spec.containers[0].image
+          value: ghcr.io/wearefrank/frank-gateway:1.2.1
+
+  - it: uses an explicit image tag
+    set:
+      image.tag: "9.9.9"
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].image
+          value: ghcr.io/wearefrank/frank-gateway:9.9.9
+      - equal:
+          path: spec.template.spec.initContainers[0].image
+          value: ghcr.io/wearefrank/frank-gateway:9.9.9
+
+  - it: uses a mirror registry
+    set:
+      image.registry: registry.example.nl:5000
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].image
+          value: registry.example.nl:5000/wearefrank/frank-gateway:1.2.1
+
+  - it: uses a repository without registry
+    set:
+      image.registry: ""
+      image.repository: wearefrank/frank-gateway
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].image
+          value: wearefrank/frank-gateway:1.2.1
+
+  - it: uses the digest instead of the tag, in the gateway and the init container
+    set:
+      image.tag: "9.9.9"
+      image.digest: sha256:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].image
+          value: ghcr.io/wearefrank/frank-gateway@sha256:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef
+      - equal:
+          path: spec.template.spec.initContainers[0].image
+          value: ghcr.io/wearefrank/frank-gateway@sha256:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef
+
+  - it: uses the image entrypoint by default
+    asserts:
+      - notExists:
+          path: spec.template.spec.containers[0].command
+      - notExists:
+          path: spec.template.spec.containers[0].args
+
+  - it: overrides the command and arguments
+    set:
+      command: ["/docker-entrypoint.sh"]
+      args: ["docker-start"]
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].command
+          value:
+            - /docker-entrypoint.sh
+      - equal:
+          path: spec.template.spec.containers[0].args
+          value:
+            - docker-start
+
+  - it: only sleeps in diagnostic mode, without probes and lifecycle hooks
+    set:
+      diagnosticMode.enabled: true
+      command: ["ignored"]
+      startupProbe:
+        tcpSocket:
+          port: http
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].command
+          value:
+            - sleep
+      - equal:
+          path: spec.template.spec.containers[0].args
+          value:
+            - infinity
+      - notExists:
+          path: spec.template.spec.containers[0].livenessProbe
+      - notExists:
+          path: spec.template.spec.containers[0].readinessProbe
+      - notExists:
+          path: spec.template.spec.containers[0].startupProbe
+      - notExists:
+          path: spec.template.spec.containers[0].lifecycle
+      - equal:
+          path: spec.template.spec.initContainers[0].name
+          value: prepare-conf
+
+  - it: spreads the pods over the nodes by default and selects the gateway pods
+    asserts:
+      - equal:
+          path: spec.template.spec.topologySpreadConstraints
+          value:
+            - maxSkew: 1
+              topologyKey: kubernetes.io/hostname
+              whenUnsatisfiable: ScheduleAnyway
+              labelSelector:
+                matchLabels:
+                  app.kubernetes.io/name: frank-gateway
+                  app.kubernetes.io/instance: RELEASE-NAME
+                  app.kubernetes.io/component: gateway
+
+  - it: keeps the labelSelector of a constraint and fills in the others
+    set:
+      topologySpreadConstraints:
+        - maxSkew: 2
+          topologyKey: topology.kubernetes.io/zone
+          whenUnsatisfiable: DoNotSchedule
+          labelSelector:
+            matchLabels:
+              custom: label
+        - maxSkew: 1
+          topologyKey: kubernetes.io/hostname
+          whenUnsatisfiable: ScheduleAnyway
+    asserts:
+      - equal:
+          path: spec.template.spec.topologySpreadConstraints[0].labelSelector
+          value:
+            matchLabels:
+              custom: label
+      - equal:
+          path: spec.template.spec.topologySpreadConstraints[1].labelSelector.matchLabels["app.kubernetes.io/component"]
+          value: gateway
+
+  - it: renders templates in topology spread constraints
+    release:
+      name: gw
+    set:
+      topologySpreadConstraints:
+        - maxSkew: 1
+          topologyKey: kubernetes.io/hostname
+          whenUnsatisfiable: ScheduleAnyway
+          labelSelector:
+            matchLabels:
+              app.kubernetes.io/instance: "{{ .Release.Name }}"
+    asserts:
+      - equal:
+          path: spec.template.spec.topologySpreadConstraints[0].labelSelector.matchLabels["app.kubernetes.io/instance"]
+          value: gw
+
+  - it: has no topology spread constraints when set to an empty list
+    set:
+      topologySpreadConstraints: []
+    asserts:
+      - notExists:
+          path: spec.template.spec.topologySpreadConstraints
+
+  - it: applies the baseline pod security context
+    asserts:
+      - equal:
+          path: spec.template.spec.securityContext
+          value:
+            fsGroup: 636
+            fsGroupChangePolicy: OnRootMismatch
+            runAsUser: 636
+            runAsGroup: 636
+            runAsNonRoot: true
+            seccompProfile:
+              type: RuntimeDefault
+
+  - it: applies the baseline container security context to the gateway and the init container
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].securityContext
+          value:
+            runAsUser: 636
+            runAsNonRoot: true
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop:
+                - ALL
+      - equal:
+          path: spec.template.spec.initContainers[0].securityContext
+          value:
+            runAsUser: 636
+            runAsNonRoot: true
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop:
+                - ALL
+
+  - it: does not mount the service account token
+    asserts:
+      - equal:
+          path: spec.template.spec.automountServiceAccountToken
+          value: false
+
+  - it: copies the conf directory and links apisix.yaml in the init container
+    asserts:
+      - equal:
+          path: spec.template.spec.initContainers[0].name
+          value: prepare-conf
+      - equal:
+          path: spec.template.spec.initContainers[0].command
+          value:
+            - sh
+            - -c
+            - cp -R /usr/local/apisix/conf/. /conf/ && ln -sf "/apisix-config/$1" /conf/apisix.yaml
+            - sh
+            - apisix.yaml
+
+  - it: passes the key of the apisix.yaml file as an argument and not as part of the shell script
+    set:
+      standalone.key: routes.yaml
+    asserts:
+      - equal:
+          path: spec.template.spec.initContainers[0].command[2]
+          value: cp -R /usr/local/apisix/conf/. /conf/ && ln -sf "/apisix-config/$1" /conf/apisix.yaml
+      - equal:
+          path: spec.template.spec.initContainers[0].command[4]
+          value: routes.yaml
+
+  - it: does not let a malicious key end up in the shell script
+    set:
+      standalone.key: 'x"; touch /conf/pwned; "'
+    asserts:
+      - equal:
+          path: spec.template.spec.initContainers[0].command[2]
+          value: cp -R /usr/local/apisix/conf/. /conf/ && ln -sf "/apisix-config/$1" /conf/apisix.yaml
+      - equal:
+          path: spec.template.spec.initContainers[0].command[4]
+          value: 'x"; touch /conf/pwned; "'
+
+  - it: stops nginx gracefully in the preStop hook and leaves time for it
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].lifecycle.preStop.exec.command[2]
+          value: sleep 10; openresty -p /usr/local/apisix -s quit; while kill -0 "$(cat /usr/local/apisix/logs/nginx.pid 2>/dev/null)" 2>/dev/null; do sleep 1; done
+      - equal:
+          path: spec.template.spec.terminationGracePeriodSeconds
+          value: 60
+
+  - it: labels the pods and selects them with the gateway component
+    asserts:
+      - equal:
+          path: spec.selector.matchLabels
+          value:
+            app.kubernetes.io/name: frank-gateway
+            app.kubernetes.io/instance: RELEASE-NAME
+            app.kubernetes.io/component: gateway
+      - equal:
+          path: spec.template.metadata.labels["app.kubernetes.io/component"]
+          value: gateway
+      - equal:
+          path: spec.template.metadata.labels["app.kubernetes.io/part-of"]
+          value: frank-gateway
+      - equal:
+          path: metadata.labels["app.kubernetes.io/component"]
+          value: gateway
+
+  - it: mounts writable emptyDir volumes where APISIX writes
+    asserts:
+      - contains:
+          path: spec.template.spec.volumes
+          content:
+            name: conf
+            emptyDir: {}
+      - contains:
+          path: spec.template.spec.volumes
+          content:
+            name: logs
+            emptyDir: {}
+      - contains:
+          path: spec.template.spec.volumes
+          content:
+            name: tmp
+            emptyDir: {}
+      - contains:
+          path: spec.template.spec.containers[0].volumeMounts
+          content:
+            name: conf
+            mountPath: /usr/local/apisix/conf
+      - contains:
+          path: spec.template.spec.containers[0].volumeMounts
+          content:
+            name: client-body-temp
+            mountPath: /usr/local/apisix/client_body_temp
+      - contains:
+          path: spec.template.spec.containers[0].volumeMounts
+          content:
+            name: config
+            mountPath: /usr/local/apisix/conf/config.yaml
+            subPath: config.yaml
+            readOnly: true
+      - contains:
+          path: spec.template.spec.containers[0].volumeMounts
+          content:
+            name: apisix-yaml
+            mountPath: /apisix-config
+            readOnly: true
+
+  - it: exposes only the http and https container ports by default
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].ports
+          value:
+            - name: http
+              containerPort: 9080
+              protocol: TCP
+            - name: https
+              containerPort: 9443
+              protocol: TCP
+
+  - it: exposes the control and metrics ports when enabled
+    set:
+      control.enabled: true
+      metrics.enabled: true
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].ports
+          content:
+            name: control
+            containerPort: 9090
+            protocol: TCP
+      - contains:
+          path: spec.template.spec.containers[0].ports
+          content:
+            name: metrics
+            containerPort: 9091
+            protocol: TCP
+
+  - it: has probes and resources by default
+    asserts:
+      - exists:
+          path: spec.template.spec.containers[0].livenessProbe
+      - exists:
+          path: spec.template.spec.containers[0].readinessProbe
+      - notExists:
+          path: spec.template.spec.containers[0].startupProbe
+      - exists:
+          path: spec.template.spec.containers[0].resources.limits.memory
+
+  - it: passes env, envFrom, volumes, volumeMounts, initContainers and sidecars through
+    set:
+      env:
+        - name: TLS_CERT
+          valueFrom:
+            secretKeyRef:
+              name: frank-gateway-cert
+              key: tls.crt
+      envFrom:
+        - secretRef:
+            name: gateway-secrets
+      volumes:
+        - name: extra
+          emptyDir: {}
+      volumeMounts:
+        - name: extra
+          mountPath: /extra
+      initContainers:
+        - name: wait
+          image: busybox
+      sidecars:
+        - name: sidecar
+          image: busybox
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].env[0].name
+          value: TLS_CERT
+      - equal:
+          path: spec.template.spec.containers[0].envFrom[0].secretRef.name
+          value: gateway-secrets
+      - contains:
+          path: spec.template.spec.volumes
+          content:
+            name: extra
+            emptyDir: {}
+      - contains:
+          path: spec.template.spec.containers[0].volumeMounts
+          content:
+            name: extra
+            mountPath: /extra
+      - equal:
+          path: spec.template.spec.initContainers[0].name
+          value: prepare-conf
+      - equal:
+          path: spec.template.spec.initContainers[1].name
+          value: wait
+      - equal:
+          path: spec.template.spec.containers[1].name
+          value: sidecar
+
+  - it: restarts the pods when the chart managed configuration changes
+    asserts:
+      - exists:
+          path: spec.template.metadata.annotations["checksum/config"]
+      - exists:
+          path: spec.template.metadata.annotations["checksum/apisix-yaml"]
+
+  - it: does not restart the pods for an existing ConfigMap, APISIX reloads the file itself
+    set:
+      standalone.existingConfigMap: my-routes
+    asserts:
+      - notExists:
+          path: spec.template.metadata.annotations["checksum/apisix-yaml"]
+      - contains:
+          path: spec.template.spec.volumes
+          content:
+            name: apisix-yaml
+            configMap:
+              name: my-routes
+
+  - it: mounts an existing Secret as the apisix.yaml source
+    set:
+      standalone.existingSecret: my-routes-secret
+    asserts:
+      - contains:
+          path: spec.template.spec.volumes
+          content:
+            name: apisix-yaml
+            secret:
+              secretName: my-routes-secret
+      - notExists:
+          path: spec.template.metadata.annotations["checksum/apisix-yaml"]
+
+  - it: leaves the replicas to the autoscaler when autoscaling is enabled
+    set:
+      autoscaling.enabled: true
+    asserts:
+      - notExists:
+          path: spec.replicas
+
+  - it: sets the scheduling options
+    set:
+      priorityClassName: high
+      nodeSelector:
+        disktype: ssd
+      tolerations:
+        - key: dedicated
+          operator: Exists
+      topologySpreadConstraints:
+        - maxSkew: 1
+          topologyKey: kubernetes.io/hostname
+          whenUnsatisfiable: ScheduleAnyway
+    asserts:
+      - equal:
+          path: spec.template.spec.priorityClassName
+          value: high
+      - equal:
+          path: spec.template.spec.nodeSelector.disktype
+          value: ssd
+      - equal:
+          path: spec.template.spec.tolerations[0].key
+          value: dedicated
+      - equal:
+          path: spec.template.spec.topologySpreadConstraints[0].maxSkew
+          value: 1
+
+  - it: uses the service account created by the chart
+    release:
+      name: gw
+    asserts:
+      - equal:
+          path: spec.template.spec.serviceAccountName
+          value: gw-frank-gateway
+
+  - it: respects fullnameOverride
+    set:
+      fullnameOverride: edge
+    asserts:
+      - equal:
+          path: metadata.name
+          value: edge
