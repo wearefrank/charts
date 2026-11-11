@@ -1,0 +1,25 @@
+{{- if .Values.control.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "frank-gateway.fullname" . }}-control
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "frank-gateway.labelsFor" (dict "context" $ "component" "control") | nindent 4 }}
+    {{- with .Values.control.service.labels }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+  {{- with (include "frank-gateway.annotations" (dict "annotations" .Values.control.service.annotations "context" $)) }}
+  annotations:
+    {{- . | nindent 4 }}
+  {{- end }}
+spec:
+  type: {{ .Values.control.service.type }}
+  ports:
+    - name: control
+      port: {{ .Values.control.service.port }}
+      targetPort: control
+      protocol: TCP
+  selector:
+    {{- include "frank-gateway.selectorLabels" . | nindent 4 }}
+{{- end }}

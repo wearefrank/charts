@@ -1,0 +1,221 @@
+suite: configuration
+templates:
+  - templates/configmap.yaml
+tests:
+  - it: renders the APISIX config in standalone data plane mode without admin API
+    documentSelector:
+      path: metadata.name
+      value: RELEASE-NAME-frank-gateway-config
+    asserts:
+      - matchRegex:
+          path: data["config.yaml"]
+          pattern: "enable_admin: false"
+      - matchRegex:
+          path: data["config.yaml"]
+          pattern: "role: data_plane"
+      - matchRegex:
+          path: data["config.yaml"]
+          pattern: "config_provider: yaml"
+      - matchRegex:
+          path: data["config.yaml"]
+          pattern: "enable_control: false"
+      - notMatchRegex:
+          path: data["config.yaml"]
+          pattern: "etcd"
+      - notMatchRegex:
+          path: data["config.yaml"]
+          pattern: "admin_key"
+
+  - it: sets the listen ports from containerPorts
+    set:
+      containerPorts.http: 8080
+      containerPorts.https: 8443
+    documentSelector:
+      path: metadata.name
+      value: RELEASE-NAME-frank-gateway-config
+    asserts:
+      - matchRegex:
+          path: data["config.yaml"]
+          pattern: "- 8080"
+      - matchRegex:
+          path: data["config.yaml"]
+          pattern: "- port: 8443"
+
+  - it: logs to stdout and stderr
+    documentSelector:
+      path: metadata.name
+      value: RELEASE-NAME-frank-gateway-config
+    asserts:
+      - matchRegex:
+          path: data["config.yaml"]
+          pattern: "error_log: /dev/stderr"
+      - matchRegex:
+          path: data["config.yaml"]
+          pattern: "access_log: /dev/stdout"
+
+  - it: lets workers finish requests for less time than the pod gets to terminate
+    documentSelector:
+      path: metadata.name
+      value: RELEASE-NAME-frank-gateway-config
+    asserts:
+      - matchRegex:
+          path: data["config.yaml"]
+          pattern: "worker_shutdown_timeout: 45s"
+
+  - it: enables the control API on all interfaces of the pod
+    set:
+      control.enabled: true
+      control.port: 9191
+    documentSelector:
+      path: metadata.name
+      value: RELEASE-NAME-frank-gateway-config
+    asserts:
+      - matchRegex:
+          path: data["config.yaml"]
+          pattern: "enable_control: true"
+      - matchRegex:
+          path: data["config.yaml"]
+          pattern: "ip: 0.0.0.0\n    port: 9191"
+
+  - it: configures the prometheus export address when metrics are enabled
+    set:
+      metrics.enabled: true
+      metrics.port: 9192
+      metrics.path: /metrics
+    documentSelector:
+      path: metadata.name
+      value: RELEASE-NAME-frank-gateway-config
+    asserts:
+      - matchRegex:
+          path: data["config.yaml"]
+          pattern: "port: 9192"
+      - matchRegex:
+          path: data["config.yaml"]
+          pattern: "export_uri: /metrics"
+
+  - it: does not configure prometheus when metrics are disabled
+    documentSelector:
+      path: metadata.name
+      value: RELEASE-NAME-frank-gateway-config
+    asserts:
+      - notMatchRegex:
+          path: data["config.yaml"]
+          pattern: "plugin_attr"
+
+  - it: lets users override native config keys but not the chart managed ones
+    set:
+      config.apisix.enable_server_tokens: true
+      config.apisix.enable_admin: true
+      config.deployment.role: traditional
+    documentSelector:
+      path: metadata.name
+      value: RELEASE-NAME-frank-gateway-config
+    asserts:
+      - matchRegex:
+          path: data["config.yaml"]
+          pattern: "enable_server_tokens: true"
+      - matchRegex:
+          path: data["config.yaml"]
+          pattern: "enable_admin: false"
+      - matchRegex:
+          path: data["config.yaml"]
+          pattern: "role: data_plane"
+
+  - it: replaces the plugin list as a whole
+    set:
+      config.plugins:
+        - key-auth
+        - proxy-rewrite
+    documentSelector:
+      path: metadata.name
+      value: RELEASE-NAME-frank-gateway-config
+    asserts:
+      - matchRegex:
+          path: data["config.yaml"]
+          pattern: "plugins:\n- key-auth\n- proxy-rewrite\n?$"
+
+  - it: loads the WeAreFrank plugins by default
+    documentSelector:
+      path: metadata.name
+      value: RELEASE-NAME-frank-gateway-config
+    asserts:
+      - matchRegex:
+          path: data["config.yaml"]
+          pattern: "- soap-action-router"
+      - matchRegex:
+          path: data["config.yaml"]
+          pattern: "- openid-connect-client"
+
+  - it: renders the inline apisix.yaml and adds the #END marker
+    set:
+      standalone.apisixYaml: |
+        routes:
+          - id: a
+            uri: /a
+    documentSelector:
+      path: metadata.name
+      value: RELEASE-NAME-frank-gateway-apisix-yaml
+    asserts:
+      - equal:
+          path: data["apisix.yaml"]
+          value: |
+            routes:
+              - id: a
+                uri: /a
+            #END
+
+  - it: does not add the #END marker twice
+    set:
+      standalone.apisixYaml: |
+        routes: []
+        #END
+    documentSelector:
+      path: metadata.name
+      value: RELEASE-NAME-frank-gateway-apisix-yaml
+    asserts:
+      - equal:
+          path: data["apisix.yaml"]
+          value: |
+            routes: []
+            #END
+
+  - it: keeps ${{ENV}} placeholders untouched
+    set:
+      standalone.apisixYaml: |
+        ssls:
+          - cert: ${{TLS_CERT}}
+            key: ${{TLS_KEY}}
+    documentSelector:
+      path: metadata.name
+      value: RELEASE-NAME-frank-gateway-apisix-yaml
+    asserts:
+      - matchRegex:
+          path: data["apisix.yaml"]
+          pattern: "cert: \\$\\{\\{TLS_CERT\\}\\}"
+
+  - it: stores apisix.yaml under the configured key
+    set:
+      standalone.key: routes.yaml
+    documentSelector:
+      path: metadata.name
+      value: RELEASE-NAME-frank-gateway-apisix-yaml
+    asserts:
+      - exists:
+          path: data["routes.yaml"]
+
+  - it: does not create an apisix.yaml ConfigMap for an existing ConfigMap
+    set:
+      standalone.existingConfigMap: my-routes
+    asserts:
+      - hasDocuments:
+          count: 1
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME-frank-gateway-config
+
+  - it: does not create an apisix.yaml ConfigMap for an existing Secret
+    set:
+      standalone.existingSecret: my-routes-secret
+    asserts:
+      - hasDocuments:
+          count: 1

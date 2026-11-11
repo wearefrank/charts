@@ -1,0 +1,31 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "frank-gateway.fullname" . }}-config
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "frank-gateway.labels" . | nindent 4 }}
+  {{- with (include "frank-gateway.annotations" (dict "context" $)) }}
+  annotations:
+    {{- . | nindent 4 }}
+  {{- end }}
+data:
+  config.yaml: |
+    {{- include "frank-gateway.config" . | nindent 4 }}
+{{- if not (or .Values.standalone.existingConfigMap .Values.standalone.existingSecret) }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "frank-gateway.standaloneName" . }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "frank-gateway.labels" . | nindent 4 }}
+  {{- with (include "frank-gateway.annotations" (dict "context" $)) }}
+  annotations:
+    {{- . | nindent 4 }}
+  {{- end }}
+data:
+  {{ .Values.standalone.key }}: |
+    {{- include "frank-gateway.apisixYaml" . | nindent 4 }}
+{{- end }}

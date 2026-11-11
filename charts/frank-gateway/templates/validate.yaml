@@ -1,0 +1,2 @@
+{{- /* Fails the render when the values are invalid, see "frank-gateway.validateValues". Renders no manifest. */}}
+{{- include "frank-gateway.validateValues" . -}}

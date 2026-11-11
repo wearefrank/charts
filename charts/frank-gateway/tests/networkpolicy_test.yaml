@@ -1,0 +1,138 @@
+suite: network policy
+templates:
+  - templates/networkpolicy.yaml
+tests:
+  - it: is not created by default
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  - it: selects the gateway pods and only restricts ingress
+    set:
+      networkPolicy.enabled: true
+    asserts:
+      - isKind:
+          of: NetworkPolicy
+      - equal:
+          path: spec.podSelector.matchLabels
+          value:
+            app.kubernetes.io/name: frank-gateway
+            app.kubernetes.io/instance: RELEASE-NAME
+            app.kubernetes.io/component: gateway
+      - equal:
+          path: spec.policyTypes
+          value:
+            - Ingress
+
+  - it: lets anyone reach the gateway ports and nobody the disabled control and metrics ports
+    set:
+      networkPolicy.enabled: true
+    asserts:
+      - equal:
+          path: spec.ingress
+          value:
+            - ports:
+                - port: 9080
+                  protocol: TCP
+                - port: 9443
+                  protocol: TCP
+
+  - it: only lets the listed peers reach the Control API
+    set:
+      networkPolicy.enabled: true
+      control.enabled: true
+      control.port: 9191
+      networkPolicy.control.from:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: dashboard
+          podSelector:
+            matchLabels:
+              app: frank-gateway-dashboard
+    asserts:
+      - lengthEqual:
+          path: spec.ingress
+          count: 2
+      - equal:
+          path: spec.ingress[1]
+          value:
+            ports:
+              - port: 9191
+                protocol: TCP
+            from:
+              - namespaceSelector:
+                  matchLabels:
+                    kubernetes.io/metadata.name: dashboard
+                podSelector:
+                  matchLabels:
+                    app: frank-gateway-dashboard
+
+  - it: opens no rule for the Control API when there are no peers, it must never be open to everyone
+    set:
+      networkPolicy.enabled: true
+      control.enabled: true
+    asserts:
+      - lengthEqual:
+          path: spec.ingress
+          count: 1
+
+  - it: only lets the listed peers scrape the metrics
+    set:
+      networkPolicy.enabled: true
+      metrics.enabled: true
+      networkPolicy.metrics.from:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: monitoring
+    asserts:
+      - equal:
+          path: spec.ingress[1]
+          value:
+            ports:
+              - port: 9091
+                protocol: TCP
+            from:
+              - namespaceSelector:
+                  matchLabels:
+                    kubernetes.io/metadata.name: monitoring
+
+  - it: ignores peers of a feature that is not enabled
+    set:
+      networkPolicy.enabled: true
+      networkPolicy.control.from:
+        - podSelector: {}
+      networkPolicy.metrics.from:
+        - podSelector: {}
+    asserts:
+      - lengthEqual:
+          path: spec.ingress
+          count: 1
+
+  - it: renders templates in peers and appends extra ingress rules
+    release:
+      namespace: gw
+    set:
+      networkPolicy.enabled: true
+      control.enabled: true
+      networkPolicy.control.from:
+        - podSelector:
+            matchLabels:
+              release-namespace: "{{ .Release.Namespace }}"
+      networkPolicy.extraIngress:
+        - ports:
+            - port: 8080
+          from:
+            - ipBlock:
+                cidr: 10.0.0.0/8
+    asserts:
+      - equal:
+          path: spec.ingress[1].from[0].podSelector.matchLabels["release-namespace"]
+          value: gw
+      - equal:
+          path: spec.ingress[2]
+          value:
+            ports:
+              - port: 8080
+            from:
+              - ipBlock:
+                  cidr: 10.0.0.0/8

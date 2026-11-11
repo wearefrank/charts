@@ -1,0 +1,171 @@
+suite: supporting resources
+templates:
+  - templates/serviceaccount.yaml
+  - templates/hpa.yaml
+  - templates/pdb.yaml
+  - templates/extra-objects.yaml
+tests:
+  - it: creates a service account without a mounted token
+    template: templates/serviceaccount.yaml
+    asserts:
+      - isKind:
+          of: ServiceAccount
+      - equal:
+          path: automountServiceAccountToken
+          value: false
+
+  - it: does not create a service account when disabled
+    template: templates/serviceaccount.yaml
+    set:
+      serviceAccount.create: false
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  - it: does not create a HorizontalPodAutoscaler by default
+    template: templates/hpa.yaml
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  - it: creates an autoscaling/v2 HorizontalPodAutoscaler for the Deployment
+    template: templates/hpa.yaml
+    set:
+      autoscaling.enabled: true
+      autoscaling.minReplicas: 3
+      autoscaling.maxReplicas: 9
+    asserts:
+      - isAPIVersion:
+          of: autoscaling/v2
+      - equal:
+          path: spec.scaleTargetRef
+          value:
+            apiVersion: apps/v1
+            kind: Deployment
+            name: RELEASE-NAME-frank-gateway
+      - equal:
+          path: spec.minReplicas
+          value: 3
+      - equal:
+          path: spec.maxReplicas
+          value: 9
+      - equal:
+          path: spec.metrics[0].resource.name
+          value: cpu
+
+  - it: does not create a PodDisruptionBudget by default
+    template: templates/pdb.yaml
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  - it: creates a PodDisruptionBudget with maxUnavailable
+    template: templates/pdb.yaml
+    set:
+      podDisruptionBudget.enabled: true
+    asserts:
+      - isKind:
+          of: PodDisruptionBudget
+      - equal:
+          path: spec.maxUnavailable
+          value: 1
+      - notExists:
+          path: spec.minAvailable
+
+  - it: allows eviction of unready pods by default
+    template: templates/pdb.yaml
+    capabilities:
+      majorVersion: 1
+      minorVersion: 33
+    set:
+      podDisruptionBudget.enabled: true
+    asserts:
+      - equal:
+          path: spec.unhealthyPodEvictionPolicy
+          value: AlwaysAllow
+
+  - it: renders unhealthyPodEvictionPolicy from Kubernetes 1.27
+    template: templates/pdb.yaml
+    capabilities:
+      majorVersion: 1
+      minorVersion: 27
+    set:
+      podDisruptionBudget.enabled: true
+    asserts:
+      - equal:
+          path: spec.unhealthyPodEvictionPolicy
+          value: AlwaysAllow
+
+  - it: leaves unhealthyPodEvictionPolicy out on Kubernetes older than 1.27
+    template: templates/pdb.yaml
+    capabilities:
+      majorVersion: 1
+      minorVersion: 26
+    set:
+      podDisruptionBudget.enabled: true
+    asserts:
+      - notExists:
+          path: spec.unhealthyPodEvictionPolicy
+      - equal:
+          path: spec.maxUnavailable
+          value: 1
+
+  - it: leaves unhealthyPodEvictionPolicy unset when empty
+    template: templates/pdb.yaml
+    capabilities:
+      majorVersion: 1
+      minorVersion: 33
+    set:
+      podDisruptionBudget.enabled: true
+      podDisruptionBudget.unhealthyPodEvictionPolicy: ""
+    asserts:
+      - notExists:
+          path: spec.unhealthyPodEvictionPolicy
+
+  - it: prefers minAvailable over maxUnavailable
+    template: templates/pdb.yaml
+    set:
+      podDisruptionBudget.enabled: true
+      podDisruptionBudget.minAvailable: 1
+      podDisruptionBudget.maxUnavailable: 2
+    asserts:
+      - equal:
+          path: spec.minAvailable
+          value: 1
+      - notExists:
+          path: spec.maxUnavailable
+
+  - it: accepts a percentage
+    template: templates/pdb.yaml
+    set:
+      podDisruptionBudget.enabled: true
+      podDisruptionBudget.maxUnavailable: 50%
+    asserts:
+      - equal:
+          path: spec.maxUnavailable
+          value: 50%
+
+  - it: renders extra objects given as an object or a template string
+    template: templates/extra-objects.yaml
+    set:
+      extraObjects:
+        - apiVersion: v1
+          kind: ConfigMap
+          metadata:
+            name: from-object
+        - |
+          apiVersion: v1
+          kind: ConfigMap
+          metadata:
+            name: {{ .Release.Name }}-from-string
+    asserts:
+      - hasDocuments:
+          count: 2
+      - equal:
+          path: metadata.name
+          value: from-object
+        documentIndex: 0
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME-from-string
+        documentIndex: 1

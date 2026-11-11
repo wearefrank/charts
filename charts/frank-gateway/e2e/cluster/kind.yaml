@@ -1,0 +1,15 @@
+kind: Cluster
+apiVersion: kind.x-k8s.io/v1alpha4
+# One control plane and two workers: a load balancer address is announced from one node, and the
+# gateway pod can run on another one, as in a real cluster. The default CNI of kind enforces NetworkPolicy.
+#
+# The kubelet updates the files of a mounted ConfigMap when it syncs a pod, which is every minute by default. A shorter
+# interval makes the test that changes an existing ConfigMap about a minute faster.
+kubeadmConfigPatches:
+  - |
+    kind: KubeletConfiguration
+    syncFrequency: 10s
+nodes:
+  - role: control-plane
+  - role: worker
+  - role: worker

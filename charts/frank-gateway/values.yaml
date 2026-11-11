@@ -1,224 +1,577 @@
 ## @section General
 ## @descriptionStart
-## These are all overrides for the `frankgateway` dependency alias, so everything must be
-## nested under the `frankgateway:` key (otherwise it never reaches the subchart, see
-## apache/apisix-helm-chart's values.yaml). Chart version 2.14.0 no longer has a separate
-## dashboard subchart/dependency, so there is no key for that.
+## Frank!Gateway: Apache APISIX in standalone (file-driven) mode with the WeAreFrank plugins.
+## There is no etcd and no Admin API. Routes are read from an `apisix.yaml` file, see `standalone`.
 ##
-## Gotcha: the subchart itself also has its own top-level `apisix:` key (a 1-to-1 mirror
-## of the APISIX `config.yaml` `apisix:` section, which includes `deployment:` among
-## others). To override something in there you need `frankgateway.apisix.*` from our
-## values.yaml — `frankgateway:` is the dependency alias, and `apisix:` is their own config
-## section.
+## Naming follows the Kubernetes manifests where possible: `env`, `volumes`, `ingress.rules`,
+## `httpRoute.parentRefs`, `service.ports` and so on have the same structure as the Kubernetes field.
+##
+## Values marked as template can contain Helm templates, for example `{{ .Release.Name }}`
+## or `{{ .Release.Namespace }}`. This is not the case for `standalone.apisixYaml` and `config`: their
+## `${{NAME}}` placeholders are for APISIX, which resolves them from the environment.
 ## @descriptionEnd
-frankgateway:
-  ## @section Image
-  ## @descriptionStart
-  ## Custom GHCR image for the APISIX container, built with WeAreFrank plugins (SOAP/FSC/OIDC).
-  ## @descriptionEnd
-  image:
-    ## @param frankgateway.image.repository APISIX container image repository
-    repository: ghcr.io/wearefrank/frank-gateway
-    ## @param frankgateway.image.tag APISIX container image tag (immutable tags are recommended)
-    tag: "1.0.0"
 
-  ## @section Deployment mode
+## @param nameOverride Partially override the chart name used in resource names
+nameOverride: ""
+## @param fullnameOverride Fully override the resource name prefix
+fullnameOverride: ""
+## @param commonLabels Labels added to all resources (template). The standard `app.kubernetes.io` labels cannot be overridden.
+commonLabels: {}
+## @param commonAnnotations Annotations added to all resources and to the pods (template). Annotations set on a resource take precedence.
+commonAnnotations: {}
+
+## @param replicas Number of gateway pods (ignored when `autoscaling.enabled` is true)
+replicas: 1
+
+## @section Image
+image:
+  ## @param image.registry Gateway image registry. Set it to your own registry when you mirror the image.
+  registry: ghcr.io
+  ## @param image.repository Gateway image repository, without the registry
+  repository: wearefrank/frank-gateway
+  ## @param image.tag Gateway image tag, defaults to the chart `appVersion`
+  tag: ""
+  ## @param image.digest Gateway image digest, for example `sha256:abc...`. It takes precedence over the tag.
+  digest: ""
+  ## @param image.pullPolicy Image pull policy
+  pullPolicy: IfNotPresent
+## @param imagePullSecrets Secrets used to pull the image, same structure as `spec.imagePullSecrets` in a Pod
+imagePullSecrets: []
+
+## @section Standalone configuration (apisix.yaml)
+## @descriptionStart
+## In standalone mode APISIX reads its routes, upstreams, ssls, consumers and so on from `apisix.yaml`.
+## The chart adds the mandatory `#END` marker when it is missing from `standalone.apisixYaml`.
+## `${{NAME}}` placeholders in the file are resolved by APISIX from environment variables, so secrets
+## can be injected with `env` or `envFrom` and do not have to be stored in the file.
+## When `existingConfigMap` or `existingSecret` is used, APISIX reloads the file when Kubernetes updates it
+## (the pod does not restart). With `apisixYaml` the pod restarts on every change.
+## @descriptionEnd
+standalone:
+  ## @param standalone.apisixYaml Content of `apisix.yaml`, ignored when `existingConfigMap` or `existingSecret` is set
+  apisixYaml: |
+    routes: []
+  ## @param standalone.existingConfigMap Name of an existing ConfigMap that contains the `apisix.yaml` file
+  existingConfigMap: ""
+  ## @param standalone.existingSecret Name of an existing Secret that contains the `apisix.yaml` file (takes precedence over `existingConfigMap`)
+  existingSecret: ""
+  ## @param standalone.key Key of the `apisix.yaml` file in the ConfigMap or Secret
+  key: apisix.yaml
+
+## @section APISIX configuration (config.yaml)
+## @descriptionStart
+## `config` is the content of the APISIX `config.yaml`, using the native APISIX names (snake_case).
+## See https://apisix.apache.org/docs/apisix/configuration/. It is merged over the APISIX defaults, so only
+## the values that differ need to be set. Lists, such as `plugins`, are replaced as a whole.
+##
+## The chart manages these keys itself and overrides them: `apisix.node_listen`, `apisix.enable_admin`,
+## `apisix.enable_control`, `apisix.control`, `apisix.ssl.enable`, `apisix.ssl.listen`, `deployment`
+## and `plugin_attr.prometheus` (see `containerPorts`, `control` and `metrics`).
+## @descriptionEnd
+config:
   apisix:
-    ## @param frankgateway.apisix.enableServerTokens hides apisix version in header and error pages (we don't want to leak our version to the public)
-    enableServerTokens: false
-    deployment:
-      ## @param frankgateway.apisix.deployment.mode APISIX deployment mode (we run standalone, without etcd)
-      mode: standalone
-      ## @param frankgateway.apisix.deployment.role APISIX deployment role required for standalone YAML configuration
-      role: data_plane
-      standalone:
-        ## @param frankgateway.apisix.deployment.standalone.config Inline APISIX routes configuration (YAML string); customers override this with their own routes
-        config: |
-          routes: []
-        # existingConfigMap: "frank-gateway-routes" # alternative: point to an existing ConfigMap instead of inline config
-    ## @section ssl settings and ciphers to limit the use of unsecure ciphers
-    ## @param frankgateway.apisix.ssl.enabled Enable TLS/SSL termination in APISIX (we always want this)
-    ## @param frankgateway.apisix.ssl.sslProtocols TLS protocol versions to support (space-separated list, e.g. "TLSv1.2 TLSv1.3")
-    ## @param frankgateway.apisix.ssl.sslCiphers TLS cipher suites to support
+    ## @param config.apisix.enable_server_tokens Show the APISIX version in the `Server` header (we do not want to leak it)
+    enable_server_tokens: false
+    ## @param config.apisix.enable_ipv6 Enable the nginx IPv6 resolver
+    enable_ipv6: true
+    ## @param config.apisix.enable_http2 Enable HTTP/2 on the TLS listener
+    enable_http2: true
+    ## @param config.apisix.extra_lua_path Extra Lua module search path, used for the plugins baked into the image
+    extra_lua_path: /usr/local/apisix/custom-plugins/?.lua
+    ## @param config.apisix.router.http How routes are matched: `radixtree_uri`, `radixtree_host_uri` or `radixtree_uri_with_parameter`
+    router:
+      http: radixtree_host_uri
     ssl:
-        enabled: true
-        sslProtocols: "TLSv1.2 TLSv1.3"
-        # Smaller list of supported TLSv1.2 ciphers that are still considered secure. The default list will trip security scanners and is not recommended for production use.
-        sslCiphers: "ECDHE-RSA-AES256-GCM-SHA384:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-ECDSA-AES128-GCM-SHA256"
-    ## @section Custom plugins
-    ## @descriptionStart
-    ## Lua plugins baked into the WeAreFrank image (SOAP/FSC/OIDC/etc.), loaded via the
-    ## APISIX `custom-plugins` mechanism rather than upstream's `plugins`/`apisix.plugins`.
-    ## Plugin code is baked into the image under `/usr/local/apisix/custom-plugins/apisix/plugins`.
-    ## @descriptionEnd
-    ## @param frankgateway.apisix.customPlugins.enabled Enable custom (WeAreFrank) Lua plugins baked into the image
-    ## @param frankgateway.apisix.customPlugins.luaPath Lua module search path pattern used to locate custom plugin code
-    customPlugins:
-      enabled: true
-      luaPath: "/usr/local/apisix/custom-plugins/?.lua"
-      ## @skip frankgateway.apisix.customPlugins.plugins
-      ## @extra frankgateway.apisix.customPlugins.plugins Custom plugin definitions: each entry has `name` (must match its Lua module name), `attrs` (passed through to the APISIX plugin config), and an optional `configMap` (`name`/`mounts`) to mount plugin config from an existing ConfigMap.
-      plugins:
-        - name: cert-auth
-          attrs: {}
-          configMap:
-            name: ""
-            mounts: []
-        - name: frank-sender
-          attrs: {}
-          configMap:
-            name: ""
-            mounts: []
-        - name: generic-oauth-client
-          attrs: {}
-          configMap:
-            name: ""
-            mounts: []
-        - name: jwt-client
-          attrs: {}
-          configMap:
-            name: ""
-            mounts: []
-        - name: limit-size
-          attrs: {}
-          configMap:
-            name: ""
-            mounts: []
-        - name: soap-action-router
-          attrs: {}
-          configMap:
-            name: ""
-            mounts: []
-        - name: openid-connect-client
-          attrs: {}
-          configMap:
-            name: ""
-            mounts: []
-        - name: fsc
-          attrs: {}
-          configMap:
-            name: ""
-            mounts: []
+      ## @param config.apisix.ssl.ssl_protocols Supported TLS versions (space separated)
+      ssl_protocols: TLSv1.2 TLSv1.3
+      ## @param config.apisix.ssl.ssl_ciphers Supported TLSv1.2 cipher suites. The APISIX default list trips security scanners.
+      ssl_ciphers: ECDHE-RSA-AES256-GCM-SHA384:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-ECDSA-AES128-GCM-SHA256
+      ## @param config.apisix.ssl.ssl_session_tickets Use TLS session tickets (they defeat perfect forward secrecy)
+      ssl_session_tickets: false
+  nginx_config:
+    ## @param config.nginx_config.error_log Location of the error log. Log to stderr, the log directory is a pod local `emptyDir`.
+    error_log: /dev/stderr
+    ## @param config.nginx_config.error_log_level Error log level: `debug`, `info`, `notice`, `warn`, `error`, `crit`, `alert` or `emerg`
+    error_log_level: warn
+    ## @extra config.nginx_config.worker_processes Number of nginx workers. Not set by default, which is `auto`: one per CPU core.
+    # worker_processes: auto
+    ## @param config.nginx_config.worker_shutdown_timeout Time workers get to finish requests on shutdown or reload, after which open connections are closed. Keep it below `terminationGracePeriodSeconds` minus the `preStop` sleep (10s).
+    worker_shutdown_timeout: 45s
+    http:
+      ## @param config.nginx_config.http.enable_access_log Enable the access log
+      enable_access_log: true
+      ## @param config.nginx_config.http.access_log Location of the access log
+      access_log: /dev/stdout
+      ## @extra config.nginx_config.http.client_max_body_size Maximum request body size, a number of bytes or a size such as `10m`. Not set by default, which is unlimited (`0`).
+      # client_max_body_size: 10m
+      ## @skip config.nginx_config.http.custom_lua_shared_dict
+      ## @extra config.nginx_config.http.custom_lua_shared_dict Lua shared dictionaries used by the WeAreFrank plugins, name and size
+      custom_lua_shared_dict:
+        fsc-registration: 1m
+        openid-connect-client-cache: 1m
+        generic-oauth-client-cache: 1m
+        jwt-client-cache: 1m
+        merge-config: 1m
+    ## @param config.nginx_config.http_configuration_snippet Raw nginx configuration added to the `http` block
+    http_configuration_snippet: |
+      lua_ssl_protocols TLSv1.2 TLSv1.3;
+    ## @param config.nginx_config.http_server_configuration_snippet Raw nginx configuration added to the `server` block
+    http_server_configuration_snippet: |
+      lua_ssl_verify_depth 4;
+    meta:
+      ## @skip config.nginx_config.meta.lua_shared_dict
+      lua_shared_dict:
+        prometheus-metrics: 15m
+  ## @param config.plugins Enabled plugins. Custom (WeAreFrank) plugins must be listed here too or APISIX does not load them. [array]
+  plugins:
+    - real-ip
+    - ai
+    - client-control
+    - proxy-control
+    - request-id
+    - zipkin
+    - ext-plugin-pre-req
+    - fault-injection
+    - mocking
+    - serverless-pre-function
+    - cors
+    - ip-restriction
+    - ua-restriction
+    - referer-restriction
+    - csrf
+    - uri-blocker
+    - request-validation
+    - chaitin-waf
+    - multi-auth
+    - openid-connect
+    - cas-auth
+    - authz-casbin
+    - authz-casdoor
+    - wolf-rbac
+    - ldap-auth
+    - hmac-auth
+    - basic-auth
+    - jwt-auth
+    - jwe-decrypt
+    - key-auth
+    - consumer-restriction
+    - forward-auth
+    - opa
+    - authz-keycloak
+    - proxy-cache
+    - body-transformer
+    - proxy-mirror
+    - proxy-rewrite
+    - workflow
+    - api-breaker
+    - limit-conn
+    - limit-count
+    - limit-req
+    - response-extractor
+    - gzip
+    - server-info
+    - traffic-split
+    - redirect
+    - response-rewrite
+    - degraphql
+    - kafka-proxy
+    - grpc-transcode
+    - grpc-web
+    - public-api
+    - prometheus
+    - datadog
+    - loki-logger
+    - elasticsearch-logger
+    - echo
+    - loggly
+    - http-logger
+    - splunk-hec-logging
+    - skywalking-logger
+    - google-cloud-logging
+    - sls-logger
+    - tcp-logger
+    - kafka-logger
+    - rocketmq-logger
+    - syslog
+    - udp-logger
+    - file-logger
+    - clickhouse-logger
+    - tencent-cloud-cls
+    - inspect
+    - example-plugin
+    - cert-auth
+    - merge-config
+    - frank-sender
+    - generic-oauth-client
+    - jwt-client
+    - limit-size
+    - soap-action-router
+    - openid-connect-client
+    - fsc
+    - aws-lambda
+    - azure-functions
+    - openwhisk
+    - openfunction
+    - serverless-post-function
+    - ext-plugin-post-req
+    - ext-plugin-post-resp
 
-    ## @param frankgateway.apisix.plugins Enabled APISIX plugin list; custom plugins (see `customPlugins.plugins` above) must also be listed here, or APISIX won't load them
-    plugins:                           # plugin list (sorted by priority)
-      - real-ip                   # priority: 23000
-      #- ai                       # priority: 22900
-      - client-control            # priority: 22000
-      - proxy-control             # priority: 21990
-      - request-id                # priority: 12015
-      #- zipkin                   # priority: 12011
-      #- skywalking               # priority: 12010
-      - opentelemetry             # priority: 12009
-      - ext-plugin-pre-req        # priority: 12000
-      - fault-injection           # priority: 11000
-      - mocking                   # priority: 10900
-      - serverless-pre-function   # priority: 10000
-      #- batch-requests           # priority: 4010
-      - cors                      # priority: 4000
-      - ip-restriction            # priority: 3000
-      - ua-restriction            # priority: 2999
-      - referer-restriction       # priority: 2990
-      - csrf                      # priority: 2980
-      - uri-blocker               # priority: 2900
-      - request-validation        # priority: 2800
-      - chaitin-waf               # priority: 2700
-      - multi-auth                # priority: 2600
-      - openid-connect            # priority: 2599
-      - cas-auth                  # priority: 2597
-      - authz-casbin              # priority: 2560
-      - authz-casdoor             # priority: 2559
-      - wolf-rbac                 # priority: 2555
-      - ldap-auth                 # priority: 2540
-      - hmac-auth                 # priority: 2530
-      - basic-auth                # priority: 2520
-      - jwt-auth                  # priority: 2510
-      - jwe-decrypt               # priority: 2509
-      - key-auth                  # priority: 2500
-      - consumer-restriction      # priority: 2400
-      - forward-auth              # priority: 2002
-      - opa                       # priority: 2001
-      - authz-keycloak            # priority: 2000
-      #- error-log-logger         # priority: 1091
-      - proxy-cache               # priority: 1085
-      - body-transformer          # priority: 1080
-      - proxy-mirror              # priority: 1010
-      - proxy-rewrite             # priority: 1008
-      - workflow                  # priority: 1006
-      - api-breaker               # priority: 1005
-      - limit-conn                # priority: 1003
-      - limit-count               # priority: 1002
-      - limit-req                 # priority: 1001
-      #- node-status              # priority: 1000
-      - response-extractor
-      #- brotli                   # priority: 996
-      - gzip                      # priority: 995
-      - server-info               # priority: 990
-      - traffic-split             # priority: 966
-      - redirect                  # priority: 900
-      - response-rewrite          # priority: 899
-      - degraphql                 # priority: 509
-      #- kafka-proxy              # priority: 508
-      #- dubbo-proxy              # priority: 507
-      - grpc-transcode            # priority: 506
-      - grpc-web                  # priority: 505
-      - public-api                # priority: 501
-      - prometheus                # priority: 500
-      - datadog                   # priority: 495
-      - loki-logger               # priority: 414
-      - elasticsearch-logger      # priority: 413
-      - echo                      # priority: 412
-      - loggly                    # priority: 411
-      - http-logger               # priority: 410
-      - splunk-hec-logging        # priority: 409
-      - skywalking-logger         # priority: 408
-      - google-cloud-logging      # priority: 407
-      - sls-logger                # priority: 406
-      - tcp-logger                # priority: 405
-      - kafka-logger              # priority: 403
-      - rocketmq-logger           # priority: 402
-      - syslog                    # priority: 401
-      - udp-logger                # priority: 400
-      - file-logger               # priority: 399
-      - clickhouse-logger         # priority: 398
-      #- tencent-cloud-cls        # priority: 397
-      - inspect                   # priority: 200
-      #- log-rotate               # priority: 100
-      # <- recommend to use priority (0, 100) for your custom plugins
-      - example-plugin            # priority: 0
-      # WeAreFrank custom plugins; priority is defined in each plugin's own Lua module
-      # (baked into the image), not tracked here
-      - cert-auth
-      - frank-sender
-      - generic-oauth-client
-      - jwt-client
-      - limit-size
-      - soap-action-router
-      - openid-connect-client
-      - fsc
-      #- gm                       # priority: -43
-      #- aws-lambda               # priority: -1899
-      #- azure-functions          # priority: -1900
-      #- openwhisk                # priority: -1901
-      #- openfunction             # priority: -1902
-      - serverless-post-function  # priority: -2000
-      - ext-plugin-post-req       # priority: -3000
-      - ext-plugin-post-resp      # priority: -4000
+## @section Container
+## @param containerPorts.http Port of the plain HTTP listener in the container (must be above 1024, the container runs as non-root)
+## @param containerPorts.https Port of the HTTPS listener in the container
+containerPorts:
+  http: 9080
+  https: 9443
 
-  ## @section etcd
-  ## @descriptionStart
-  ## We use standalone/yaml mode and don't talk to etcd at all (internal or external).
-  ## @descriptionEnd
-  etcd:
-    ## @param frankgateway.etcd.enabled Enable the bundled etcd subchart
+## @param env Environment variables of the gateway container, same structure as `env` in a container (template). Use it to feed `${{NAME}}` placeholders in `apisix.yaml`.
+env: []
+## @param envFrom Sources for environment variables, same structure as `envFrom` in a container (template)
+envFrom: []
+## @param command Override the command of the gateway container. The image's own entrypoint is used when empty.
+command: []
+## @param args Override the arguments of the gateway container
+args: []
+## @skip resources
+## @extra resources Resource requests and limits of the gateway container, same structure as `resources` in a container. The default requests 200m CPU and 256Mi memory, and limits 1 CPU and 2Gi. Write the quantities as strings, for example `"1"`.
+resources:
+  requests:
+    cpu: 200m
+    memory: 256Mi
+  limits:
+    cpu: 1000m
+    memory: 2Gi
+## @skip livenessProbe
+## @extra livenessProbe Liveness probe of the gateway container, same structure as `livenessProbe` in a container. The default is a TCP check of the `http` port, with a delay of 15 seconds.
+livenessProbe:
+  tcpSocket:
+    port: http
+  initialDelaySeconds: 15
+  periodSeconds: 10
+  failureThreshold: 6
+## @skip readinessProbe
+## @extra readinessProbe Readiness probe of the gateway container, same structure as `readinessProbe` in a container. The default is a TCP check of the `http` port, with a delay of 5 seconds.
+readinessProbe:
+  tcpSocket:
+    port: http
+  initialDelaySeconds: 5
+  periodSeconds: 5
+  failureThreshold: 3
+## @param startupProbe Startup probe of the gateway container
+startupProbe: {}
+## @skip lifecycle
+## @extra lifecycle Lifecycle hooks of the gateway container. The `preStop` hook waits 10 seconds so endpoints can drain while the gateway keeps serving, then stops nginx gracefully and waits until it has finished the in-flight requests. The image also finishes its in-flight requests on SIGTERM, so the wait is what the hook adds.
+lifecycle:
+  preStop:
+    exec:
+      command:
+        - sh
+        - -c
+        - sleep 10; openresty -p /usr/local/apisix -s quit; while kill -0 "$(cat /usr/local/apisix/logs/nginx.pid 2>/dev/null)" 2>/dev/null; do sleep 1; done
+## @param volumes Additional volumes of the pod, same structure as `volumes` in a Pod (template)
+volumes: []
+## @param volumeMounts Additional volume mounts of the gateway container, same structure as `volumeMounts` in a container (template)
+volumeMounts: []
+## @param initContainers Additional init containers, they run after the chart's own `prepare-conf` init container (template)
+initContainers: []
+## @param sidecars Additional containers in the pod (template)
+sidecars: []
+
+## @section Diagnostic mode
+## @descriptionStart
+## With a read-only root filesystem you cannot easily debug a container that crashes on start. In diagnostic
+## mode the gateway container only runs `sleep infinity`, without probes and without `lifecycle` hooks, so
+## you can open a shell in it. The init container still runs, so the `conf` directory is prepared.
+## @descriptionEnd
+diagnosticMode:
+  ## @param diagnosticMode.enabled Enable diagnostic mode
+  enabled: false
+  ## @param diagnosticMode.command Command to run in diagnostic mode
+  command:
+    - sleep
+  ## @param diagnosticMode.args Arguments of the command in diagnostic mode
+  args:
+    - infinity
+
+## @section Pod
+## @param podAnnotations Annotations added to the pods (template)
+podAnnotations: {}
+## @param podLabels Labels added to the pods (template)
+podLabels: {}
+## @skip podSecurityContext
+## @extra podSecurityContext Security context of the pod, same structure as `securityContext` in a Pod. The default is the baseline: non-root user 636 and the `RuntimeDefault` seccomp profile.
+podSecurityContext:
+  fsGroup: 636
+  fsGroupChangePolicy: OnRootMismatch
+  runAsUser: 636
+  runAsGroup: 636
+  runAsNonRoot: true
+  seccompProfile:
+    type: RuntimeDefault
+## @skip securityContext
+## @extra securityContext Security context of the gateway and init containers, same structure as `securityContext` in a container. The default is the baseline: non-root user 636, no privilege escalation, no capabilities and a read-only root filesystem. The chart mounts writable `emptyDir` volumes where APISIX needs to write.
+securityContext:
+  runAsUser: 636
+  runAsNonRoot: true
+  allowPrivilegeEscalation: false
+  readOnlyRootFilesystem: true
+  capabilities:
+    drop:
+      - ALL
+## @param terminationGracePeriodSeconds Time Kubernetes waits for the gateway to stop. It covers the 10 second `preStop` sleep plus `config.nginx_config.worker_shutdown_timeout`, after which Kubernetes kills the container.
+terminationGracePeriodSeconds: 60
+## @param priorityClassName Priority class of the pods
+priorityClassName: ""
+## @param nodeSelector Node selector of the pods
+nodeSelector: {}
+## @param tolerations Tolerations of the pods
+tolerations: []
+## @param affinity Affinity of the pods (template)
+affinity: {}
+## @skip topologySpreadConstraints
+## @extra topologySpreadConstraints Topology spread constraints of the pods (template). A constraint without a `labelSelector` gets the selector of the gateway pods. The default spreads the pods over the nodes when possible, set it to `[]` to turn that off.
+topologySpreadConstraints:
+  - maxSkew: 1
+    topologyKey: kubernetes.io/hostname
+    whenUnsatisfiable: ScheduleAnyway
+## @param strategy.type Deployment strategy type: `RollingUpdate` or `Recreate`
+## @extra strategy.rollingUpdate Settings of a rolling update, same structure as `spec.strategy.rollingUpdate` in a Deployment. Numbers and percentages such as `25%` are allowed. A missing `maxUnavailable` is 0 and a missing `maxSurge` is 1, so a rolling update starts a new pod before it stops an old one.
+strategy:
+  type: RollingUpdate
+
+## @section Service account
+serviceAccount:
+  ## @param serviceAccount.create Create a service account
+  create: true
+  ## @param serviceAccount.name Name of the service account, generated when empty and `create` is true
+  name: ""
+  ## @param serviceAccount.annotations Annotations of the service account
+  annotations: {}
+  ## @param serviceAccount.automountServiceAccountToken Mount the service account token in the pod. The gateway does not talk to the Kubernetes API.
+  automountServiceAccountToken: false
+
+## @section Service
+## @descriptionStart
+## The gateway Service. Set `type: LoadBalancer` to expose the gateway directly, without Ingress or HTTPRoute.
+## `ports` has the same structure as `spec.ports` in a Service. A missing `targetPort` is the name of the port,
+## which is the name of a container port (`http` and `https`), and a missing `protocol` is `TCP`.
+## A list is replaced as a whole when you override it.
+## @descriptionEnd
+service:
+  ## @param service.type Service type: `ClusterIP`, `NodePort` or `LoadBalancer`
+  type: ClusterIP
+  ## @param service.annotations Service annotations (template)
+  annotations: {}
+  ## @param service.labels Service labels
+  labels: {}
+  ## @skip service.ports
+  ## @extra service.ports Service ports, same structure as `spec.ports` in a Service. A `targetPort` is a container port name or number. The default maps `http` 80 to the container port `http` and `https` 443 to `https`.
+  ports:
+    - name: http
+      port: 80
+    - name: https
+      port: 443
+  ## @param service.externalTrafficPolicy `Cluster` or `Local`, only used for `NodePort` and `LoadBalancer`. Unset by default.
+  externalTrafficPolicy: ""
+  ## @param service.loadBalancerClass Load balancer implementation, only used for `LoadBalancer`
+  loadBalancerClass: ""
+  ## @param service.loadBalancerSourceRanges Client CIDRs allowed to use the load balancer, only used for `LoadBalancer`
+  loadBalancerSourceRanges: []
+  ## @param service.externalIPs IP addresses outside the cluster on which the Service is also available, same as `spec.externalIPs`
+  externalIPs: []
+  ## @param service.ipFamilyPolicy `SingleStack`, `PreferDualStack` or `RequireDualStack`, same as `spec.ipFamilyPolicy`. Unset by default.
+  ipFamilyPolicy: ""
+  ## @param service.ipFamilies IP families of the Service, `IPv4` and or `IPv6`, same as `spec.ipFamilies`
+  ipFamilies: []
+  ## @param service.internalTrafficPolicy `Cluster` or `Local`, same as `spec.internalTrafficPolicy`. Unset by default.
+  internalTrafficPolicy: ""
+  ## @param service.sessionAffinity `None` or `ClientIP`, same as `spec.sessionAffinity`. Unset by default.
+  sessionAffinity: ""
+
+## @section Ingress
+## @descriptionStart
+## A `networking.k8s.io/v1` Ingress. `rules` and `tls` have the same structure as in the Ingress spec.
+## A path without `backend` gets the gateway Service as backend, on the port named in `defaultBackendPort`.
+## For TLS passthrough (client certificates validated by APISIX) use the `https` port and the annotation
+## of your ingress controller, for example `ingress.cilium.io/tls-passthrough: "enabled"` for Cilium.
+## @descriptionEnd
+ingress:
+  ## @param ingress.enabled Create an Ingress
+  enabled: false
+  ## @param ingress.annotations Ingress annotations (template)
+  annotations: {}
+  ## @param ingress.labels Ingress labels
+  labels: {}
+  ## @param ingress.ingressClassName Ingress class, same as `spec.ingressClassName`
+  ingressClassName: ""
+  ## @param ingress.defaultBackendPort Name of the port in `service.ports` used by paths without a `backend`
+  defaultBackendPort: https
+  ## @skip ingress.rules
+  ## @extra ingress.rules Ingress rules, same structure as `spec.rules` in an Ingress (template). A path without `backend` gets the gateway Service as backend.
+  rules:
+    - host: gateway.local
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+  ## @param ingress.tls Ingress TLS settings, same structure as `spec.tls` in an Ingress (template)
+  tls: []
+
+## @section Gateway API
+## @descriptionStart
+## Routes for the Kubernetes Gateway API (`gateway.networking.k8s.io`). The Gateway API CRDs and a Gateway must exist.
+## Use an `HTTPRoute` when the Gateway terminates TLS. Use a `TLSRoute` when TLS must pass through to APISIX,
+## for example because APISIX validates client certificates (mTLS). A rule without `backendRefs` gets
+## the gateway Service as backend.
+## @descriptionEnd
+httpRoute:
+  ## @param httpRoute.enabled Create an HTTPRoute
+  enabled: false
+  ## @param httpRoute.annotations HTTPRoute annotations (template)
+  annotations: {}
+  ## @param httpRoute.labels HTTPRoute labels
+  labels: {}
+  ## @param httpRoute.parentRefs Gateways to attach to, same structure as `spec.parentRefs` (template). Required.
+  parentRefs: []
+  ## @param httpRoute.hostnames Hostnames to match, same as `spec.hostnames` (template)
+  hostnames: []
+  ## @param httpRoute.defaultBackendPort Name of the port in `service.ports` used by rules without `backendRefs`
+  defaultBackendPort: http
+  ## @skip httpRoute.rules
+  ## @extra httpRoute.rules Rules, same structure as `spec.rules` in an HTTPRoute. A rule without `backendRefs` gets the gateway Service as backend.
+  rules:
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /
+tlsRoute:
+  ## @param tlsRoute.enabled Create a TLSRoute (TLS passthrough)
+  enabled: false
+  ## @param tlsRoute.apiVersion API version of the TLSRoute, detected from the cluster when empty (`v1`, otherwise `v1alpha2`)
+  apiVersion: ""
+  ## @param tlsRoute.annotations TLSRoute annotations (template)
+  annotations: {}
+  ## @param tlsRoute.labels TLSRoute labels
+  labels: {}
+  ## @param tlsRoute.parentRefs Gateways (listeners with TLS mode `Passthrough`) to attach to, same structure as `spec.parentRefs` (template). Required.
+  parentRefs: []
+  ## @param tlsRoute.hostnames SNI hostnames to match, same as `spec.hostnames` (template). Required.
+  hostnames: []
+  ## @param tlsRoute.defaultBackendPort Name of the port in `service.ports` used by rules without `backendRefs`
+  defaultBackendPort: https
+  ## @skip tlsRoute.rules
+  ## @extra tlsRoute.rules Rules, same structure as `spec.rules` in a TLSRoute. A rule without `backendRefs` gets the gateway Service as backend.
+  rules:
+    - {}
+
+## @section Control API
+## @descriptionStart
+## The APISIX Control API (health checks, plugin and upstream status), for example for a dashboard.
+## It has no authentication, and it can read the route configuration and reload plugins. It is only exposed
+## through its own Service and never through Ingress or Gateway API routes. Restrict access to it with
+## `networkPolicy.control.from` or a NetworkPolicy of your own.
+## @descriptionEnd
+control:
+  ## @param control.enabled Enable the Control API
+  enabled: false
+  ## @param control.port Container port of the Control API
+  port: 9090
+  service:
+    ## @param control.service.type Service type of the Control API Service
+    type: ClusterIP
+    ## @param control.service.port Service port of the Control API
+    port: 9090
+    ## @param control.service.annotations Annotations of the Control API Service
+    annotations: {}
+    ## @param control.service.labels Labels of the Control API Service
+    labels: {}
+
+## @section Metrics
+## @descriptionStart
+## Prometheus metrics of the `prometheus` plugin, served on their own port and Service.
+## The plugin must be enabled in `config.plugins` and on routes or in a `global_rules` entry in `apisix.yaml`.
+## @descriptionEnd
+metrics:
+  ## @param metrics.enabled Serve Prometheus metrics and create the metrics Service
+  enabled: false
+  ## @param metrics.port Container and Service port of the metrics endpoint
+  port: 9091
+  ## @param metrics.path Path of the metrics endpoint
+  path: /apisix/prometheus/metrics
+  ## @param metrics.service.annotations Annotations of the metrics Service
+  service:
+    annotations: {}
+  serviceMonitor:
+    ## @param metrics.serviceMonitor.enabled Create a Prometheus Operator ServiceMonitor
     enabled: false
+    ## @param metrics.serviceMonitor.namespace Namespace of the ServiceMonitor, the release namespace when empty
+    namespace: ""
+    ## @param metrics.serviceMonitor.labels Labels of the ServiceMonitor, for example the label your Prometheus selects on
+    labels: {}
+    ## @param metrics.serviceMonitor.annotations Annotations of the ServiceMonitor (template)
+    annotations: {}
+    ## @param metrics.serviceMonitor.jobLabel Label of the Service whose value becomes the `job` label, `spec.jobLabel`. Unset by default.
+    jobLabel: ""
+    ## @param metrics.serviceMonitor.honorLabels Keep the labels of the scraped metrics when they conflict with the target labels
+    honorLabels: false
+    ## @param metrics.serviceMonitor.interval Scrape interval
+    interval: 30s
+    ## @param metrics.serviceMonitor.scrapeTimeout Scrape timeout
+    scrapeTimeout: 10s
+    ## @param metrics.serviceMonitor.relabelings Relabelings, same structure as in a ServiceMonitor endpoint
+    relabelings: []
+    ## @param metrics.serviceMonitor.metricRelabelings Metric relabelings, same structure as in a ServiceMonitor endpoint
+    metricRelabelings: []
 
-  ## @param frankgateway.externalEtcd.user External etcd username, emptied to avoid an unused etcd secret/env var since `etcd.enabled` is false
-  externalEtcd:
-    user: ""
+## @section Autoscaling and availability
+autoscaling:
+  ## @param autoscaling.enabled Create a HorizontalPodAutoscaler
+  enabled: false
+  ## @param autoscaling.minReplicas Minimum number of replicas
+  minReplicas: 2
+  ## @param autoscaling.maxReplicas Maximum number of replicas
+  maxReplicas: 5
+  ## @skip autoscaling.metrics
+  ## @extra autoscaling.metrics Metrics, same structure as `spec.metrics` in an `autoscaling/v2` HorizontalPodAutoscaler
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: 80
+  ## @param autoscaling.behavior Scaling behavior, same structure as `spec.behavior` in an `autoscaling/v2` HorizontalPodAutoscaler
+  behavior: {}
+podDisruptionBudget:
+  ## @param podDisruptionBudget.enabled Create a PodDisruptionBudget
+  enabled: false
+  ## @extra podDisruptionBudget.minAvailable Minimum available pods, a number or a percentage such as `50%`. Takes precedence over `maxUnavailable`. Not set by default.
+  ## @extra podDisruptionBudget.maxUnavailable Maximum unavailable pods, a number or a percentage such as `50%`. Defaults to `1` when `minAvailable` is not set.
+  # minAvailable: 1
+  # maxUnavailable: 1
+  ## @param podDisruptionBudget.unhealthyPodEvictionPolicy Whether unready pods can be evicted: `AlwaysAllow` or `IfHealthyBudget`, empty to leave it unset. Only rendered on Kubernetes 1.27 or newer.
+  unhealthyPodEvictionPolicy: AlwaysAllow
 
-  ## @section Ingress controller
-  ##
-  ingress-controller:
-    ## @param frankgateway.ingress-controller.enabled Enable the bundled APISIX ingress-controller subchart
-    enabled: false
+## @section Network policy
+## @descriptionStart
+## An optional NetworkPolicy for the gateway pods. It only restricts ingress, the gateway has to reach its upstreams.
+## The gateway ports (`containerPorts.http` and `containerPorts.https`) accept traffic from anywhere, so ingress
+## controllers and Gateways keep working. The Control API and metrics ports are only reachable from the
+## peers you list in `control.from` and `metrics.from`. Without peers nobody can reach them.
+## A peer has the structure of `from` in a NetworkPolicy ingress rule, for example a `podSelector`,
+## a `namespaceSelector` or an `ipBlock`.
+## @descriptionEnd
+networkPolicy:
+  ## @param networkPolicy.enabled Create a NetworkPolicy
+  enabled: false
+  control:
+    ## @param networkPolicy.control.from Peers that may reach the Control API port (template). Needs `control.enabled`.
+    from: []
+  metrics:
+    ## @param networkPolicy.metrics.from Peers that may reach the metrics port (template). Needs `metrics.enabled`.
+    from: []
+  ## @param networkPolicy.extraIngress Additional ingress rules, same structure as `spec.ingress` in a NetworkPolicy (template)
+  extraIngress: []
+
+## @section Extra objects
+## @param extraObjects Additional Kubernetes objects to deploy with the release. Each item is an object or a string, and is rendered as a template.
+extraObjects: []

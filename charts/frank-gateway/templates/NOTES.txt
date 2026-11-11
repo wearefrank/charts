@@ -1,0 +1,49 @@
+Frank!Gateway {{ .Chart.AppVersion }} is running in standalone mode.
+
+Routes are read from {{ include "frank-gateway.standaloneName" . }}, key "{{ .Values.standalone.key }}".
+{{- if or .Values.standalone.existingConfigMap .Values.standalone.existingSecret }}
+APISIX reloads the file by itself when it changes, the pods are not restarted.
+{{- end }}
+
+{{- if not (or .Values.ingress.enabled .Values.httpRoute.enabled .Values.tlsRoute.enabled (eq .Values.service.type "LoadBalancer")) }}
+
+The gateway is only reachable inside the cluster. Try it with:
+  kubectl --namespace {{ .Release.Namespace }} port-forward svc/{{ include "frank-gateway.fullname" . }} 8080:80
+{{- end }}
+{{- if .Values.control.enabled }}
+
+The Control API is available inside the cluster at {{ include "frank-gateway.fullname" . }}-control.{{ .Release.Namespace }}.svc:{{ .Values.control.service.port }}.
+It has no authentication, restrict access to it with networkPolicy or a NetworkPolicy of your own.
+{{- if and .Values.networkPolicy.enabled (not .Values.networkPolicy.control.from) }}
+
+WARNING: networkPolicy is enabled but networkPolicy.control.from is empty, so nothing can reach the Control API.
+{{- end }}
+{{- end }}
+{{- if .Values.metrics.enabled }}
+
+Metrics are served at {{ include "frank-gateway.fullname" . }}-metrics.{{ .Release.Namespace }}.svc:{{ .Values.metrics.port }}{{ .Values.metrics.path }}.
+Enable the "prometheus" plugin on your routes or in a global_rules entry to produce metrics.
+{{- if not (has "prometheus" (.Values.config.plugins | default list)) }}
+
+WARNING: "prometheus" is not in config.plugins, so APISIX does not load the plugin and serves no metrics.
+{{- end }}
+{{- if and .Values.networkPolicy.enabled (not .Values.networkPolicy.metrics.from) }}
+
+WARNING: networkPolicy is enabled but networkPolicy.metrics.from is empty, so nothing can scrape the metrics.
+{{- end }}
+{{- end }}
+{{- if and .Values.tlsRoute.enabled .Values.httpRoute.enabled }}
+
+Both an HTTPRoute and a TLSRoute are enabled. Make sure they attach to different Gateway listeners.
+{{- end }}
+{{- if and (not .Values.image.digest) (eq (toString (.Values.image.tag | default .Chart.AppVersion)) "latest") }}
+
+WARNING: the image tag is "latest", a mutable tag. Use a version tag or image.digest so that the same chart values always deploy the same image.
+{{- end }}
+{{- if .Values.diagnosticMode.enabled }}
+
+WARNING: diagnostic mode is enabled. The gateway does not run, the container only sleeps and the probes are off.
+Open a shell with:
+  kubectl --namespace {{ .Release.Namespace }} exec -it deploy/{{ include "frank-gateway.fullname" . }} -- sh
+Start the gateway by hand with: /docker-entrypoint.sh docker-start
+{{- end }}

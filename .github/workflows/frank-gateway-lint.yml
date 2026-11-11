@@ -1,0 +1,79 @@
+name: Frank-gateway chart lint
+
+# Static checks of the chart: Helm lint, the schemas of the rendered manifests, kube-linter and the generated docs.
+
+on:
+  pull_request:
+    paths:
+      - "charts/frank-gateway/**"
+      - ".github/workflows/frank-gateway-lint.yml"
+      - "package.json"
+      - "package-lock.json"
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+
+concurrency:
+  group: frank-gateway-lint-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  CHART: charts/frank-gateway
+  # Schemas of the Gateway API and Prometheus Operator resources
+  CRD_SCHEMAS: https://raw.githubusercontent.com/datreeio/CRDs-catalog/main/{{.Group}}/{{.ResourceKind}}_{{.ResourceAPIVersion}}.json
+
+jobs:
+  lint:
+    name: Lint and validate
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+
+      - name: Install Helm
+        uses: azure/setup-helm@1a275c3b69536ee54be43f2070a358922e12c8d4
+        with:
+          version: "v4.3.1"
+
+      - name: Install kubeconform and kube-linter
+        run: |
+          go install github.com/yannh/kubeconform/cmd/kubeconform@v0.8.0
+          go install golang.stackrox.io/kube-linter/cmd/kube-linter@v0.8.3
+          echo "$(go env GOPATH)/bin" >> "$GITHUB_PATH"
+
+      - name: Helm lint
+        run: |
+          helm lint --strict "$CHART"
+          helm lint --strict "$CHART" -f "$CHART/ci/all-features-values.yaml"
+
+      - name: Render the chart
+        run: |
+          helm template ci "$CHART" --namespace ci > "$RUNNER_TEMP/default.yaml"
+          helm template ci "$CHART" --namespace ci -f "$CHART/ci/all-features-values.yaml" > "$RUNNER_TEMP/all-features.yaml"
+          # The oldest supported Kubernetes version, to check the version dependent fields
+          helm template ci "$CHART" --namespace ci --kube-version 1.25.0 \
+            --set podDisruptionBudget.enabled=true --set autoscaling.enabled=true > "$RUNNER_TEMP/kube-1.25.yaml"
+
+      - name: Validate the manifests with kubeconform
+        run: |
+          kubeconform -strict -summary -kubernetes-version 1.33.0 \
+            -schema-location default -schema-location "$CRD_SCHEMAS" \
+            "$RUNNER_TEMP/default.yaml" "$RUNNER_TEMP/all-features.yaml"
+          kubeconform -strict -summary -kubernetes-version 1.25.0 "$RUNNER_TEMP/kube-1.25.yaml"
+
+      - name: Lint the manifests with kube-linter
+        run: |
+          kube-linter lint "$CHART"
+          kube-linter lint "$RUNNER_TEMP/all-features.yaml"
+
+      - name: Check that the README and the schema are up to date
+        run: |
+          npm ci --ignore-scripts
+          npx readme-generator -v "$CHART/values.yaml" -r "$CHART/README.md" -s "$CHART/values.schema.json"
+          git diff --exit-code -- "$CHART" || {
+            echo "::error::README.md or values.schema.json is out of date. Run the pre-commit hook (npm install) or readme-generator and commit the result."
+            exit 1
+          }

@@ -1,0 +1,43 @@
+{{- if .Values.networkPolicy.enabled }}
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: {{ include "frank-gateway.fullname" . }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "frank-gateway.labels" . | nindent 4 }}
+  {{- with (include "frank-gateway.annotations" (dict "context" $)) }}
+  annotations:
+    {{- . | nindent 4 }}
+  {{- end }}
+spec:
+  podSelector:
+    matchLabels:
+      {{- include "frank-gateway.selectorLabels" . | nindent 6 }}
+  policyTypes:
+    - Ingress
+  ingress:
+    # The gateway ports accept traffic from anywhere. Egress is not restricted, the gateway has to reach its upstreams.
+    - ports:
+        - port: {{ .Values.containerPorts.http }}
+          protocol: TCP
+        - port: {{ .Values.containerPorts.https }}
+          protocol: TCP
+    {{- if and .Values.control.enabled .Values.networkPolicy.control.from }}
+    - ports:
+        - port: {{ .Values.control.port }}
+          protocol: TCP
+      from:
+        {{- include "frank-gateway.tplvalues.render" (dict "value" .Values.networkPolicy.control.from "context" $) | nindent 8 }}
+    {{- end }}
+    {{- if and .Values.metrics.enabled .Values.networkPolicy.metrics.from }}
+    - ports:
+        - port: {{ .Values.metrics.port }}
+          protocol: TCP
+      from:
+        {{- include "frank-gateway.tplvalues.render" (dict "value" .Values.networkPolicy.metrics.from "context" $) | nindent 8 }}
+    {{- end }}
+    {{- with .Values.networkPolicy.extraIngress }}
+    {{- include "frank-gateway.tplvalues.render" (dict "value" . "context" $) | nindent 4 }}
+    {{- end }}
+{{- end }}

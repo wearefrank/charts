@@ -2,248 +2,1245 @@
     "title": "Chart Values",
     "type": "object",
     "properties": {
-        "frankgateway": {
+        "nameOverride": {
+            "type": "string",
+            "description": "Partially override the chart name used in resource names",
+            "default": ""
+        },
+        "fullnameOverride": {
+            "type": "string",
+            "description": "Fully override the resource name prefix",
+            "default": ""
+        },
+        "commonLabels": {
+            "type": "object",
+            "description": "Labels added to all resources (template). The standard `app.kubernetes.io` labels cannot be overridden.",
+            "default": {}
+        },
+        "commonAnnotations": {
+            "type": "object",
+            "description": "Annotations added to all resources and to the pods (template). Annotations set on a resource take precedence.",
+            "default": {}
+        },
+        "replicas": {
+            "type": "number",
+            "description": "Number of gateway pods (ignored when `autoscaling.enabled` is true)",
+            "default": 1
+        },
+        "image": {
             "type": "object",
             "properties": {
-                "image": {
-                    "type": "object",
-                    "properties": {
-                        "repository": {
-                            "type": "string",
-                            "description": "APISIX container image repository",
-                            "default": "ghcr.io/wearefrank/frank-gateway"
-                        },
-                        "tag": {
-                            "type": "string",
-                            "description": "APISIX container image tag (immutable tags are recommended)",
-                            "default": "1.0.0"
-                        }
-                    }
+                "registry": {
+                    "type": "string",
+                    "description": "Gateway image registry. Set it to your own registry when you mirror the image.",
+                    "default": "ghcr.io"
                 },
+                "repository": {
+                    "type": "string",
+                    "description": "Gateway image repository, without the registry",
+                    "default": "wearefrank/frank-gateway"
+                },
+                "tag": {
+                    "type": "string",
+                    "description": "Gateway image tag, defaults to the chart `appVersion`",
+                    "default": ""
+                },
+                "digest": {
+                    "type": "string",
+                    "description": "Gateway image digest, for example `sha256:abc...`. It takes precedence over the tag.",
+                    "default": ""
+                },
+                "pullPolicy": {
+                    "type": "string",
+                    "description": "Image pull policy",
+                    "default": "IfNotPresent"
+                }
+            }
+        },
+        "imagePullSecrets": {
+            "type": "array",
+            "description": "Secrets used to pull the image, same structure as `spec.imagePullSecrets` in a Pod",
+            "default": [],
+            "items": {}
+        },
+        "standalone": {
+            "type": "object",
+            "properties": {
+                "apisixYaml": {
+                    "type": "string",
+                    "description": "Content of `apisix.yaml`, ignored when `existingConfigMap` or `existingSecret` is set",
+                    "default": "routes: []\n"
+                },
+                "existingConfigMap": {
+                    "type": "string",
+                    "description": "Name of an existing ConfigMap that contains the `apisix.yaml` file",
+                    "default": ""
+                },
+                "existingSecret": {
+                    "type": "string",
+                    "description": "Name of an existing Secret that contains the `apisix.yaml` file (takes precedence over `existingConfigMap`)",
+                    "default": ""
+                },
+                "key": {
+                    "type": "string",
+                    "description": "Key of the `apisix.yaml` file in the ConfigMap or Secret",
+                    "default": "apisix.yaml"
+                }
+            }
+        },
+        "config": {
+            "type": "object",
+            "properties": {
                 "apisix": {
                     "type": "object",
                     "properties": {
-                        "enableServerTokens": {
+                        "enable_server_tokens": {
                             "type": "boolean",
-                            "description": "hides apisix version in header and error pages (we don't want to leak our version to the public)",
+                            "description": "Show the APISIX version in the `Server` header (we do not want to leak it)",
                             "default": false
                         },
-                        "deployment": {
+                        "enable_ipv6": {
+                            "type": "boolean",
+                            "description": "Enable the nginx IPv6 resolver",
+                            "default": true
+                        },
+                        "enable_http2": {
+                            "type": "boolean",
+                            "description": "Enable HTTP/2 on the TLS listener",
+                            "default": true
+                        },
+                        "extra_lua_path": {
+                            "type": "string",
+                            "description": "Extra Lua module search path, used for the plugins baked into the image",
+                            "default": "/usr/local/apisix/custom-plugins/?.lua"
+                        },
+                        "router": {
                             "type": "object",
                             "properties": {
-                                "mode": {
+                                "http": {
                                     "type": "string",
-                                    "description": "APISIX deployment mode (we run standalone, without etcd)",
-                                    "default": "standalone"
-                                },
-                                "role": {
-                                    "type": "string",
-                                    "description": "APISIX deployment role required for standalone YAML configuration",
-                                    "default": "data_plane"
-                                },
-                                "standalone": {
-                                    "type": "object",
-                                    "properties": {
-                                        "config": {
-                                            "type": "string",
-                                            "description": "Inline APISIX routes configuration (YAML string); customers override this with their own routes",
-                                            "default": "routes: []\n"
-                                        }
-                                    }
+                                    "description": "How routes are matched: `radixtree_uri`, `radixtree_host_uri` or `radixtree_uri_with_parameter`",
+                                    "default": "radixtree_host_uri"
                                 }
                             }
                         },
                         "ssl": {
                             "type": "object",
                             "properties": {
-                                "enabled": {
-                                    "type": "boolean",
-                                    "description": "Enable TLS/SSL termination in APISIX (we always want this)",
-                                    "default": true
-                                },
-                                "sslProtocols": {
+                                "ssl_protocols": {
                                     "type": "string",
-                                    "description": "TLS protocol versions to support (space-separated list, e.g. \"TLSv1.2 TLSv1.3\")",
+                                    "description": "Supported TLS versions (space separated)",
                                     "default": "TLSv1.2 TLSv1.3"
                                 },
-                                "sslCiphers": {
+                                "ssl_ciphers": {
                                     "type": "string",
-                                    "description": "TLS cipher suites to support",
+                                    "description": "Supported TLSv1.2 cipher suites. The APISIX default list trips security scanners.",
                                     "default": "ECDHE-RSA-AES256-GCM-SHA384:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-ECDSA-AES128-GCM-SHA256"
+                                },
+                                "ssl_session_tickets": {
+                                    "type": "boolean",
+                                    "description": "Use TLS session tickets (they defeat perfect forward secrecy)",
+                                    "default": false
                                 }
                             }
+                        }
+                    }
+                },
+                "nginx_config": {
+                    "type": "object",
+                    "properties": {
+                        "error_log": {
+                            "type": "string",
+                            "description": "Location of the error log. Log to stderr, the log directory is a pod local `emptyDir`.",
+                            "default": "/dev/stderr"
                         },
-                        "customPlugins": {
+                        "error_log_level": {
+                            "type": "string",
+                            "description": "Error log level: `debug`, `info`, `notice`, `warn`, `error`, `crit`, `alert` or `emerg`",
+                            "default": "warn"
+                        },
+                        "worker_shutdown_timeout": {
+                            "type": "string",
+                            "description": "Time workers get to finish requests on shutdown or reload, after which open connections are closed. Keep it below `terminationGracePeriodSeconds` minus the `preStop` sleep (10s).",
+                            "default": "45s"
+                        },
+                        "http": {
                             "type": "object",
                             "properties": {
-                                "enabled": {
+                                "enable_access_log": {
                                     "type": "boolean",
-                                    "description": "Enable custom (WeAreFrank) Lua plugins baked into the image",
+                                    "description": "Enable the access log",
                                     "default": true
                                 },
-                                "luaPath": {
+                                "access_log": {
                                     "type": "string",
-                                    "description": "Lua module search path pattern used to locate custom plugin code",
-                                    "default": "/usr/local/apisix/custom-plugins/?.lua"
+                                    "description": "Location of the access log",
+                                    "default": "/dev/stdout"
                                 },
-                                "plugins": {
-                                    "type": "array",
-                                    "description": "",
-                                    "items": {
-                                        "type": "object",
-                                        "properties": {
-                                            "name": {
-                                                "type": "string",
-                                                "description": ""
-                                            },
-                                            "attrs": {
-                                                "type": "object",
-                                                "description": ""
-                                            },
-                                            "configMap": {
-                                                "type": "object",
-                                                "properties": {
-                                                    "name": {
-                                                        "type": "string",
-                                                        "description": ""
-                                                    },
-                                                    "mounts": {
-                                                        "type": "array",
-                                                        "description": "",
-                                                        "items": {}
-                                                    }
-                                                }
-                                            }
+                                "custom_lua_shared_dict": {
+                                    "type": "object",
+                                    "properties": {
+                                        "fsc-registration": {
+                                            "type": "string",
+                                            "description": "",
+                                            "default": "1m"
+                                        },
+                                        "openid-connect-client-cache": {
+                                            "type": "string",
+                                            "description": "",
+                                            "default": "1m"
+                                        },
+                                        "generic-oauth-client-cache": {
+                                            "type": "string",
+                                            "description": "",
+                                            "default": "1m"
+                                        },
+                                        "jwt-client-cache": {
+                                            "type": "string",
+                                            "description": "",
+                                            "default": "1m"
+                                        },
+                                        "merge-config": {
+                                            "type": "string",
+                                            "description": "",
+                                            "default": "1m"
                                         }
                                     }
                                 }
                             }
                         },
-                        "plugins": {
+                        "meta": {
+                            "type": "object",
+                            "properties": {
+                                "lua_shared_dict": {
+                                    "type": "object",
+                                    "properties": {
+                                        "prometheus-metrics": {
+                                            "type": "string",
+                                            "description": "",
+                                            "default": "15m"
+                                        }
+                                    }
+                                }
+                            }
+                        },
+                        "http_configuration_snippet": {
+                            "type": "string",
+                            "description": "Raw nginx configuration added to the `http` block",
+                            "default": "lua_ssl_protocols TLSv1.2 TLSv1.3;\n"
+                        },
+                        "http_server_configuration_snippet": {
+                            "type": "string",
+                            "description": "Raw nginx configuration added to the `server` block",
+                            "default": "lua_ssl_verify_depth 4;\n"
+                        }
+                    }
+                },
+                "plugins": {
+                    "type": "array",
+                    "description": "Enabled plugins. Custom (WeAreFrank) plugins must be listed here too or APISIX does not load them. [array]",
+                    "default": [
+                        "real-ip",
+                        "ai",
+                        "client-control",
+                        "proxy-control",
+                        "request-id",
+                        "zipkin",
+                        "ext-plugin-pre-req",
+                        "fault-injection",
+                        "mocking",
+                        "serverless-pre-function",
+                        "cors",
+                        "ip-restriction",
+                        "ua-restriction",
+                        "referer-restriction",
+                        "csrf",
+                        "uri-blocker",
+                        "request-validation",
+                        "chaitin-waf",
+                        "multi-auth",
+                        "openid-connect",
+                        "cas-auth",
+                        "authz-casbin",
+                        "authz-casdoor",
+                        "wolf-rbac",
+                        "ldap-auth",
+                        "hmac-auth",
+                        "basic-auth",
+                        "jwt-auth",
+                        "jwe-decrypt",
+                        "key-auth",
+                        "consumer-restriction",
+                        "forward-auth",
+                        "opa",
+                        "authz-keycloak",
+                        "proxy-cache",
+                        "body-transformer",
+                        "proxy-mirror",
+                        "proxy-rewrite",
+                        "workflow",
+                        "api-breaker",
+                        "limit-conn",
+                        "limit-count",
+                        "limit-req",
+                        "response-extractor",
+                        "gzip",
+                        "server-info",
+                        "traffic-split",
+                        "redirect",
+                        "response-rewrite",
+                        "degraphql",
+                        "kafka-proxy",
+                        "grpc-transcode",
+                        "grpc-web",
+                        "public-api",
+                        "prometheus",
+                        "datadog",
+                        "loki-logger",
+                        "elasticsearch-logger",
+                        "echo",
+                        "loggly",
+                        "http-logger",
+                        "splunk-hec-logging",
+                        "skywalking-logger",
+                        "google-cloud-logging",
+                        "sls-logger",
+                        "tcp-logger",
+                        "kafka-logger",
+                        "rocketmq-logger",
+                        "syslog",
+                        "udp-logger",
+                        "file-logger",
+                        "clickhouse-logger",
+                        "tencent-cloud-cls",
+                        "inspect",
+                        "example-plugin",
+                        "cert-auth",
+                        "merge-config",
+                        "frank-sender",
+                        "generic-oauth-client",
+                        "jwt-client",
+                        "limit-size",
+                        "soap-action-router",
+                        "openid-connect-client",
+                        "fsc",
+                        "aws-lambda",
+                        "azure-functions",
+                        "openwhisk",
+                        "openfunction",
+                        "serverless-post-function",
+                        "ext-plugin-post-req",
+                        "ext-plugin-post-resp"
+                    ],
+                    "items": {
+                        "type": "string"
+                    }
+                }
+            }
+        },
+        "containerPorts": {
+            "type": "object",
+            "properties": {
+                "http": {
+                    "type": "number",
+                    "description": "Port of the plain HTTP listener in the container (must be above 1024, the container runs as non-root)",
+                    "default": 9080
+                },
+                "https": {
+                    "type": "number",
+                    "description": "Port of the HTTPS listener in the container",
+                    "default": 9443
+                }
+            }
+        },
+        "resources": {
+            "type": "object",
+            "properties": {
+                "requests": {
+                    "type": "object",
+                    "properties": {
+                        "cpu": {
+                            "type": "string",
+                            "description": "",
+                            "default": "200m"
+                        },
+                        "memory": {
+                            "type": "string",
+                            "description": "",
+                            "default": "256Mi"
+                        }
+                    }
+                },
+                "limits": {
+                    "type": "object",
+                    "properties": {
+                        "cpu": {
+                            "type": "string",
+                            "description": "",
+                            "default": "1000m"
+                        },
+                        "memory": {
+                            "type": "string",
+                            "description": "",
+                            "default": "2Gi"
+                        }
+                    }
+                }
+            }
+        },
+        "livenessProbe": {
+            "type": "object",
+            "properties": {
+                "tcpSocket": {
+                    "type": "object",
+                    "properties": {
+                        "port": {
+                            "type": "string",
+                            "description": "",
+                            "default": "http"
+                        }
+                    }
+                },
+                "initialDelaySeconds": {
+                    "type": "number",
+                    "description": "",
+                    "default": 15
+                },
+                "periodSeconds": {
+                    "type": "number",
+                    "description": "",
+                    "default": 10
+                },
+                "failureThreshold": {
+                    "type": "number",
+                    "description": "",
+                    "default": 6
+                }
+            }
+        },
+        "readinessProbe": {
+            "type": "object",
+            "properties": {
+                "tcpSocket": {
+                    "type": "object",
+                    "properties": {
+                        "port": {
+                            "type": "string",
+                            "description": "",
+                            "default": "http"
+                        }
+                    }
+                },
+                "initialDelaySeconds": {
+                    "type": "number",
+                    "description": "",
+                    "default": 5
+                },
+                "periodSeconds": {
+                    "type": "number",
+                    "description": "",
+                    "default": 5
+                },
+                "failureThreshold": {
+                    "type": "number",
+                    "description": "",
+                    "default": 3
+                }
+            }
+        },
+        "env": {
+            "type": "array",
+            "description": "Environment variables of the gateway container, same structure as `env` in a container (template). Use it to feed `${{NAME}}` placeholders in `apisix.yaml`.",
+            "default": [],
+            "items": {}
+        },
+        "lifecycle": {
+            "type": "object",
+            "properties": {
+                "preStop": {
+                    "type": "object",
+                    "properties": {
+                        "exec": {
+                            "type": "object",
+                            "properties": {
+                                "command": {
+                                    "type": "array",
+                                    "description": "",
+                                    "default": [
+                                        "sh",
+                                        "-c",
+                                        "sleep 10; openresty -p /usr/local/apisix -s quit; while kill -0 \"$(cat /usr/local/apisix/logs/nginx.pid 2>/dev/null)\" 2>/dev/null; do sleep 1; done"
+                                    ],
+                                    "items": {
+                                        "type": "string"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "envFrom": {
+            "type": "array",
+            "description": "Sources for environment variables, same structure as `envFrom` in a container (template)",
+            "default": [],
+            "items": {}
+        },
+        "command": {
+            "type": "array",
+            "description": "Override the command of the gateway container. The image's own entrypoint is used when empty.",
+            "default": [],
+            "items": {}
+        },
+        "args": {
+            "type": "array",
+            "description": "Override the arguments of the gateway container",
+            "default": [],
+            "items": {}
+        },
+        "podSecurityContext": {
+            "type": "object",
+            "properties": {
+                "fsGroup": {
+                    "type": "number",
+                    "description": "",
+                    "default": 636
+                },
+                "fsGroupChangePolicy": {
+                    "type": "string",
+                    "description": "",
+                    "default": "OnRootMismatch"
+                },
+                "runAsUser": {
+                    "type": "number",
+                    "description": "",
+                    "default": 636
+                },
+                "runAsGroup": {
+                    "type": "number",
+                    "description": "",
+                    "default": 636
+                },
+                "runAsNonRoot": {
+                    "type": "boolean",
+                    "description": "",
+                    "default": true
+                },
+                "seccompProfile": {
+                    "type": "object",
+                    "properties": {
+                        "type": {
+                            "type": "string",
+                            "description": "",
+                            "default": "RuntimeDefault"
+                        }
+                    }
+                }
+            }
+        },
+        "securityContext": {
+            "type": "object",
+            "properties": {
+                "runAsUser": {
+                    "type": "number",
+                    "description": "",
+                    "default": 636
+                },
+                "runAsNonRoot": {
+                    "type": "boolean",
+                    "description": "",
+                    "default": true
+                },
+                "allowPrivilegeEscalation": {
+                    "type": "boolean",
+                    "description": "",
+                    "default": false
+                },
+                "readOnlyRootFilesystem": {
+                    "type": "boolean",
+                    "description": "",
+                    "default": true
+                },
+                "capabilities": {
+                    "type": "object",
+                    "properties": {
+                        "drop": {
                             "type": "array",
-                            "description": "Enabled APISIX plugin list; custom plugins (see `customPlugins.plugins` above) must also be listed here, or APISIX won't load them",
+                            "description": "",
                             "default": [
-                                "real-ip",
-                                "client-control",
-                                "proxy-control",
-                                "request-id",
-                                "opentelemetry",
-                                "ext-plugin-pre-req",
-                                "fault-injection",
-                                "mocking",
-                                "serverless-pre-function",
-                                "cors",
-                                "ip-restriction",
-                                "ua-restriction",
-                                "referer-restriction",
-                                "csrf",
-                                "uri-blocker",
-                                "request-validation",
-                                "chaitin-waf",
-                                "multi-auth",
-                                "openid-connect",
-                                "cas-auth",
-                                "authz-casbin",
-                                "authz-casdoor",
-                                "wolf-rbac",
-                                "ldap-auth",
-                                "hmac-auth",
-                                "basic-auth",
-                                "jwt-auth",
-                                "jwe-decrypt",
-                                "key-auth",
-                                "consumer-restriction",
-                                "forward-auth",
-                                "opa",
-                                "authz-keycloak",
-                                "proxy-cache",
-                                "body-transformer",
-                                "proxy-mirror",
-                                "proxy-rewrite",
-                                "workflow",
-                                "api-breaker",
-                                "limit-conn",
-                                "limit-count",
-                                "limit-req",
-                                "response-extractor",
-                                "gzip",
-                                "server-info",
-                                "traffic-split",
-                                "redirect",
-                                "response-rewrite",
-                                "degraphql",
-                                "grpc-transcode",
-                                "grpc-web",
-                                "public-api",
-                                "prometheus",
-                                "datadog",
-                                "loki-logger",
-                                "elasticsearch-logger",
-                                "echo",
-                                "loggly",
-                                "http-logger",
-                                "splunk-hec-logging",
-                                "skywalking-logger",
-                                "google-cloud-logging",
-                                "sls-logger",
-                                "tcp-logger",
-                                "kafka-logger",
-                                "rocketmq-logger",
-                                "syslog",
-                                "udp-logger",
-                                "file-logger",
-                                "clickhouse-logger",
-                                "inspect",
-                                "example-plugin",
-                                "cert-auth",
-                                "frank-sender",
-                                "generic-oauth-client",
-                                "jwt-client",
-                                "limit-size",
-                                "soap-action-router",
-                                "openid-connect-client",
-                                "fsc",
-                                "serverless-post-function",
-                                "ext-plugin-post-req",
-                                "ext-plugin-post-resp"
+                                "ALL"
                             ],
                             "items": {
                                 "type": "string"
                             }
                         }
                     }
+                }
+            }
+        },
+        "startupProbe": {
+            "type": "object",
+            "description": "Startup probe of the gateway container",
+            "default": {}
+        },
+        "volumes": {
+            "type": "array",
+            "description": "Additional volumes of the pod, same structure as `volumes` in a Pod (template)",
+            "default": [],
+            "items": {}
+        },
+        "volumeMounts": {
+            "type": "array",
+            "description": "Additional volume mounts of the gateway container, same structure as `volumeMounts` in a container (template)",
+            "default": [],
+            "items": {}
+        },
+        "topologySpreadConstraints": {
+            "type": "array",
+            "description": "",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "maxSkew": {
+                        "type": "number",
+                        "description": ""
+                    },
+                    "topologyKey": {
+                        "type": "string",
+                        "description": ""
+                    },
+                    "whenUnsatisfiable": {
+                        "type": "string",
+                        "description": ""
+                    }
+                }
+            }
+        },
+        "initContainers": {
+            "type": "array",
+            "description": "Additional init containers, they run after the chart's own `prepare-conf` init container (template)",
+            "default": [],
+            "items": {}
+        },
+        "sidecars": {
+            "type": "array",
+            "description": "Additional containers in the pod (template)",
+            "default": [],
+            "items": {}
+        },
+        "diagnosticMode": {
+            "type": "object",
+            "properties": {
+                "enabled": {
+                    "type": "boolean",
+                    "description": "Enable diagnostic mode",
+                    "default": false
                 },
-                "etcd": {
-                    "type": "object",
-                    "properties": {
-                        "enabled": {
-                            "type": "boolean",
-                            "description": "Enable the bundled etcd subchart",
-                            "default": false
+                "command": {
+                    "type": "array",
+                    "description": "Command to run in diagnostic mode",
+                    "default": [
+                        "sleep"
+                    ],
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "args": {
+                    "type": "array",
+                    "description": "Arguments of the command in diagnostic mode",
+                    "default": [
+                        "infinity"
+                    ],
+                    "items": {
+                        "type": "string"
+                    }
+                }
+            }
+        },
+        "podAnnotations": {
+            "type": "object",
+            "description": "Annotations added to the pods (template)",
+            "default": {}
+        },
+        "podLabels": {
+            "type": "object",
+            "description": "Labels added to the pods (template)",
+            "default": {}
+        },
+        "service": {
+            "type": "object",
+            "properties": {
+                "ports": {
+                    "type": "array",
+                    "description": "",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "name": {
+                                "type": "string",
+                                "description": ""
+                            },
+                            "port": {
+                                "type": "number",
+                                "description": ""
+                            }
                         }
                     }
                 },
-                "externalEtcd": {
+                "type": {
+                    "type": "string",
+                    "description": "Service type: `ClusterIP`, `NodePort` or `LoadBalancer`",
+                    "default": "ClusterIP"
+                },
+                "annotations": {
+                    "type": "object",
+                    "description": "Service annotations (template)",
+                    "default": {}
+                },
+                "labels": {
+                    "type": "object",
+                    "description": "Service labels",
+                    "default": {}
+                },
+                "externalTrafficPolicy": {
+                    "type": "string",
+                    "description": "`Cluster` or `Local`, only used for `NodePort` and `LoadBalancer`. Unset by default.",
+                    "default": ""
+                },
+                "loadBalancerClass": {
+                    "type": "string",
+                    "description": "Load balancer implementation, only used for `LoadBalancer`",
+                    "default": ""
+                },
+                "loadBalancerSourceRanges": {
+                    "type": "array",
+                    "description": "Client CIDRs allowed to use the load balancer, only used for `LoadBalancer`",
+                    "default": [],
+                    "items": {}
+                },
+                "externalIPs": {
+                    "type": "array",
+                    "description": "IP addresses outside the cluster on which the Service is also available, same as `spec.externalIPs`",
+                    "default": [],
+                    "items": {}
+                },
+                "ipFamilyPolicy": {
+                    "type": "string",
+                    "description": "`SingleStack`, `PreferDualStack` or `RequireDualStack`, same as `spec.ipFamilyPolicy`. Unset by default.",
+                    "default": ""
+                },
+                "ipFamilies": {
+                    "type": "array",
+                    "description": "IP families of the Service, `IPv4` and or `IPv6`, same as `spec.ipFamilies`",
+                    "default": [],
+                    "items": {}
+                },
+                "internalTrafficPolicy": {
+                    "type": "string",
+                    "description": "`Cluster` or `Local`, same as `spec.internalTrafficPolicy`. Unset by default.",
+                    "default": ""
+                },
+                "sessionAffinity": {
+                    "type": "string",
+                    "description": "`None` or `ClientIP`, same as `spec.sessionAffinity`. Unset by default.",
+                    "default": ""
+                }
+            }
+        },
+        "terminationGracePeriodSeconds": {
+            "type": "number",
+            "description": "Time Kubernetes waits for the gateway to stop. It covers the 10 second `preStop` sleep plus `config.nginx_config.worker_shutdown_timeout`, after which Kubernetes kills the container.",
+            "default": 60
+        },
+        "priorityClassName": {
+            "type": "string",
+            "description": "Priority class of the pods",
+            "default": ""
+        },
+        "nodeSelector": {
+            "type": "object",
+            "description": "Node selector of the pods",
+            "default": {}
+        },
+        "tolerations": {
+            "type": "array",
+            "description": "Tolerations of the pods",
+            "default": [],
+            "items": {}
+        },
+        "affinity": {
+            "type": "object",
+            "description": "Affinity of the pods (template)",
+            "default": {}
+        },
+        "strategy": {
+            "type": "object",
+            "properties": {
+                "type": {
+                    "type": "string",
+                    "description": "Deployment strategy type: `RollingUpdate` or `Recreate`",
+                    "default": "RollingUpdate"
+                }
+            }
+        },
+        "serviceAccount": {
+            "type": "object",
+            "properties": {
+                "create": {
+                    "type": "boolean",
+                    "description": "Create a service account",
+                    "default": true
+                },
+                "name": {
+                    "type": "string",
+                    "description": "Name of the service account, generated when empty and `create` is true",
+                    "default": ""
+                },
+                "annotations": {
+                    "type": "object",
+                    "description": "Annotations of the service account",
+                    "default": {}
+                },
+                "automountServiceAccountToken": {
+                    "type": "boolean",
+                    "description": "Mount the service account token in the pod. The gateway does not talk to the Kubernetes API.",
+                    "default": false
+                }
+            }
+        },
+        "ingress": {
+            "type": "object",
+            "properties": {
+                "rules": {
+                    "type": "array",
+                    "description": "",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "host": {
+                                "type": "string",
+                                "description": ""
+                            },
+                            "http": {
+                                "type": "object",
+                                "properties": {
+                                    "paths": {
+                                        "type": "array",
+                                        "description": "",
+                                        "items": {
+                                            "type": "object",
+                                            "properties": {
+                                                "path": {
+                                                    "type": "string",
+                                                    "description": ""
+                                                },
+                                                "pathType": {
+                                                    "type": "string",
+                                                    "description": ""
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "enabled": {
+                    "type": "boolean",
+                    "description": "Create an Ingress",
+                    "default": false
+                },
+                "annotations": {
+                    "type": "object",
+                    "description": "Ingress annotations (template)",
+                    "default": {}
+                },
+                "labels": {
+                    "type": "object",
+                    "description": "Ingress labels",
+                    "default": {}
+                },
+                "ingressClassName": {
+                    "type": "string",
+                    "description": "Ingress class, same as `spec.ingressClassName`",
+                    "default": ""
+                },
+                "defaultBackendPort": {
+                    "type": "string",
+                    "description": "Name of the port in `service.ports` used by paths without a `backend`",
+                    "default": "https"
+                },
+                "tls": {
+                    "type": "array",
+                    "description": "Ingress TLS settings, same structure as `spec.tls` in an Ingress (template)",
+                    "default": [],
+                    "items": {}
+                }
+            }
+        },
+        "httpRoute": {
+            "type": "object",
+            "properties": {
+                "rules": {
+                    "type": "array",
+                    "description": "",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "matches": {
+                                "type": "array",
+                                "description": "",
+                                "items": {
+                                    "type": "object",
+                                    "properties": {
+                                        "path": {
+                                            "type": "object",
+                                            "properties": {
+                                                "type": {
+                                                    "type": "string",
+                                                    "description": ""
+                                                },
+                                                "value": {
+                                                    "type": "string",
+                                                    "description": ""
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "enabled": {
+                    "type": "boolean",
+                    "description": "Create an HTTPRoute",
+                    "default": false
+                },
+                "annotations": {
+                    "type": "object",
+                    "description": "HTTPRoute annotations (template)",
+                    "default": {}
+                },
+                "labels": {
+                    "type": "object",
+                    "description": "HTTPRoute labels",
+                    "default": {}
+                },
+                "parentRefs": {
+                    "type": "array",
+                    "description": "Gateways to attach to, same structure as `spec.parentRefs` (template). Required.",
+                    "default": [],
+                    "items": {}
+                },
+                "hostnames": {
+                    "type": "array",
+                    "description": "Hostnames to match, same as `spec.hostnames` (template)",
+                    "default": [],
+                    "items": {}
+                },
+                "defaultBackendPort": {
+                    "type": "string",
+                    "description": "Name of the port in `service.ports` used by rules without `backendRefs`",
+                    "default": "http"
+                }
+            }
+        },
+        "tlsRoute": {
+            "type": "object",
+            "properties": {
+                "rules[0]": {
+                    "type": "object",
+                    "description": "",
+                    "default": {}
+                },
+                "enabled": {
+                    "type": "boolean",
+                    "description": "Create a TLSRoute (TLS passthrough)",
+                    "default": false
+                },
+                "apiVersion": {
+                    "type": "string",
+                    "description": "API version of the TLSRoute, detected from the cluster when empty (`v1`, otherwise `v1alpha2`)",
+                    "default": ""
+                },
+                "annotations": {
+                    "type": "object",
+                    "description": "TLSRoute annotations (template)",
+                    "default": {}
+                },
+                "labels": {
+                    "type": "object",
+                    "description": "TLSRoute labels",
+                    "default": {}
+                },
+                "parentRefs": {
+                    "type": "array",
+                    "description": "Gateways (listeners with TLS mode `Passthrough`) to attach to, same structure as `spec.parentRefs` (template). Required.",
+                    "default": [],
+                    "items": {}
+                },
+                "hostnames": {
+                    "type": "array",
+                    "description": "SNI hostnames to match, same as `spec.hostnames` (template). Required.",
+                    "default": [],
+                    "items": {}
+                },
+                "defaultBackendPort": {
+                    "type": "string",
+                    "description": "Name of the port in `service.ports` used by rules without `backendRefs`",
+                    "default": "https"
+                }
+            }
+        },
+        "autoscaling": {
+            "type": "object",
+            "properties": {
+                "metrics": {
+                    "type": "array",
+                    "description": "",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "type": {
+                                "type": "string",
+                                "description": ""
+                            },
+                            "resource": {
+                                "type": "object",
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "description": ""
+                                    },
+                                    "target": {
+                                        "type": "object",
+                                        "properties": {
+                                            "type": {
+                                                "type": "string",
+                                                "description": ""
+                                            },
+                                            "averageUtilization": {
+                                                "type": "number",
+                                                "description": ""
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "enabled": {
+                    "type": "boolean",
+                    "description": "Create a HorizontalPodAutoscaler",
+                    "default": false
+                },
+                "minReplicas": {
+                    "type": "number",
+                    "description": "Minimum number of replicas",
+                    "default": 2
+                },
+                "maxReplicas": {
+                    "type": "number",
+                    "description": "Maximum number of replicas",
+                    "default": 5
+                },
+                "behavior": {
+                    "type": "object",
+                    "description": "Scaling behavior, same structure as `spec.behavior` in an `autoscaling/v2` HorizontalPodAutoscaler",
+                    "default": {}
+                }
+            }
+        },
+        "control": {
+            "type": "object",
+            "properties": {
+                "enabled": {
+                    "type": "boolean",
+                    "description": "Enable the Control API",
+                    "default": false
+                },
+                "port": {
+                    "type": "number",
+                    "description": "Container port of the Control API",
+                    "default": 9090
+                },
+                "service": {
                     "type": "object",
                     "properties": {
-                        "user": {
+                        "type": {
                             "type": "string",
-                            "description": "External etcd username, emptied to avoid an unused etcd secret/env var since `etcd.enabled` is false",
-                            "default": ""
-                        }
-                    }
-                },
-                "ingress-controller": {
-                    "type": "object",
-                    "properties": {
-                        "enabled": {
-                            "type": "boolean",
-                            "description": "Enable the bundled APISIX ingress-controller subchart",
-                            "default": false
+                            "description": "Service type of the Control API Service",
+                            "default": "ClusterIP"
+                        },
+                        "port": {
+                            "type": "number",
+                            "description": "Service port of the Control API",
+                            "default": 9090
+                        },
+                        "annotations": {
+                            "type": "object",
+                            "description": "Annotations of the Control API Service",
+                            "default": {}
+                        },
+                        "labels": {
+                            "type": "object",
+                            "description": "Labels of the Control API Service",
+                            "default": {}
                         }
                     }
                 }
             }
+        },
+        "metrics": {
+            "type": "object",
+            "properties": {
+                "enabled": {
+                    "type": "boolean",
+                    "description": "Serve Prometheus metrics and create the metrics Service",
+                    "default": false
+                },
+                "port": {
+                    "type": "number",
+                    "description": "Container and Service port of the metrics endpoint",
+                    "default": 9091
+                },
+                "path": {
+                    "type": "string",
+                    "description": "Path of the metrics endpoint",
+                    "default": "/apisix/prometheus/metrics"
+                },
+                "service": {
+                    "type": "object",
+                    "properties": {
+                        "annotations": {
+                            "type": "object",
+                            "description": "Annotations of the metrics Service",
+                            "default": {}
+                        }
+                    }
+                },
+                "serviceMonitor": {
+                    "type": "object",
+                    "properties": {
+                        "enabled": {
+                            "type": "boolean",
+                            "description": "Create a Prometheus Operator ServiceMonitor",
+                            "default": false
+                        },
+                        "namespace": {
+                            "type": "string",
+                            "description": "Namespace of the ServiceMonitor, the release namespace when empty",
+                            "default": ""
+                        },
+                        "labels": {
+                            "type": "object",
+                            "description": "Labels of the ServiceMonitor, for example the label your Prometheus selects on",
+                            "default": {}
+                        },
+                        "annotations": {
+                            "type": "object",
+                            "description": "Annotations of the ServiceMonitor (template)",
+                            "default": {}
+                        },
+                        "jobLabel": {
+                            "type": "string",
+                            "description": "Label of the Service whose value becomes the `job` label, `spec.jobLabel`. Unset by default.",
+                            "default": ""
+                        },
+                        "honorLabels": {
+                            "type": "boolean",
+                            "description": "Keep the labels of the scraped metrics when they conflict with the target labels",
+                            "default": false
+                        },
+                        "interval": {
+                            "type": "string",
+                            "description": "Scrape interval",
+                            "default": "30s"
+                        },
+                        "scrapeTimeout": {
+                            "type": "string",
+                            "description": "Scrape timeout",
+                            "default": "10s"
+                        },
+                        "relabelings": {
+                            "type": "array",
+                            "description": "Relabelings, same structure as in a ServiceMonitor endpoint",
+                            "default": [],
+                            "items": {}
+                        },
+                        "metricRelabelings": {
+                            "type": "array",
+                            "description": "Metric relabelings, same structure as in a ServiceMonitor endpoint",
+                            "default": [],
+                            "items": {}
+                        }
+                    }
+                }
+            }
+        },
+        "podDisruptionBudget": {
+            "type": "object",
+            "properties": {
+                "enabled": {
+                    "type": "boolean",
+                    "description": "Create a PodDisruptionBudget",
+                    "default": false
+                },
+                "unhealthyPodEvictionPolicy": {
+                    "type": "string",
+                    "description": "Whether unready pods can be evicted: `AlwaysAllow` or `IfHealthyBudget`, empty to leave it unset. Only rendered on Kubernetes 1.27 or newer.",
+                    "default": "AlwaysAllow"
+                }
+            }
+        },
+        "networkPolicy": {
+            "type": "object",
+            "properties": {
+                "enabled": {
+                    "type": "boolean",
+                    "description": "Create a NetworkPolicy",
+                    "default": false
+                },
+                "control": {
+                    "type": "object",
+                    "properties": {
+                        "from": {
+                            "type": "array",
+                            "description": "Peers that may reach the Control API port (template). Needs `control.enabled`.",
+                            "default": [],
+                            "items": {}
+                        }
+                    }
+                },
+                "metrics": {
+                    "type": "object",
+                    "properties": {
+                        "from": {
+                            "type": "array",
+                            "description": "Peers that may reach the metrics port (template). Needs `metrics.enabled`.",
+                            "default": [],
+                            "items": {}
+                        }
+                    }
+                },
+                "extraIngress": {
+                    "type": "array",
+                    "description": "Additional ingress rules, same structure as `spec.ingress` in a NetworkPolicy (template)",
+                    "default": [],
+                    "items": {}
+                }
+            }
+        },
+        "extraObjects": {
+            "type": "array",
+            "description": "Additional Kubernetes objects to deploy with the release. Each item is an object or a string, and is rendered as a template.",
+            "default": [],
+            "items": {}
         }
     }
 }

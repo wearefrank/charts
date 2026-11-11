@@ -1,0 +1,213 @@
+{{- /* A constraint without a labelSelector gets the selector of the gateway pods. */}}
+{{- $topologySpreadConstraints := list }}
+{{- range (include "frank-gateway.tplvalues.render" (dict "value" (.Values.topologySpreadConstraints | default list) "context" $) | fromYamlArray) }}
+{{- $constraint := deepCopy . }}
+{{- if not $constraint.labelSelector }}
+{{- $_ := set $constraint "labelSelector" (dict "matchLabels" (include "frank-gateway.selectorLabels" $ | fromYaml)) }}
+{{- end }}
+{{- $topologySpreadConstraints = append $topologySpreadConstraints $constraint }}
+{{- end }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "frank-gateway.fullname" . }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "frank-gateway.labels" . | nindent 4 }}
+  {{- with (include "frank-gateway.annotations" (dict "context" $)) }}
+  annotations:
+    {{- . | nindent 4 }}
+  {{- end }}
+spec:
+  {{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.replicas }}
+  {{- end }}
+  {{- with .Values.strategy }}
+  strategy:
+    {{- include "frank-gateway.strategy" $ | nindent 4 }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "frank-gateway.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      annotations:
+        checksum/config: {{ include "frank-gateway.config" . | sha256sum }}
+        {{- if not (or .Values.standalone.existingConfigMap .Values.standalone.existingSecret) }}
+        checksum/apisix-yaml: {{ include "frank-gateway.apisixYaml" . | sha256sum }}
+        {{- end }}
+        {{- with (include "frank-gateway.annotations" (dict "annotations" .Values.podAnnotations "context" $)) }}
+        {{- . | nindent 8 }}
+        {{- end }}
+      labels:
+        {{- include "frank-gateway.labels" . | nindent 8 }}
+        {{- with .Values.podLabels }}
+        {{- include "frank-gateway.tplvalues.render" (dict "value" . "context" $) | nindent 8 }}
+        {{- end }}
+    spec:
+      serviceAccountName: {{ include "frank-gateway.serviceAccountName" . }}
+      automountServiceAccountToken: {{ .Values.serviceAccount.automountServiceAccountToken }}
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.podSecurityContext }}
+      securityContext:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.priorityClassName }}
+      priorityClassName: {{ . }}
+      {{- end }}
+      terminationGracePeriodSeconds: {{ .Values.terminationGracePeriodSeconds }}
+      initContainers:
+        # The root filesystem is read-only. APISIX generates nginx.conf in its conf directory, so copy the
+        # image's conf directory to a writable volume and link apisix.yaml into it.
+        - name: prepare-conf
+          image: {{ include "frank-gateway.image" . | quote }}
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          command:
+            - sh
+            - -c
+            - cp -R /usr/local/apisix/conf/. /conf/ && ln -sf "/apisix-config/$1" /conf/apisix.yaml
+            - sh
+            - {{ .Values.standalone.key | quote }}
+          {{- with .Values.securityContext }}
+          securityContext:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          resources:
+            requests:
+              cpu: 10m
+              memory: 16Mi
+            limits:
+              cpu: 100m
+              memory: 64Mi
+          volumeMounts:
+            - name: conf
+              mountPath: /conf
+        {{- with .Values.initContainers }}
+        {{- include "frank-gateway.tplvalues.render" (dict "value" . "context" $) | nindent 8 }}
+        {{- end }}
+      containers:
+        - name: gateway
+          image: {{ include "frank-gateway.image" . | quote }}
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          {{- with .Values.securityContext }}
+          securityContext:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- if .Values.diagnosticMode.enabled }}
+          command:
+            {{- toYaml .Values.diagnosticMode.command | nindent 12 }}
+          args:
+            {{- toYaml .Values.diagnosticMode.args | nindent 12 }}
+          {{- else }}
+          {{- with .Values.command }}
+          command:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.args }}
+          args:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- end }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.containerPorts.http }}
+              protocol: TCP
+            - name: https
+              containerPort: {{ .Values.containerPorts.https }}
+              protocol: TCP
+            {{- if .Values.control.enabled }}
+            - name: control
+              containerPort: {{ .Values.control.port }}
+              protocol: TCP
+            {{- end }}
+            {{- if .Values.metrics.enabled }}
+            - name: metrics
+              containerPort: {{ .Values.metrics.port }}
+              protocol: TCP
+            {{- end }}
+          {{- with .Values.env }}
+          env:
+            {{- include "frank-gateway.tplvalues.render" (dict "value" . "context" $) | nindent 12 }}
+          {{- end }}
+          {{- with .Values.envFrom }}
+          envFrom:
+            {{- include "frank-gateway.tplvalues.render" (dict "value" . "context" $) | nindent 12 }}
+          {{- end }}
+          {{- if not .Values.diagnosticMode.enabled }}
+          {{- with .Values.livenessProbe }}
+          livenessProbe:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.readinessProbe }}
+          readinessProbe:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.startupProbe }}
+          startupProbe:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.lifecycle }}
+          lifecycle:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- end }}
+          {{- with .Values.resources }}
+          resources:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          volumeMounts:
+            {{- range (include "frank-gateway.writablePaths" . | fromYamlArray) }}
+            - name: {{ .name }}
+              mountPath: {{ .path }}
+            {{- end }}
+            - name: config
+              mountPath: /usr/local/apisix/conf/config.yaml
+              subPath: config.yaml
+              readOnly: true
+            - name: apisix-yaml
+              mountPath: /apisix-config
+              readOnly: true
+            {{- with .Values.volumeMounts }}
+            {{- include "frank-gateway.tplvalues.render" (dict "value" . "context" $) | nindent 12 }}
+            {{- end }}
+        {{- with .Values.sidecars }}
+        {{- include "frank-gateway.tplvalues.render" (dict "value" . "context" $) | nindent 8 }}
+        {{- end }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- include "frank-gateway.tplvalues.render" (dict "value" . "context" $) | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with $topologySpreadConstraints }}
+      topologySpreadConstraints:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      volumes:
+        {{- range (include "frank-gateway.writablePaths" . | fromYamlArray) }}
+        - name: {{ .name }}
+          emptyDir: {}
+        {{- end }}
+        - name: config
+          configMap:
+            name: {{ include "frank-gateway.fullname" . }}-config
+        - name: apisix-yaml
+          {{- if .Values.standalone.existingSecret }}
+          secret:
+            secretName: {{ include "frank-gateway.standaloneName" . }}
+          {{- else }}
+          configMap:
+            name: {{ include "frank-gateway.standaloneName" . }}
+          {{- end }}
+        {{- with .Values.volumes }}
+        {{- include "frank-gateway.tplvalues.render" (dict "value" . "context" $) | nindent 8 }}
+        {{- end }}

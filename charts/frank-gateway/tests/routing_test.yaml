@@ -1,0 +1,260 @@
+suite: ingress and gateway api
+templates:
+  - templates/ingress.yaml
+  - templates/httproute.yaml
+  - templates/tlsroute.yaml
+tests:
+  - it: does not create an Ingress by default
+    template: templates/ingress.yaml
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  - it: points paths without a backend at the https port of the gateway Service
+    template: templates/ingress.yaml
+    set:
+      ingress.enabled: true
+      ingress.rules:
+        - host: api.example.nl
+          http:
+            paths:
+              - path: /
+    asserts:
+      - isKind:
+          of: Ingress
+      - equal:
+          path: spec.rules
+          value:
+            - host: api.example.nl
+              http:
+                paths:
+                  - path: /
+                    pathType: Prefix
+                    backend:
+                      service:
+                        name: RELEASE-NAME-frank-gateway
+                        port:
+                          name: https
+
+  - it: uses the configured default backend port name
+    template: templates/ingress.yaml
+    set:
+      ingress.enabled: true
+      ingress.defaultBackendPort: http
+    asserts:
+      - equal:
+          path: spec.rules[0].http.paths[0].backend.service.port
+          value:
+            name: http
+
+  - it: keeps an explicit backend and pathType
+    template: templates/ingress.yaml
+    set:
+      ingress.enabled: true
+      ingress.rules:
+        - host: api.example.nl
+          http:
+            paths:
+              - path: /other
+                pathType: Exact
+                backend:
+                  service:
+                    name: other
+                    port:
+                      number: 8080
+    asserts:
+      - equal:
+          path: spec.rules[0].http.paths[0]
+          value:
+            path: /other
+            pathType: Exact
+            backend:
+              service:
+                name: other
+                port:
+                  number: 8080
+
+  - it: supports multiple hosts and paths
+    template: templates/ingress.yaml
+    set:
+      ingress.enabled: true
+      ingress.rules:
+        - host: a.example.nl
+          http:
+            paths:
+              - path: /one
+              - path: /two
+        - host: b.example.nl
+          http:
+            paths:
+              - path: /
+    asserts:
+      - lengthEqual:
+          path: spec.rules
+          count: 2
+      - lengthEqual:
+          path: spec.rules[0].http.paths
+          count: 2
+
+  - it: sets class, annotations, labels and tls like the Ingress spec
+    template: templates/ingress.yaml
+    set:
+      ingress.enabled: true
+      ingress.ingressClassName: cilium
+      ingress.annotations:
+        ingress.cilium.io/tls-passthrough: enabled
+      ingress.labels:
+        team: integrations
+      ingress.tls:
+        - hosts:
+            - api.example.nl
+          secretName: frank-gateway-cert
+    asserts:
+      - equal:
+          path: spec.ingressClassName
+          value: cilium
+      - equal:
+          path: metadata.annotations["ingress.cilium.io/tls-passthrough"]
+          value: enabled
+      - equal:
+          path: metadata.labels.team
+          value: integrations
+      - equal:
+          path: spec.tls
+          value:
+            - hosts:
+                - api.example.nl
+              secretName: frank-gateway-cert
+
+  - it: does not create an HTTPRoute by default
+    template: templates/httproute.yaml
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  - it: creates an HTTPRoute that sends rules to the http port of the gateway Service
+    template: templates/httproute.yaml
+    set:
+      httpRoute.enabled: true
+      httpRoute.hostnames:
+        - api.example.nl
+      httpRoute.parentRefs:
+        - name: shared-gateway
+          namespace: gateways
+          sectionName: https
+    asserts:
+      - isKind:
+          of: HTTPRoute
+      - isAPIVersion:
+          of: gateway.networking.k8s.io/v1
+      - equal:
+          path: spec.parentRefs
+          value:
+            - name: shared-gateway
+              namespace: gateways
+              sectionName: https
+      - equal:
+          path: spec.hostnames
+          value:
+            - api.example.nl
+      - equal:
+          path: spec.rules
+          value:
+            - matches:
+                - path:
+                    type: PathPrefix
+                    value: /
+              backendRefs:
+                - name: RELEASE-NAME-frank-gateway
+                  port: 80
+
+  - it: resolves the defaultBackendPort name of an HTTPRoute to the Service port number
+    template: templates/httproute.yaml
+    set:
+      httpRoute.enabled: true
+      httpRoute.defaultBackendPort: https
+    asserts:
+      - equal:
+          path: spec.rules[0].backendRefs[0].port
+          value: 443
+
+  - it: keeps explicit backendRefs of an HTTPRoute rule
+    template: templates/httproute.yaml
+    set:
+      httpRoute.enabled: true
+      httpRoute.rules:
+        - backendRefs:
+            - name: other
+              port: 9000
+    asserts:
+      - equal:
+          path: spec.rules
+          value:
+            - backendRefs:
+                - name: other
+                  port: 9000
+
+  - it: fails when the defaultBackendPort is not a Service port
+    template: templates/httproute.yaml
+    set:
+      httpRoute.enabled: true
+      httpRoute.defaultBackendPort: unknown
+    asserts:
+      - failedTemplate:
+          errorMessage: service.ports has no port named "unknown"
+
+  - it: does not create a TLSRoute by default
+    template: templates/tlsroute.yaml
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  - it: creates a TLSRoute to the https port for TLS passthrough
+    template: templates/tlsroute.yaml
+    set:
+      tlsRoute.enabled: true
+      tlsRoute.hostnames:
+        - api.example.nl
+      tlsRoute.parentRefs:
+        - name: shared-gateway
+          sectionName: tls-passthrough
+    asserts:
+      - isKind:
+          of: TLSRoute
+      - isAPIVersion:
+          of: gateway.networking.k8s.io/v1
+      - equal:
+          path: spec.parentRefs
+          value:
+            - name: shared-gateway
+              sectionName: tls-passthrough
+      - equal:
+          path: spec.hostnames
+          value:
+            - api.example.nl
+      - equal:
+          path: spec.rules
+          value:
+            - backendRefs:
+                - name: RELEASE-NAME-frank-gateway
+                  port: 443
+
+  - it: uses the v1alpha2 TLSRoute when only that version is available in the cluster
+    template: templates/tlsroute.yaml
+    capabilities:
+      apiVersions:
+        - gateway.networking.k8s.io/v1alpha2/TLSRoute
+    set:
+      tlsRoute.enabled: true
+    asserts:
+      - isAPIVersion:
+          of: gateway.networking.k8s.io/v1alpha2
+
+  - it: allows overriding the TLSRoute apiVersion
+    template: templates/tlsroute.yaml
+    set:
+      tlsRoute.enabled: true
+      tlsRoute.apiVersion: gateway.networking.k8s.io/v1alpha2
+    asserts:
+      - isAPIVersion:
+          of: gateway.networking.k8s.io/v1alpha2

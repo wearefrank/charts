@@ -1,0 +1,79 @@
+name: Frank-gateway chart e2e
+
+# End-to-end tests of the chart on kind clusters. Every cluster configuration is a job of its own, and runs in
+# parallel with the others. A job only installs what its tests need. The tests run on the latest Kubernetes minor
+# version, which is the default node image of the runner (DEFAULT_NODE_IMAGE in e2e/fge2e/config.py).
+
+on:
+  pull_request:
+    paths:
+      - "charts/frank-gateway/**"
+      - ".github/workflows/frank-gateway-e2e.yml"
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+
+concurrency:
+  group: frank-gateway-e2e-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  e2e:
+    name: ${{ matrix.configuration }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        configuration:
+          - core
+          - operations
+          - loadbalancer-l2
+          - loadbalancer-bgp
+          - ingress
+          - gateway-api
+        include:
+          # What each cluster configuration installs, see E2E_COMPONENTS in e2e/fge2e/config.py, and what it tests
+          - configuration: core
+            components: none
+            tests: tests/test_core.py
+          - configuration: operations
+            components: metallb,prometheus-crds
+            tests: tests/test_operations.py
+          - configuration: loadbalancer-l2
+            components: metallb
+            tests: tests/test_loadbalancer.py
+          - configuration: loadbalancer-bgp
+            components: bgp
+            tests: tests/test_loadbalancer_bgp.py
+          - configuration: ingress
+            components: haproxy
+            tests: tests/test_ingress.py
+          - configuration: gateway-api
+            components: envoy-gateway
+            tests: tests/test_gateway_api.py
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+
+      # The same script that runs the tests on a developer machine: it builds the runner image, creates a kind
+      # cluster with the components of this configuration, and runs the tests of this configuration with pytest.
+      - name: Run the end-to-end tests
+        env:
+          E2E_COMPONENTS: ${{ matrix.components }}
+          E2E_RESULTS_DIR: ${{ runner.temp }}/e2e-results
+          TESTS: ${{ matrix.tests }}
+        # TESTS is a list of files from the matrix above, so it is not quoted
+        run: ./charts/frank-gateway/e2e/run.sh test $TESTS
+
+      - name: Upload the test report and the logs of failed tests
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: e2e-results-${{ matrix.configuration }}
+          path: ${{ runner.temp }}/e2e-results
+          if-no-files-found: ignore
+          retention-days: 14
