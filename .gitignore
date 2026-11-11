@@ -3,3 +3,5 @@
 **/charts/*.tgz
 /.npmrc
 *.iml
+
+/e2e-results/
