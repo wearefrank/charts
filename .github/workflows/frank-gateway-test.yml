@@ -1,0 +1,41 @@
+name: Frank-gateway chart test
+
+# The unit tests of the templates, with helm-unittest.
+
+on:
+  pull_request:
+    paths:
+      - "charts/frank-gateway/**"
+      - ".github/workflows/frank-gateway-test.yml"
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+
+concurrency:
+  group: frank-gateway-test-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  CHART: charts/frank-gateway
+
+jobs:
+  unittest:
+    name: Unit tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+
+      - name: Install Helm
+        uses: azure/setup-helm@1a275c3b69536ee54be43f2070a358922e12c8d4
+        with:
+          version: "v4.3.1"
+
+      - name: Install helm-unittest
+        run: helm plugin install https://github.com/helm-unittest/helm-unittest --version v1.2.1 --verify=false
+
+      - name: Unit tests
+        run: helm unittest "$CHART"
